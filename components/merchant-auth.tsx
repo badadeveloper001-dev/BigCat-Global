@@ -54,12 +54,21 @@ const NIGERIAN_STATES = [
   "Zamfara",
 ]
 
+const CHINESE_REGIONS = [
+  'Guangdong',
+  'Zhejiang',
+  'Jiangsu',
+  'Shanghai',
+  'Beijing',
+  'Shandong',
+  'Fujian',
+  'Sichuan',
+]
+
 export function MerchantAuth({
   onBack,
-  onNeedAgentOnboarding,
 }: {
   onBack: () => void
-  onNeedAgentOnboarding?: () => void
 }) {
   const { setRole, setUser } = useRole()
   const [isSignUp, setIsSignUp] = useState(false)
@@ -92,6 +101,9 @@ export function MerchantAuth({
       website_layout: user.website_layout || undefined,
       smedan_id: user.smedan_id || "",
       cac_id: user.cac_id || "",
+      country: user.country || 'NG',
+      verification_status: user.verification_status || '',
+      verification_module: user.verification_module || '',
       setup_completed: Boolean(user.setup_completed),
       city: user.city || "",
       state: user.state || "",
@@ -119,6 +131,10 @@ export function MerchantAuth({
     password: "",
     smedanId: "",
     cacId: "",
+    country: "NG",
+    governmentIdNumber: "",
+    bankVerificationRef: "",
+    chineseVerificationNote: "",
   })
 
   const loadMerchantProfile = async (userId: string, accessToken: string) => {
@@ -168,6 +184,10 @@ export function MerchantAuth({
         smedanId: formData.smedanId,
         cacId: formData.cacId,
         merchantType,
+        country: formData.country,
+        governmentIdNumber: formData.governmentIdNumber,
+        bankVerificationRef: formData.bankVerificationRef,
+        verificationModule: formData.country === 'CN' ? 'Chinese Business Verification' : 'Nigerian Merchant Verification',
       }),
     })
 
@@ -531,8 +551,8 @@ export function MerchantAuth({
                             className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground"
                             required
                           >
-                            <option value="">Select your state</option>
-                            {NIGERIAN_STATES.map((stateName) => (
+                            <option value="">Select your region</option>
+                            {(formData.country === 'CN' ? CHINESE_REGIONS : NIGERIAN_STATES).map((stateName) => (
                               <option key={stateName} value={stateName}>
                                 {stateName}
                               </option>
@@ -556,6 +576,19 @@ export function MerchantAuth({
                           />
                         </div>
                       </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-foreground">Operating Country</label>
+                      <select
+                        name="country"
+                        value={formData.country}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground"
+                      >
+                        <option value="NG">Nigeria</option>
+                        <option value="CN">China</option>
+                      </select>
                     </div>
                   </div>
 
@@ -596,48 +629,81 @@ export function MerchantAuth({
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="relative">
-                      <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                      <input
-                        type="text"
-                        name="smedanId"
-                        placeholder="Enter your SMEDAN registration ID"
-                        value={formData.smedanId}
-                        onChange={handleChange}
-                        className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
-                        required
+                  {formData.country === 'NG' ? (
+                    <>
+                      <div className="space-y-2">
+                        <div className="relative">
+                          <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                          <input
+                            type="text"
+                            name="smedanId"
+                            placeholder="SMEDAN registration ID (optional)"
+                            value={formData.smedanId}
+                            onChange={handleChange}
+                            className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground">
+                          CAC Registration ID {merchantType === 'services' ? '(optional for service merchants)' : ''}
+                        </label>
+                        <div className="relative">
+                          <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                          <input
+                            type="text"
+                            name="cacId"
+                            placeholder={merchantType === 'services' ? 'Enter CAC registration ID (optional)' : 'Enter CAC registration ID'}
+                            value={formData.cacId}
+                            onChange={handleChange}
+                            className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
+                            required={merchantType !== 'services'}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground">Government-issued ID</label>
+                        <input
+                          type="text"
+                          name="governmentIdNumber"
+                          placeholder="Enter ID number"
+                          value={formData.governmentIdNumber}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground">Bank Verification Reference</label>
+                        <input
+                          type="text"
+                          name="bankVerificationRef"
+                          placeholder="Enter bank verification reference"
+                          value={formData.bankVerificationRef}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
+                          required
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="rounded-xl border border-border/60 bg-secondary/30 p-4 space-y-2">
+                      <p className="text-sm font-semibold text-foreground">Chinese Business Verification</p>
+                      <p className="text-xs text-muted-foreground">
+                        Placeholder module enabled. Full requirements will be connected after Orchid API discussions.
+                      </p>
+                      <textarea
+                        name="chineseVerificationNote"
+                        value={formData.chineseVerificationNote}
+                        onChange={(e) => setFormData({ ...formData, chineseVerificationNote: e.target.value })}
+                        className="w-full min-h-[72px] px-3 py-2 bg-background border border-border rounded-xl text-sm"
+                        placeholder="Add any current business verification notes (optional)"
                       />
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">
-                      CAC ID {merchantType === 'services' ? '(optional for service merchants)' : ''}
-                    </label>
-                    <div className="relative">
-                      <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                      <input
-                        type="text"
-                        name="cacId"
-                        placeholder={merchantType === 'services' ? 'Enter your CAC registration ID (optional)' : 'Enter your CAC registration ID'}
-                        value={formData.cacId}
-                        onChange={handleChange}
-                        className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
-                        required={merchantType !== 'services'}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="-mt-1">
-                    <button
-                      type="button"
-                      onClick={onNeedAgentOnboarding}
-                      className="text-xs text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
-                    >
-                      Don&apos;t have a SMEDAN/CAC ID? Click here to get onboarded by our onboarding agent.
-                    </button>
-                  </div>
+                  )}
                 </>
               )}
 
@@ -707,7 +773,20 @@ export function MerchantAuth({
                   setError("")
                   setWarningMessage("")
                   setSuccessMessage("")
-                  setFormData({ businessName: "", email: "", phone: "", city: "", state: "", password: "", smedanId: "", cacId: "" })
+                  setFormData({
+                    businessName: "",
+                    email: "",
+                    phone: "",
+                    city: "",
+                    state: "",
+                    password: "",
+                    smedanId: "",
+                    cacId: "",
+                    country: "NG",
+                    governmentIdNumber: "",
+                    bankVerificationRef: "",
+                    chineseVerificationNote: "",
+                  })
                 }}
                 className="text-primary hover:text-primary/80 font-medium transition-colors"
               >

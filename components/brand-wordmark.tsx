@@ -8,7 +8,7 @@ export function BrandWordmark({ compact = false }: { compact?: boolean }) {
       <div className={`relative rounded-lg overflow-hidden bg-white border border-border flex-shrink-0 ${compact ? 'w-9 h-9' : 'w-10 h-10'}`}>
         <Image
           src="/image.png"
-          alt="BigCat International logo"
+          alt="BigCat Global logo"
           fill
           className="object-contain"
           sizes="40px"
@@ -16,7 +16,7 @@ export function BrandWordmark({ compact = false }: { compact?: boolean }) {
       </div>
       <div className="min-w-0">
         <p className={`font-bold text-foreground leading-none tracking-tight ${compact ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'}`}>
-          BigCat International
+          BigCat Global
         </p>
       </div>
     </div>
@@ -26,16 +26,16 @@ export function BrandWordmark({ compact = false }: { compact?: boolean }) {
 export function PoweredByMarquee() {
   const logos = [
     {
-      src: '/SMEDAN_ido8Y4OzuL_0.png',
-      alt: 'SMEDAN',
+      src: '/image.png',
+      alt: 'BigCat Global',
       className: 'h-5 w-auto',
-      wrapperClassName: 'bg-emerald-950 border-emerald-900 px-2.5',
+      wrapperClassName: 'bg-white border-border px-2.5',
     },
     {
-      src: '/palmpay-seeklogo.png',
-      alt: 'PalmPay',
+      src: '',
+      alt: 'Orchid',
       className: 'h-5 w-auto',
-      wrapperClassName: 'bg-white border-border px-2',
+      wrapperClassName: 'bg-background border-border px-3',
     },
     {
       src: '/image.png',
@@ -52,9 +52,15 @@ export function PoweredByMarquee() {
           {[...logos, ...logos].map((logo, index) => (
             <div key={`${logo.alt}-${index}`} className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="font-medium">powered by</span>
-              <div className={`h-7 rounded-full border flex items-center ${logo.wrapperClassName}`}>
-                <Image src={logo.src} alt={logo.alt} width={72} height={20} className={logo.className} />
-              </div>
+              {logo.src ? (
+                <div className={`h-7 rounded-full border flex items-center ${logo.wrapperClassName}`}>
+                  <Image src={logo.src} alt={logo.alt} width={72} height={20} className={logo.className} />
+                </div>
+              ) : (
+                <div className={`h-7 rounded-full border flex items-center ${logo.wrapperClassName}`}>
+                  <span className="text-xs font-semibold text-foreground">Orchid</span>
+                </div>
+              )}
             </div>
           ))}
         </div>

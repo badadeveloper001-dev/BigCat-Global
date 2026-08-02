@@ -374,7 +374,7 @@ export default function MerchantMiniWebsitePage() {
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/80 mb-2">BigCat Mini Website</p>
               <h1 className="text-3xl md:text-5xl font-bold mb-3">{profile.business_name || profile.full_name || 'Merchant Store'}</h1>
               <p className="max-w-2xl text-sm md:text-base text-white/85">
-                {profile.business_description || 'Trusted merchant on BigCat International.'}
+                {profile.business_description || 'Trusted merchant on BigCat Global.'}
               </p>
               <div className="flex flex-wrap items-center gap-2 mt-4">
                 {profile.business_category && (

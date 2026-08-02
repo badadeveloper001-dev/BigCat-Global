@@ -5,7 +5,6 @@ import Image from "next/image"
 import { ShoppingBag, Store, ArrowRight } from "lucide-react"
 import { BuyerAuth } from "./buyer-auth"
 import { MerchantAuth } from "./merchant-auth"
-import { MerchantOnboardingIntake } from "./merchant-onboarding-intake"
 
 type AuthType = "buyer" | "merchant" | null
 
@@ -26,22 +25,10 @@ const roles = [
 
 export function Onboarding({ onGuestBrowse }: { onGuestBrowse?: () => void } = {}) {
   const [selectedAuth, setSelectedAuth] = useState<AuthType>(null)
-  const [showMerchantOnboarding, setShowMerchantOnboarding] = useState(false)
 
   // Show buyer auth if selected (only when no guest browse available)
   if (selectedAuth === "buyer") {
     return <BuyerAuth onBack={() => setSelectedAuth(null)} />
-  }
-
-  if (showMerchantOnboarding) {
-    return (
-      <MerchantOnboardingIntake
-        onBack={() => {
-          setShowMerchantOnboarding(false)
-          setSelectedAuth("merchant")
-        }}
-      />
-    )
   }
 
   // Show merchant auth if selected
@@ -49,10 +36,6 @@ export function Onboarding({ onGuestBrowse }: { onGuestBrowse?: () => void } = {
     return (
       <MerchantAuth
         onBack={() => setSelectedAuth(null)}
-        onNeedAgentOnboarding={() => {
-          setSelectedAuth(null)
-          setShowMerchantOnboarding(true)
-        }}
       />
     )
   }
@@ -62,13 +45,12 @@ export function Onboarding({ onGuestBrowse }: { onGuestBrowse?: () => void } = {
       <div className="w-full max-w-md">
         {/* Logos */}
         <div className="text-center mb-10">
-          {/* Primary: SMEDAN — dark background so white logo text is visible */}
           <div className="inline-flex items-center justify-center bg-gray-900 rounded-2xl px-6 py-3 mb-4 shadow-md">
             <Image
-              src="/SMEDAN_ido8Y4OzuL_0.png"
-              alt="SMEDAN logo"
-              width={160}
-              height={70}
+              src="/image.png"
+              alt="BigCat Global logo"
+              width={72}
+              height={72}
               className="object-contain"
               priority
             />
@@ -77,14 +59,9 @@ export function Onboarding({ onGuestBrowse }: { onGuestBrowse?: () => void } = {
           {/* Secondary partners */}
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Powered By</p>
           <div className="flex items-center justify-center gap-6 mb-6">
-            <Image
-              src="/palmpay-seeklogo.png"
-              alt="PalmPay logo"
-              width={90}
-              height={70}
-              className="object-contain mix-blend-multiply dark:mix-blend-screen"
-              priority
-            />
+            <div className="rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground">
+              Orchid Payments
+            </div>
             <Image
               src="/image.png"
               alt="BigCat logo"
@@ -95,10 +72,10 @@ export function Onboarding({ onGuestBrowse }: { onGuestBrowse?: () => void } = {
             />
           </div>
           <h1 className="text-2xl font-bold text-foreground text-balance">
-            Welcome to BigCat International
+            Welcome to BigCat Global
           </h1>
           <p className="text-muted-foreground mt-2 text-pretty">
-            Select your role to get started
+            Start cross-border trade between Nigeria and China
           </p>
         </div>
 

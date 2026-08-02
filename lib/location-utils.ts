@@ -3,6 +3,7 @@ export interface ResolvedLocation {
   longitude: number
   city?: string | null
   state?: string | null
+  country?: string | null
   displayName?: string | null
 }
 
@@ -33,7 +34,7 @@ export function buildLocationQuery(city?: string | null, state?: string | null, 
   return [city, state].filter(Boolean).join(', ') || fallbackLocation || ''
 }
 
-export async function geocodeLocation(query: string): Promise<ResolvedLocation | null> {
+export async function geocodeLocation(query: string, countryCode: 'ng' | 'cn' = 'ng'): Promise<ResolvedLocation | null> {
   const normalizedQuery = query.trim()
   if (!normalizedQuery) return null
 
@@ -43,12 +44,16 @@ export async function geocodeLocation(query: string): Promise<ResolvedLocation |
   }
 
   try {
-    const finalQuery = normalizedQuery.toLowerCase().includes('nigeria') ? normalizedQuery : `${normalizedQuery}, Nigeria`
+    const countryLabel = countryCode === 'cn' ? 'China' : 'Nigeria'
+    const lowerLabel = countryLabel.toLowerCase()
+    const finalQuery = normalizedQuery.toLowerCase().includes(lowerLabel)
+      ? normalizedQuery
+      : `${normalizedQuery}, ${countryLabel}`
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&addressdetails=1&countrycodes=ng&q=${encodeURIComponent(finalQuery)}`,
+      `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&addressdetails=1&countrycodes=${countryCode}&q=${encodeURIComponent(finalQuery)}`,
       {
         headers: {
-          'User-Agent': 'BigCat International/1.0 (support@bigcat.ng)',
+          'User-Agent': 'BigCat Global/1.0 (support@bigcat.global)',
           'Accept-Language': 'en',
         },
         next: { revalidate: 60 * 60 * 24 },
@@ -73,6 +78,7 @@ export async function geocodeLocation(query: string): Promise<ResolvedLocation |
       longitude: Number(match.lon),
       city: resolveAddressCity(match.address),
       state: match.address?.state || null,
+      country: match.address?.country || countryLabel,
       displayName: match.display_name || finalQuery,
     }
 
@@ -100,7 +106,7 @@ export async function reverseGeocode(latitude: number, longitude: number): Promi
       `https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&lat=${lat}&lon=${lng}`,
       {
         headers: {
-          'User-Agent': 'BigCat International/1.0 (support@bigcat.ng)',
+          'User-Agent': 'BigCat Global/1.0 (support@bigcat.global)',
           'Accept-Language': 'en',
         },
         next: { revalidate: 60 * 10 },
@@ -119,6 +125,7 @@ export async function reverseGeocode(latitude: number, longitude: number): Promi
       longitude: lng,
       city: resolveAddressCity(data?.address),
       state: data?.address?.state || null,
+      country: data?.address?.country || null,
       displayName: data?.display_name || [data?.address?.city, data?.address?.state].filter(Boolean).join(', '),
     }
 

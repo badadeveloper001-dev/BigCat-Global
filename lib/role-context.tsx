@@ -3,6 +3,14 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
+import {
+  applyCountryPreset,
+  buildDefaultPreferences,
+  DEFAULT_GLOBAL_PREFERENCES,
+  detectCountryFromBrowser,
+  type GlobalPreferences,
+  type SupportedCountry,
+} from '@/lib/global-market-config'
 
 interface User {
   userId: string
@@ -14,7 +22,7 @@ interface User {
   location?: string
   latitude?: number
   longitude?: number
-  role: 'buyer' | 'merchant' | 'agent'
+  role: 'buyer' | 'merchant' | 'admin' | 'orchid_admin' | 'trade_logistics_admin' | 'support'
   merchantType?: 'products' | 'services'
   merchantProfile?: any
   region?: string
@@ -23,8 +31,11 @@ interface User {
 interface RoleContextType {
   role: string | null
   user: User | null
+  preferences: GlobalPreferences
   setRole: (role: string | null) => void
   setUser: (user: User | null) => void
+  setPreferences: (preferences: GlobalPreferences) => void
+  setCountry: (country: SupportedCountry) => void
   isLoading: boolean
 }
 
@@ -33,6 +44,7 @@ const RoleContext = createContext<RoleContextType | undefined>(undefined)
 export function RoleProvider({ children }: { children: React.ReactNode }) {
   const [role, setRoleState] = useState<string | null>(null)
   const [user, setUserState] = useState<User | null>(null)
+  const [preferences, setPreferencesState] = useState<GlobalPreferences>(DEFAULT_GLOBAL_PREFERENCES)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -61,9 +73,22 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     // Read localStorage immediately for a fast first render
     const stored = localStorage.getItem('userRole')
     const storedUser = localStorage.getItem('userData')
+    const storedPreferences = localStorage.getItem('globalPreferences')
     if (stored) setRoleState(stored)
     if (storedUser) {
       try { setUserState(JSON.parse(storedUser)) } catch {}
+    }
+    if (storedPreferences) {
+      try {
+        const parsed = JSON.parse(storedPreferences)
+        setPreferencesState({ ...DEFAULT_GLOBAL_PREFERENCES, ...parsed })
+      } catch {
+        const detectedCountry = detectCountryFromBrowser()
+        setPreferencesState(buildDefaultPreferences(detectedCountry))
+      }
+    } else {
+      const detectedCountry = detectCountryFromBrowser()
+      setPreferencesState(buildDefaultPreferences(detectedCountry))
     }
 
     const initializeSession = async () => {
@@ -139,8 +164,17 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const setPreferences = (nextPreferences: GlobalPreferences) => {
+    setPreferencesState(nextPreferences)
+    localStorage.setItem('globalPreferences', JSON.stringify(nextPreferences))
+  }
+
+  const setCountry = (country: SupportedCountry) => {
+    setPreferences(applyCountryPreset(preferences, country))
+  }
+
   return (
-    <RoleContext.Provider value={{ role, user, setRole, setUser, isLoading }}>
+    <RoleContext.Provider value={{ role, user, preferences, setRole, setUser, setPreferences, setCountry, isLoading }}>
       {children}
     </RoleContext.Provider>
   )

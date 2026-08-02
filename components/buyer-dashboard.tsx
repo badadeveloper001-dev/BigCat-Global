@@ -43,6 +43,7 @@ import { NotificationsPanel } from "./notifications-panel"
 import { ProductGrid } from "./product-card"
 import { BrandWordmark } from "./brand-wordmark"
 import { NigeriaAiAssistant } from "./nigeria-ai-assistant"
+import { TradeProtectionPanel } from "./trade-protection-panel"
 import { getUserStrikeCount, isUserSuspended, resetSafetyState } from "@/lib/trust-safety"
 
 const categories = [
@@ -102,6 +103,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
   const [showProfile, setShowProfile] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showPaymentMethods, setShowPaymentMethods] = useState(false)
+  const [showTradeProtection, setShowTradeProtection] = useState(false)
   const [cartPopupProduct, setCartPopupProduct] = useState<any | null>(null)
   const [isSuspended, setIsSuspended] = useState(false)
   const [strikeCount, setStrikeCount] = useState(0)
@@ -718,6 +720,35 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
 
   if (showPaymentMethods) {
     return <PaymentMethodsPage onBack={() => setShowPaymentMethods(false)} />
+  }
+
+  if (showTradeProtection) {
+    return (
+      <div className="min-h-screen bg-background pb-24">
+        <header className="sticky top-0 z-30 border-b border-border bg-card px-4 py-3">
+          <div className="flex items-center justify-between">
+            <button onClick={() => setShowTradeProtection(false)} className="p-2 -ml-2 text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h1 className="font-semibold text-foreground">Trade Protection</h1>
+            <div className="w-9" />
+          </div>
+        </header>
+        <main className="p-4">
+          <TradeProtectionPanel
+            title="Buyer Trade Protection"
+            orders={recentOrders.map((order) => ({
+              id: order.id,
+              payment_status: order.paymentStatus || order.payment_status,
+              verification_status: 'pending_review',
+              logistics_status: order.status,
+              status: order.status,
+              created_at: order.date,
+            }))}
+          />
+        </main>
+      </div>
+    )
   }
 
   if (selectedProductId) {
@@ -1501,6 +1532,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
                 {[
                   { label: "Edit Profile", value: "Update your info", action: () => setShowProfile(true) },
                   { label: "Wallet", value: "Balance, funding and payments", action: () => setShowPaymentMethods(true) },
+                  { label: "Trade Protection", value: "Order safeguards and shipment progress", action: () => setShowTradeProtection(true) },
                   { label: "Settings", value: "App settings", action: () => setShowSettings(true) },
                 ].map((item) => (
                   <button 

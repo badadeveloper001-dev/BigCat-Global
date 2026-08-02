@@ -6,10 +6,9 @@ import Image from "next/image"
 import { Lock, Loader2, AlertCircle, ArrowLeft } from "lucide-react"
 
 const ACCESS_CODES: Record<string, string> = {
-  SMEDAN_123: "/admin/smedan",
-  PALMPAY_012: "/admin/palmpay",
+  ORCHID_012: "/admin/orchid",
   BIGCAT_00: "/admin/bigcat",
-  LOGISTICS_001: "/logistics",
+  TRADELOG_001: "/admin/trade-logistics",
 }
 
 export default function AdminPortalPage() {
@@ -41,24 +40,19 @@ export default function AdminPortalPage() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center bg-gray-900 rounded-2xl px-6 py-3 mb-4 shadow-md">
             <Image
-              src="/SMEDAN_ido8Y4OzuL_0.png"
-              alt="SMEDAN logo"
-              width={160}
-              height={70}
+              src="/image.png"
+              alt="BigCat Global logo"
+              width={64}
+              height={64}
               className="object-contain"
               priority
             />
           </div>
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Powered By</p>
           <div className="flex items-center justify-center gap-6 mb-6">
-            <Image
-              src="/palmpay-seeklogo.png"
-              alt="PalmPay logo"
-              width={90}
-              height={70}
-              className="object-contain mix-blend-multiply dark:mix-blend-screen"
-              priority
-            />
+            <div className="rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground">
+              Orchid Payments
+            </div>
             <Image
               src="/image.png"
               alt="BigCat logo"
@@ -68,7 +62,7 @@ export default function AdminPortalPage() {
               priority
             />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Admin Portal</h1>
+          <h1 className="text-2xl font-bold text-foreground">BigCat Global Admin Portal</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Restricted access — authorized personnel only
           </p>

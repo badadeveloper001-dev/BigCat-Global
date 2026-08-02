@@ -3,6 +3,7 @@
 import { randomUUID } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { dispatchNotification } from '@/lib/notifications'
+import { detectMessageLanguage, translateMessageForUser } from '@/lib/chat-translation'
 
 function generateId(prefix: string) {
   return `${prefix}_${randomUUID()}`
@@ -54,7 +55,11 @@ export async function getOrCreateConversation(buyerId: string, merchantId: strin
   }
 }
 
-export async function getConversationMessages(conversationId: string, viewerId?: string) {
+export async function getConversationMessages(
+  conversationId: string,
+  viewerId?: string,
+  viewerLanguage: 'en' | 'zh' = 'en',
+) {
   try {
     const supabase = await createClient()
 
@@ -78,7 +83,26 @@ export async function getConversationMessages(conversationId: string, viewerId?:
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true })
     if (error) throw error
-    return { success: true, data: data || [] }
+
+    const translatedMessages = await Promise.all(
+      (data || []).map(async (message: any) => {
+        const sourceLanguage = detectMessageLanguage(String(message?.content || ''))
+        const translation = await translateMessageForUser({
+          text: String(message?.content || ''),
+          sourceLanguage,
+          targetLanguage: viewerLanguage,
+        })
+
+        return {
+          ...message,
+          source_language: sourceLanguage,
+          translated: translation.translated,
+          display_content: translation.translatedText,
+        }
+      }),
+    )
+
+    return { success: true, data: translatedMessages }
   } catch (error: any) {
     return { success: false, error: error.message, data: [] }
   }
@@ -111,7 +135,12 @@ export async function markConversationAsRead(conversationId: string, userId: str
   }
 }
 
-export async function sendMessage(conversationId: string, senderId: string, content: string) {
+export async function sendMessage(
+  conversationId: string,
+  senderId: string,
+  content: string,
+  senderLanguage: 'en' | 'zh' = 'en',
+) {
   try {
     const supabase = await createClient()
     const { data: conversation, error: conversationError } = await supabase
@@ -124,6 +153,9 @@ export async function sendMessage(conversationId: string, senderId: string, cont
     if (conversation?.buyer_id !== senderId && conversation?.merchant_id !== senderId) {
       return { success: false, error: 'You are not allowed to send a message in this conversation.' }
     }
+
+    const detectedLanguage = detectMessageLanguage(content)
+    const resolvedSenderLanguage = senderLanguage || detectedLanguage
 
     const basePayload = {
       conversation_id: conversationId,
@@ -169,11 +201,19 @@ export async function sendMessage(conversationId: string, senderId: string, cont
         type: 'system',
         title: 'New chat message',
         message: `${senderName}: ${preview}`,
-        emailSubject: 'You have a new message on BigCat International',
+        emailSubject: 'You have a new message on BigCat Global',
       })
     }
 
-    return { success: true, data: result.data }
+    return {
+      success: true,
+      data: {
+        ...(result.data || {}),
+        source_language: resolvedSenderLanguage,
+        translated: false,
+        display_content: content,
+      },
+    }
   } catch (error: any) {
     return { success: false, error: error.message }
   }

@@ -7,7 +7,7 @@
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://v0-big-cat-marketplace.vercel.app"
+        "EXPO_PUBLIC_API_BASE_URL": "https://bigcat-international.vercel.app"
       },
       "android": {
         "buildType": "apk"
@@ -16,7 +16,7 @@
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://v0-big-cat-marketplace.vercel.app"
+        "EXPO_PUBLIC_API_BASE_URL": "https://bigcat-international.vercel.app"
       },
       "android": {
         "buildType": "app-bundle"

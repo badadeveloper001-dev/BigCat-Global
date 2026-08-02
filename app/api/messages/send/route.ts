@@ -6,7 +6,7 @@ import { getUserSafetyStatus, recordContactSafetyViolation } from '@/lib/server-
 
 export async function POST(request: NextRequest) {
   try {
-    const { conversationId, senderId, content } = await request.json()
+    const { conversationId, senderId, content, senderLanguage } = await request.json()
     const trimmedContent = typeof content === 'string' ? content.trim() : ''
 
     if (!conversationId || !senderId || !trimmedContent) {
@@ -54,7 +54,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const result = await sendMessage(conversationId, senderId, trimmedContent)
+    const resolvedSenderLanguage = senderLanguage === 'zh' ? 'zh' : 'en'
+    const result = await sendMessage(conversationId, senderId, trimmedContent, resolvedSenderLanguage)
     return NextResponse.json(result)
   } catch (error) {
     console.error('Send message API error:', error)

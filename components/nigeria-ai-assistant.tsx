@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { Languages, Loader2, Mic, Send, Volume2 } from "lucide-react"
 
 type AssistantMode = "buyer" | "merchant"
-type AssistantLanguage = "auto" | "en" | "pcm" | "yo" | "ig" | "ha"
+type AssistantLanguage = "auto" | "en" | "zh" | "pcm" | "yo" | "ig" | "ha"
 
 type AssistantMessage = {
   id: string
@@ -37,58 +37,37 @@ declare global {
 }
 
 const LANG_OPTIONS: Array<{ value: AssistantLanguage; label: string; locale: string }> = [
-  { value: "auto", label: "Auto (Detect)", locale: "en-NG" },
-  { value: "en", label: "English", locale: "en-NG" },
-  { value: "pcm", label: "Nigerian Pidgin", locale: "en-NG" },
-  { value: "yo", label: "Yoruba", locale: "yo-NG" },
-  { value: "ig", label: "Igbo", locale: "ig-NG" },
-  { value: "ha", label: "Hausa", locale: "ha-NG" },
+  { value: "auto", label: "Auto (Detect)", locale: "en-US" },
+  { value: "en", label: "English", locale: "en-US" },
+  { value: "zh", label: "Chinese (Simplified)", locale: "zh-CN" },
 ]
 
 const BUYER_SUGGESTIONS = [
-  "Find affordable phones in Lagos",
-  "Show me trusted tailors near me",
-  "Compare prices for cooking gas",
+  "Find verified suppliers in Shenzhen",
+  "Translate this product description to Chinese",
+  "Estimate shipping from Guangzhou to Lagos",
 ]
 
 const MERCHANT_SUGGESTIONS = [
-  "Suggest products I should promote this week",
-  "How can I increase repeat buyers?",
-  "Write a short promo in Pidgin",
+  "Suggest products for export from Nigeria",
+  "How can I price in NGN, CNY, and USD?",
+  "Draft a bilingual listing for this item",
 ]
 
 function getGreeting(mode: AssistantMode, language: AssistantLanguage) {
-  if (language === "yo") {
+  if (language === "zh") {
     return mode === "merchant"
-      ? "E kaabo. Emi ni BigCat AI. Mo le ran o lowo pelu tita, ipolowo, ati isakoso itaja re."
-      : "E kaabo. Emi ni BigCat AI. Mo le ran o lowo lati wa ọja ati onisowo to ba ye o."
-  }
-
-  if (language === "ig") {
-    return mode === "merchant"
-      ? "Nnoo. Abum BigCat AI. A ga m enyere gi na ire ahia, mgbasa ozi, na nlekota ulo ahia gi."
-      : "Nnoo. Abum BigCat AI. A ga m enyere gi ichota ngwaahịa na ndi na-ere ahia di mma."
-  }
-
-  if (language === "ha") {
-    return mode === "merchant"
-      ? "Sannu. Ni BigCat AI. Zan taimaka maka tallace-tallace, talla, da kula da shagon ka."
-      : "Sannu. Ni BigCat AI. Zan taimaka maka neman kaya da dillalai masu kyau kusa da kai."
-  }
-
-  if (language === "pcm") {
-    return mode === "merchant"
-      ? "Welcome. I be BigCat AI. I fit help you grow sales, run better promo, and manage your store well."
-      : "Welcome. I be BigCat AI. I fit help you find better products and trusted vendors fast fast."
+      ? "欢迎使用 BigCat Global AI。我可以帮助您处理跨境销售、商品翻译、运费估算和贸易流程。"
+      : "欢迎使用 BigCat Global AI。我可以帮助您寻找可靠供应商、对比价格、并理解跨境运输和清关信息。"
   }
 
   return mode === "merchant"
-    ? "Welcome. I am BigCat AI. I can help you grow sales, improve offers, and manage your store operations."
-    : "Welcome. I am BigCat AI. I can help you find products, compare prices, and discover trusted vendors."
+    ? "Welcome to BigCat Global AI. I can help you with cross-border pricing, translated listings, and trade operations."
+    : "Welcome to BigCat Global AI. I can help you discover suppliers, translate product details, and estimate shipping."
 }
 
 function safeLocale(value: AssistantLanguage) {
-  return LANG_OPTIONS.find((item) => item.value === value)?.locale || "en-NG"
+  return LANG_OPTIONS.find((item) => item.value === value)?.locale || "en-US"
 }
 
 export function NigeriaAiAssistant({

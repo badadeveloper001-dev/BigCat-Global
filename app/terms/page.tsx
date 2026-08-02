@@ -2,11 +2,11 @@ import Link from 'next/link'
 import { Scale } from 'lucide-react'
 
 export const metadata = {
-  title: 'Terms of Service – BigCat International',
+  title: 'Terms of Service – BigCat Global',
 }
 
 const EFFECTIVE_DATE = 'April 29, 2026'
-const COMPANY = 'BigCat International'
+const COMPANY = 'BigCat Global'
 const EMAIL = 'legal@bigcat.ng'
 const SUPPORT_EMAIL = 'support@bigcat.ng'
 
@@ -36,7 +36,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="font-bold text-base mb-3">1. About BigCat International</h2>
+            <h2 className="font-bold text-base mb-3">1. About BigCat Global</h2>
             <p className="text-muted-foreground">
               {COMPANY} is a Nigerian e-commerce marketplace that connects buyers and sellers of goods and services. We provide the platform, payment infrastructure, escrow protection, and related tools. We are not a party to transactions between buyers and merchants, but we facilitate and protect them through our escrow system.
             </p>
@@ -48,7 +48,7 @@ export default function TermsPage() {
               <li>You must be at least 18 years old to use this platform.</li>
               <li>You must provide accurate and truthful information when creating an account.</li>
               <li>You are responsible for all activity under your account.</li>
-              <li>Merchants must hold valid business registration (CAC) and SMEDAN verification where applicable.</li>
+              <li>Merchants must hold valid business registration and complete country-specific verification requirements where applicable.</li>
             </ul>
           </section>
 
@@ -78,7 +78,7 @@ export default function TermsPage() {
           <section>
             <h2 className="font-bold text-base mb-3">5. Payments, GIT Fee & Escrow</h2>
             <ul className="text-muted-foreground space-y-2 list-disc list-inside">
-              <li>All payments are processed through PalmPay&rsquo;s secure infrastructure.</li>
+              <li>All payments are processed through Orchid&rsquo;s secure infrastructure.</li>
               <li>Funds are held in escrow until the buyer confirms receipt and releases payment.</li>
               <li>A Goods in Transit (GIT) fee of 1.5% is applied to goods and services at checkout to cover goods damaged in transit only. The GIT fee is not charged on delivery fees and does not cover return delivery.</li>
               <li>Escrow funds are auto-released to the merchant after 7 days if the buyer does not confirm or dispute.</li>

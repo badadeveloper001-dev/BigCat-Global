@@ -64,7 +64,7 @@ export async function sendSignupOtpEmail(
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;padding:24px;background:#f8fafc;">
       <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:32px;">
-        <p style="margin:0 0 8px;color:#64748b;font-size:13px;letter-spacing:.08em;text-transform:uppercase;">BigCat International</p>
+        <p style="margin:0 0 8px;color:#64748b;font-size:13px;letter-spacing:.08em;text-transform:uppercase;">BigCat Global</p>
         <h1 style="margin:0 0 12px;color:#0f172a;font-size:24px;">Verify your email</h1>
         <p style="margin:0 0 20px;color:#334155;font-size:14px;line-height:1.6;">
           Use the verification code below to complete your ${role} account signup for <strong>${safeEmail}</strong>.
@@ -77,7 +77,7 @@ export async function sendSignupOtpEmail(
       </div>
     </div>
   `
-  const text = `BigCat International\n\nUse this verification code to complete your ${role} account signup for ${safeEmail}: ${otp}\n\nThis code expires in 5 minutes.`
+  const text = `BigCat Global\n\nUse this verification code to complete your ${role} account signup for ${safeEmail}: ${otp}\n\nThis code expires in 5 minutes.`
 
   if (deliveryMethod === 'email') {
     const result = await sendEmail({ to: safeEmail, subject, html, text })

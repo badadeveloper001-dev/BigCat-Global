@@ -369,7 +369,7 @@ function buildDefaultEmailHtml(title: string, message: string, metadata?: Record
   const appUrl = (
     process.env.NEXT_PUBLIC_APP_URL ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
-    "https://v0-big-cat-marketplace.vercel.app"
+    "https://bigcat-global.vercel.app"
   ).replace(/\/$/, "")
   const trackingUrl = isTrackingAction
     ? (actionPath
@@ -552,7 +552,7 @@ function buildDefaultEmailHtml(title: string, message: string, metadata?: Record
               <table cellpadding="0" cellspacing="0" role="presentation" width="100%">
                 <tr>
                   <td style="vertical-align:middle;">
-                    <img src="${logoUrl}" alt="BigCat International" width="100" height="100"
+                    <img src="${logoUrl}" alt="BigCat Global" width="100" height="100"
                          style="width:100px;height:100px;object-fit:contain;display:block;filter:brightness(0) invert(1);" />
                   </td>
                   <td style="vertical-align:middle;padding-left:16px;">
@@ -602,11 +602,11 @@ function buildDefaultEmailHtml(title: string, message: string, metadata?: Record
               <table cellpadding="0" cellspacing="0" role="presentation" width="100%">
                 <tr>
                   <td>
-                    <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#0f172a;">BigCat International</p>
+                    <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#0f172a;">BigCat Global</p>
                     <p style="margin:0 0 10px;font-size:11px;color:#94a3b8;">Nigeria&rsquo;s trusted commerce platform for buyers, merchants &amp; businesses.</p>
                     <hr style="border:none;border-top:1px solid #e2e8f0;margin:10px 0;" />
                     <p style="margin:0;font-size:10px;color:#94a3b8;">
-                      &copy; ${year} BigCat International. All rights reserved.
+                      &copy; ${year} BigCat Global. All rights reserved.
                       &nbsp;&middot;&nbsp;
                       <a href="${appUrl}" style="color:#f97316;text-decoration:none;">Visit Marketplace</a>
                       &nbsp;&middot;&nbsp;
@@ -745,7 +745,7 @@ async function maybeSendEmail(userId: string, input: DispatchNotificationInput) 
     return { sent: false, reason: "User disabled email notifications" }
   }
 
-  const from = process.env.EMAIL_FROM || process.env.RESEND_FROM_EMAIL || "BigCat International <onboarding@resend.dev>"
+  const from = process.env.EMAIL_FROM || process.env.RESEND_FROM_EMAIL || "BigCat Global <onboarding@resend.dev>"
   const subject = input.emailSubject || input.title
 
   let ctx: OrderEmailContext | undefined

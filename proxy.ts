@@ -50,7 +50,7 @@ export function proxy(request: NextRequest) {
 
   if ((isAdminHost || isAgentHost) && pathname === '/') {
     const url = request.nextUrl.clone()
-    url.pathname = isAdminHost ? '/admin-portal' : '/agent-portal'
+    url.pathname = isAdminHost ? '/admin-portal' : '/marketplace'
     return NextResponse.rewrite(url)
   }
 

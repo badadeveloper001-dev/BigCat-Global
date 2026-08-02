@@ -615,7 +615,7 @@ function BuyerWalletSection({ userId }: { userId: string }) {
             >
               <option value="card">Debit / Credit Card</option>
               <option value="bank_transfer">Bank Transfer</option>
-              <option value="palmpay">PalmPay</option>
+              <option value="orchid">Orchid</option>
               <option value="opay">OPay</option>
             </select>
             <input

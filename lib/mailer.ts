@@ -1,5 +1,5 @@
 /**
- * Shared email transport for BigCat International.
+ * Shared email transport for BigCat Global.
  *
  * Priority:
  *  1. SMTP via nodemailer (EMAIL_HOST set) — works with Gmail, AWS SES, Brevo, Mailersend, etc.
@@ -10,7 +10,7 @@
  *   EMAIL_PORT=587
  *   EMAIL_USER=your@gmail.com
  *   EMAIL_PASS=your-app-password   (Google Account → Security → App Passwords)
- *   EMAIL_FROM=BigCat International <your@gmail.com>
+ *   EMAIL_FROM=BigCat Global <your@gmail.com>
  *
  * For other providers (Brevo, Mailersend, AWS SES SMTP, etc.):
  *   Just change EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASS accordingly.
@@ -79,10 +79,10 @@ function getResendClient(): Resend | null {
 function defaultFrom(): string {
   // SMTP from address
   if (getEnv('EMAIL_FROM')) return getEnv('EMAIL_FROM')
-  if (getEnv('EMAIL_USER')) return `BigCat International <${getEnv('EMAIL_USER')}>`
+  if (getEnv('EMAIL_USER')) return `BigCat Global <${getEnv('EMAIL_USER')}>`
   // Resend from address
   if (getEnv('RESEND_FROM_EMAIL')) return getEnv('RESEND_FROM_EMAIL')
-  return 'BigCat International <onboarding@resend.dev>'
+  return 'BigCat Global <onboarding@resend.dev>'
 }
 
 function isTransientSmtpError(error: any) {

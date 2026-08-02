@@ -34,12 +34,6 @@ export function MarketplaceApp() {
   }, [merchantSetupCompleted])
 
   useEffect(() => {
-    if (role === "agent") {
-      router.replace("/agent-dashboard")
-    }
-  }, [role, router])
-
-  useEffect(() => {
     if (typeof window === "undefined") return
     const requestedView = new URLSearchParams(window.location.search).get("view")
     if (!role && (requestedView === "cart" || requestedView === "checkout")) {
@@ -112,6 +106,8 @@ export function MarketplaceApp() {
       return <BuyerDashboard />
     case "merchant":
       return <MerchantDashboard />
+    case "orchid_admin":
+    case "trade_logistics_admin":
     case "admin":
       if (!adminAuthenticated) {
         return <AdminLogin onSuccess={() => setAdminAuthenticated(true)} />

@@ -1,4 +1,4 @@
-# BigCat International Mobile (Expo)
+# BigCat Global Mobile (Expo)
 
 This folder contains the Expo mobile starter for the marketplace.
 
@@ -13,7 +13,7 @@ cp .env.example .env
 Set the backend URL:
 
 ```bash
-EXPO_PUBLIC_API_BASE_URL=https://v0-big-cat-marketplace.vercel.app
+EXPO_PUBLIC_API_BASE_URL=https://bigcat-global.vercel.app
 ```
 
 If you run your backend locally, use your machine LAN IP instead of `localhost`, for example:

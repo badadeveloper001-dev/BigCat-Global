@@ -1,5 +1,5 @@
-import { LogisticsAdminDashboard } from '@/components/logistics-admin-dashboard'
+import { redirect } from 'next/navigation'
 
 export default function LogisticsPage() {
-  return <LogisticsAdminDashboard />
+  redirect('/admin/trade-logistics')
 }

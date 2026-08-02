@@ -15,10 +15,9 @@ export function AdminAccessModal({ onClose }: AdminAccessModalProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const accessCodes = {
-    "SMEDAN_123": "/admin/smedan",
-    "PALMPAY_012": "/admin/palmpay",
+    "ORCHID_012": "/admin/orchid",
     "BIGCAT_00": "/admin/bigcat",
-    "LOGISTICS_001": "/logistics",
+    "TRADELOG_001": "/admin/trade-logistics",
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -10,7 +10,7 @@ interface MerchantOnboardingIntakeProps {
 const ONBOARDING_FEE = 2000
 const BANK_NAME = "Zenith Bank"
 const ACCOUNT_NUMBER = "1234567890"
-const ACCOUNT_NAME = "BigCat International Ltd"
+const ACCOUNT_NAME = "BigCat Global Ltd"
 
 export function MerchantOnboardingIntake({ onBack }: MerchantOnboardingIntakeProps) {
   const [loading, setLoading] = useState(false)

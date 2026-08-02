@@ -10,7 +10,7 @@ import {
 } from "react-native"
 import { WebView } from "react-native-webview"
 
-const FALLBACK_URL = "https://v0-big-cat-marketplace.vercel.app"
+const FALLBACK_URL = "https://bigcat-international.vercel.app"
 const SPLASH_DURATION = 2800 // ms before WebView is shown
 
 const { width, height } = Dimensions.get("window")

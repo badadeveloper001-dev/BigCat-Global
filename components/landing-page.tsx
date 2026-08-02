@@ -19,23 +19,23 @@ import {
 } from "lucide-react"
 
 const categories = [
-  "Electronics", "Fashion", "Food & Drinks", "Health & Beauty",
-  "Home & Garden", "Automobiles", "Books & Media", "Sports",
-  "Baby & Kids", "Agriculture", "Services", "Artisans",
+  "Trade Without Borders", "Shop from China", "Export from Nigeria", "Featured Global Merchants",
+  "Trending Imports", "Trending Exports", "Industrial Supplies", "Consumer Electronics",
+  "AI Trade Assistant", "Cross-Border Services", "Wholesale Deals", "Verified Suppliers",
 ]
 
 const stats = [
-  { value: "50K+", label: "Active Merchants", icon: Users },
-  { value: "200K+", label: "Products Listed", icon: Package },
-  { value: "₦2B+", label: "Transactions Processed", icon: TrendingUp },
-  { value: "4.8★", label: "Average Rating", icon: Star },
+  { value: "50K+", label: "Verified Merchants", icon: Users },
+  { value: "200K+", label: "Cross-Border Listings", icon: Package },
+  { value: "$120M+", label: "Trade Volume Processed", icon: TrendingUp },
+  { value: "4.8★", label: "Trade Confidence Score", icon: Star },
 ]
 
 const features = [
   {
     icon: ShoppingBag,
-    title: "Smart Marketplace",
-    description: "AI-powered product discovery with intelligent search that understands what you really need.",
+    title: "Global Supplier Marketplace",
+    description: "Discover trusted suppliers across Nigeria and China with AI-powered discovery and multilingual search.",
     gradient: "from-[#00A651] to-[#45c76c]",
     bg: "bg-[#06521c]/40",
     border: "border-[#0b772a]/50",
@@ -43,8 +43,8 @@ const features = [
   },
   {
     icon: Brain,
-    title: "AI BizPilot",
-    description: "Get business insights, real-time analytics, and personalised growth recommendations.",
+    title: "AI Trade Assistant",
+    description: "Translate listings, estimate freight, explain customs, and guide import/export decisions in real time.",
     gradient: "from-violet-500 to-purple-400",
     bg: "bg-violet-950/50",
     border: "border-violet-800/40",
@@ -52,8 +52,8 @@ const features = [
   },
   {
     icon: Shield,
-    title: "Secure Escrow",
-    description: "Buyer-protection escrow powered by PalmPay — funds only released when you're satisfied.",
+    title: "Trade Protection",
+    description: "Track payment status, merchant verification, shipment progress, and buyer protection in one place.",
     gradient: "from-sky-500 to-blue-400",
     bg: "bg-sky-950/50",
     border: "border-sky-800/40",
@@ -61,8 +61,8 @@ const features = [
   },
   {
     icon: Building2,
-    title: "Business Onboarding",
-    description: "CAC registration, SMEDAN certification, and agent-assisted setup — all in one place.",
+    title: "International Verification",
+    description: "Support for CAC and identity verification in Nigeria plus Chinese Business Verification onboarding.",
     gradient: "from-orange-500 to-amber-400",
     bg: "bg-orange-950/50",
     border: "border-orange-800/40",
@@ -81,21 +81,21 @@ const steps = [
   {
     number: "02",
     title: "Get Verified",
-    description: "SMEDAN-backed onboarding grants you instant business credibility and trust badges.",
+    description: "Complete merchant verification workflows for cross-border trust and payment readiness.",
     color: "bg-violet-400",
     textColor: "text-violet-400",
   },
   {
     number: "03",
-    title: "Start Trading",
-    description: "List products, browse thousands of categories, and make secure transactions.",
+    title: "Start Cross-Border Trading",
+    description: "Source from China, export from Nigeria, and manage international catalogs in one workflow.",
     color: "bg-sky-400",
     textColor: "text-sky-400",
   },
   {
     number: "04",
     title: "Scale with AI",
-    description: "Use AI BizPilot dashboards to optimise your store and grow revenue faster.",
+    description: "Use AI-powered supplier discovery, translation, and trade insights to grow global revenue.",
     color: "bg-orange-400",
     textColor: "text-orange-400",
   },
@@ -104,22 +104,22 @@ const steps = [
 const testimonials = [
   {
     name: "Amara Obi",
-    role: "Fashion Merchant, Lagos",
-    quote: "BigCat tripled my sales in 3 months. The AI recommendations are like having a business consultant 24/7.",
+    role: "Fashion Exporter, Lagos",
+    quote: "BigCat Global helped us source materials from China and sell faster across borders with less friction.",
     rating: 5,
     avatar: "AO",
   },
   {
     name: "Chukwuemeka Nwosu",
-    role: "Electronics Retailer, Abuja",
-    quote: "The escrow payment system gives my customers confidence. Refund disputes are a thing of the past.",
+    role: "Electronics Importer, Abuja",
+    quote: "The Trade Protection workflow and shipment milestones gave our buyers confidence on every international order.",
     rating: 5,
     avatar: "CN",
   },
   {
     name: "Fatimah Bello",
-    role: "Food Vendor, Kano",
-    quote: "Getting my SMEDAN certification through BigCat took two days. What used to take weeks!",
+    role: "Agribusiness Merchant, Kano",
+    quote: "The AI translation and supplier recommendations opened new sourcing channels we could not reach before.",
     rating: 5,
     avatar: "FB",
   },
@@ -136,7 +136,7 @@ export function LandingPage() {
             <div className="w-10 h-10 rounded-2xl bg-white p-1.5 shadow-lg shadow-black/30 ring-1 ring-black/5 overflow-hidden">
               <Image src="/image.png" alt="BigCat" width={36} height={36} className="w-full h-full object-cover object-top rounded-xl" />
             </div>
-            <span className="font-extrabold text-white text-lg tracking-tight">BigCat International</span>
+            <span className="font-extrabold text-white text-lg tracking-tight">BigCat Global</span>
             <span className="hidden sm:block text-[10px] font-semibold text-[#45c76c] bg-[#00A651]/10 border border-[#00A651]/30 px-2 py-0.5 rounded-full uppercase tracking-widest ml-1">
               International
             </span>
@@ -169,22 +169,22 @@ export function LandingPage() {
             <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 mb-7">
               <span className="w-2 h-2 rounded-full bg-[#00A651] animate-pulse" />
               <span className="text-xs font-semibold text-gray-300 uppercase tracking-widest">
-                Nigeria&apos;s smart commerce platform
+                AI-powered Nigeria-China commerce bridge
               </span>
             </div>
 
             <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-white leading-[1.02] tracking-tight mb-5">
-              Shop local.
+              Trade without
               <br />
-              Sell smarter.
+              language barriers.
               <br />
               <span className="bg-gradient-to-r from-[#00A651] via-[#72d38e] to-violet-300 bg-clip-text text-transparent">
-                Grow beautifully.
+                Grow globally.
               </span>
             </h1>
 
             <p className="text-gray-300/90 text-lg sm:text-xl max-w-2xl lg:max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed">
-              A premium marketplace powered by AI, secured by PalmPay escrow, and backed by SMEDAN — designed for modern Nigerian buyers and merchants.
+              BigCat Global is an AI-first cross-border commerce platform connecting buyers and merchants between Nigeria and China.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center lg:items-center justify-center lg:justify-start gap-4">
@@ -244,7 +244,7 @@ export function LandingPage() {
               <div className="relative aspect-[4/5] overflow-hidden rounded-[26px] bg-[#0a1b0f]">
                 <Image
                   src="/hero-marketplace.png"
-                  alt="BigCat International — Your Market. Your Culture. One Click."
+                  alt="BigCat Global — Your Market. Your Culture. One Click."
                   fill
                   priority
                   className="object-cover object-top"
@@ -308,14 +308,11 @@ export function LandingPage() {
             Trusted & Backed By
           </p>
           <div className="flex items-center justify-center gap-10 sm:gap-16 flex-wrap">
-            {/* SMEDAN — transparent bg, white text shows on dark green */}
-            <Image src="/SMEDAN_ido8Y4OzuL_0.png" alt="SMEDAN" width={130} height={52} className="object-contain opacity-90 hover:opacity-100 transition-opacity" />
-            {/* PalmPay — white bg baked in, keep minimal white pill */}
-            <div className="bg-white rounded-2xl px-4 py-2.5 shadow-md opacity-90 hover:opacity-100 transition-opacity">
-              <Image src="/palmpay-seeklogo.png" alt="PalmPay" width={90} height={36} className="object-contain" />
+            <div className="rounded-2xl border border-white/20 px-4 py-2.5 text-sm font-semibold text-white/90">
+              Orchid Payments
             </div>
             <div className="bg-white rounded-2xl px-3 py-2 shadow-md opacity-90 hover:opacity-100 transition-opacity">
-              <Image src="/image.png" alt="BigCat" width={72} height={36} className="object-contain" />
+              <Image src="/image.png" alt="BigCat Global" width={72} height={36} className="object-contain" />
             </div>
           </div>
         </div>
@@ -483,7 +480,7 @@ export function LandingPage() {
             <div className="w-9 h-9 rounded-xl bg-white p-1.5 shadow-md ring-1 ring-black/5 overflow-hidden">
               <Image src="/image.png" alt="BigCat" width={28} height={28} className="w-full h-full object-cover object-top rounded-lg" />
             </div>
-            <span className="font-bold text-white text-sm">BigCat International</span>
+            <span className="font-bold text-white text-sm">BigCat Global</span>
           </div>
           <div className="flex items-center gap-6 flex-wrap justify-center">
             <Link href="/marketplace" className="text-gray-500 hover:text-gray-300 text-xs transition-colors">Browse</Link>
@@ -494,14 +491,16 @@ export function LandingPage() {
             <Link href="/privacy" className="text-gray-500 hover:text-gray-300 text-xs transition-colors">Privacy</Link>
           </div>
           <div className="flex items-center gap-4">
-            <div className="bg-white rounded-lg px-3 py-1.5">
-              <Image src="/palmpay-seeklogo.png" alt="PalmPay" width={60} height={22} className="object-contain" />
+            <div className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/80">
+              Orchid
             </div>
-            <Image src="/SMEDAN_ido8Y4OzuL_0.png" alt="SMEDAN" width={60} height={22} className="object-contain opacity-80 hover:opacity-100 transition-opacity" />
+            <div className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/80">
+              BigCat Global
+            </div>
           </div>
         </div>
         <div className="max-w-5xl mx-auto mt-8 pt-6 border-t border-white/5 text-center">
-          <p className="text-gray-600 text-xs">© {new Date().getFullYear()} BigCat International. All rights reserved.</p>
+          <p className="text-gray-600 text-xs">© {new Date().getFullYear()} BigCat Global. All rights reserved.</p>
         </div>
       </footer>
 

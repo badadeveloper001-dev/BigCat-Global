@@ -2,11 +2,11 @@ import Link from 'next/link'
 import { Lock } from 'lucide-react'
 
 export const metadata = {
-  title: 'Privacy Policy – BigCat International',
+  title: 'Privacy Policy – BigCat Global',
 }
 
 const EFFECTIVE_DATE = 'April 29, 2026'
-const COMPANY = 'BigCat International'
+const COMPANY = 'BigCat Global'
 const EMAIL = 'privacy@bigcat.ng'
 
 export default function PrivacyPage() {
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
               </div>
               <div>
                 <p className="font-medium text-foreground">Merchant Information</p>
-                <p className="text-muted-foreground">Business name, CAC registration number, SMEDAN ID, business address, bank account details (for payouts), and product/service listings.</p>
+                <p className="text-muted-foreground">Business name, country-specific registration details, business address, payout account details, and product/service listings.</p>
               </div>
               <div>
                 <p className="font-medium text-foreground">Transaction Information</p>
@@ -92,8 +92,8 @@ export default function PrivacyPage() {
             <ul className="text-muted-foreground space-y-2 list-disc list-inside">
               <li><strong className="text-foreground">With merchants</strong> — your delivery address and contact name are shared with the merchant fulfilling your order.</li>
               <li><strong className="text-foreground">With buyers</strong> — your store name, description, and listing information are publicly visible on your merchant profile.</li>
-              <li><strong className="text-foreground">Payment processors</strong> — PalmPay processes payments and receives necessary transaction data.</li>
-              <li><strong className="text-foreground">Regulatory bodies</strong> — FIRS, SMEDAN, CAC, or other Nigerian government agencies when legally required.</li>
+              <li><strong className="text-foreground">Payment processors</strong> — Orchid processes payments and receives necessary transaction data.</li>
+              <li><strong className="text-foreground">Regulatory bodies</strong> — relevant tax, customs, and business regulators in applicable jurisdictions when legally required.</li>
               <li><strong className="text-foreground">Service providers</strong> — hosting (Vercel/Supabase), email delivery, and analytics tools, all under strict data processing agreements.</li>
               <li><strong className="text-foreground">Law enforcement</strong> — when required by a valid court order or law enforcement request.</li>
             </ul>

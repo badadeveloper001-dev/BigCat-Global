@@ -161,7 +161,7 @@ export function DeploymentGuide() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-2">
-            BigCat International - Deployment Guide
+            BigCat Global - Deployment Guide
           </h1>
           <p className="text-lg text-muted-foreground">
             Complete checklist for deployment and testing

@@ -34,6 +34,8 @@ interface Message {
   text: string
   timestamp: Date
   read: boolean
+  translated?: boolean
+  sourceLanguage?: 'en' | 'zh'
 }
 
 export interface Conversation {
@@ -71,9 +73,11 @@ function mapMessage(message: any, userId?: string): Message {
   return {
     id: message.id,
     sender: message.sender_id === userId ? "buyer" : "merchant",
-    text: message.content,
+    text: String(message.display_content || message.content || ''),
     timestamp: new Date(message.created_at || Date.now()),
     read: Boolean(message.read_at),
+    translated: Boolean(message.translated),
+    sourceLanguage: message.source_language === 'zh' ? 'zh' : 'en',
   }
 }
 
@@ -202,7 +206,7 @@ function ChatConversationScreen({
   userRole?: 'merchant' | 'buyer'
   merchantId?: string
 }) {
-  const { user } = useRole()
+  const { user, preferences } = useRole()
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState("")
   const [showQuickActions, setShowQuickActions] = useState(true)
@@ -282,7 +286,8 @@ function ChatConversationScreen({
     const loadMessages = async () => {
       setLoading(true)
       try {
-        const response = await fetch(`/api/messages/${conversation.id}?userId=${encodeURIComponent(user?.userId || '')}`)
+        const viewerLanguage = preferences.language === 'zh' ? 'zh' : 'en'
+        const response = await fetch(`/api/messages/${conversation.id}?userId=${encodeURIComponent(user?.userId || '')}&viewerLanguage=${viewerLanguage}`)
         const result = await response.json()
         if (result.success) {
           setMessages((result.data || []).map((message: any) => mapMessage(message, user?.userId)))
@@ -352,6 +357,7 @@ function ChatConversationScreen({
           conversationId: conversation.id,
           senderId: resolvedMerchantId,
           content: `📋 I've sent you a service bill for ${formatNaira(billTotal)}. Scope: "${billForm.scopeSummary}". Check your Bills tab to review and pay securely.`,
+          senderLanguage: preferences.language === 'zh' ? 'zh' : 'en',
         }),
       })
 
@@ -386,6 +392,7 @@ function ChatConversationScreen({
           conversationId: conversation.id,
           senderId: user.userId,
           content: newMessage,
+          senderLanguage: preferences.language === 'zh' ? 'zh' : 'en',
         }),
       })
       const result = await response.json()
@@ -506,6 +513,11 @@ function ChatConversationScreen({
                 }`}
               >
                 <p className="text-sm break-words">{msg.text}</p>
+                {msg.translated ? (
+                  <p className={`mt-1 text-[10px] ${msg.sender === "buyer" ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                    Auto-translated from {msg.sourceLanguage === 'zh' ? 'Chinese' : 'English'}
+                  </p>
+                ) : null}
                 <div
                   className={`flex items-center gap-1 mt-1 text-xs ${
                     msg.sender === "buyer" ? "text-primary-foreground/70" : "text-muted-foreground"

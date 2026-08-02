@@ -16,7 +16,7 @@ const faqs: { category: string; icon: React.ReactNode; items: { q: string; a: st
       },
       {
         q: 'What payment methods are accepted?',
-        a: 'We accept PalmPay wallet, bank transfer, and credit/debit card payments. You can also apply eligible coupon codes at checkout. All payments are protected by our escrow system.',
+        a: 'We accept Orchid wallet, bank transfer, and credit/debit card payments. You can also apply eligible coupon codes at checkout. All payments are protected by our escrow system.',
       },
       {
         q: 'Why do I see a crossed-out price on some products?',
@@ -66,11 +66,11 @@ const faqs: { category: string; icon: React.ReactNode; items: { q: string; a: st
       },
       {
         q: 'How long does a refund take?',
-        a: 'Refunds for disputes resolved in your favour are processed within 3–5 business days back to your original payment method or PalmPay wallet.',
+        a: 'Refunds for disputes resolved in your favour are processed within 3–5 business days back to your original payment method or Orchid wallet.',
       },
       {
         q: 'Is my payment information secure?',
-        a: 'Yes. BigCat does not store your card or bank details. All transactions are processed through PalmPay\'s secure payment infrastructure.',
+        a: 'Yes. BigCat does not store your card or bank details. All transactions are processed through Orchid\'s secure payment infrastructure.',
       },
     ],
   },
@@ -80,11 +80,11 @@ const faqs: { category: string; icon: React.ReactNode; items: { q: string; a: st
     items: [
       {
         q: 'How do I become a merchant?',
-        a: 'Sign up as a merchant, complete the onboarding form, and submit your business details including CAC registration and SMEDAN ID. Our team reviews applications within 1–3 business days.',
+        a: 'Sign up as a merchant, complete the onboarding form, and submit your business details based on your operating country. Nigeria merchants provide CAC and ID details, while China merchants currently use the Chinese Business Verification placeholder module.',
       },
       {
         q: 'What documents do I need to register?',
-        a: 'You need a valid government-issued ID, your CAC Business Name or Company registration certificate, and a SMEDAN ID (for SMEs). These are required for merchant verification.',
+        a: 'For Nigeria, you need a government-issued ID, CAC registration details, and bank verification reference. For China, complete the placeholder verification section pending full Orchid international compliance rollout.',
       },
       {
         q: 'How do I get paid for my sales?',
@@ -211,7 +211,7 @@ export default function HelpCenterPage() {
             </div>
           </div>
           <h1 className="text-2xl font-bold mb-2">Help Center</h1>
-          <p className="text-white/80 text-sm mb-6">Find answers to common questions about BigCat International</p>
+          <p className="text-white/80 text-sm mb-6">Find answers to common questions about BigCat Global</p>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input

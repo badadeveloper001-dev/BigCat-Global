@@ -26,7 +26,18 @@ async function insertAuthUserWithFallback(admin: ReturnType<typeof createClient>
     }
 
     const message = String(result.error.message || '').toLowerCase()
-    const removableColumn = ['city', 'state', 'cac_id', 'google_id', 'merchant_type'].find((column) => message.includes(column))
+    const removableColumn = [
+      'city',
+      'state',
+      'cac_id',
+      'google_id',
+      'merchant_type',
+      'country',
+      'government_id_number',
+      'bank_verification_ref',
+      'verification_module',
+      'verification_status',
+    ].find((column) => message.includes(column))
 
     if (!removableColumn || !(removableColumn in insertPayload)) {
       return result
@@ -143,10 +154,31 @@ export async function signupEnhanced(params: {
   smedanId?: string
   cacId?: string
   merchantType?: 'products' | 'services'
+  country?: 'NG' | 'CN'
+  governmentIdNumber?: string
+  bankVerificationRef?: string
+  verificationModule?: string
+  verificationStatus?: string
 }) {
   try {
     const admin = createClient()
-    const { email, password, name, phone, city, state, role, smedanId, cacId, merchantType } = params
+    const {
+      email,
+      password,
+      name,
+      phone,
+      city,
+      state,
+      role,
+      smedanId,
+      cacId,
+      merchantType,
+      country,
+      governmentIdNumber,
+      bankVerificationRef,
+      verificationModule,
+      verificationStatus,
+    } = params
     const normalizedCity = city?.trim() || null
     const normalizedState = state?.trim() || null
 
@@ -178,6 +210,11 @@ export async function signupEnhanced(params: {
           location: buildMerchantLocation(normalizedCity, normalizedState),
           smedan_id: smedanId || null,
           cac_id: cacId || null,
+          country: country || 'NG',
+          government_id_number: governmentIdNumber || null,
+          bank_verification_ref: bankVerificationRef || null,
+          verification_module: verificationModule || null,
+          verification_status: verificationStatus || null,
           merchant_type: merchantType || 'products',
           token_balance: INITIAL_MERCHANT_TOKENS,
         }

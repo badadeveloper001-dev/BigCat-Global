@@ -498,7 +498,7 @@ export function AdminDashboard() {
               <h3 className="font-semibold text-foreground p-4 border-b border-border">General</h3>
               <div className="divide-y divide-border">
                 {[
-                  { label: "Platform Name", value: "BigCat International" },
+                  { label: "Platform Name", value: "BigCat Global" },
                   { label: "Support Email", value: "support@bigcat.ng" },
                   { label: "Currency", value: "NGN (₦)" },
                 ].map((item) => (

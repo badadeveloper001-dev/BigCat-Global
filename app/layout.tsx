@@ -16,8 +16,8 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'BigCat International',
-  description: 'Your modern international marketplace platform',
+  title: 'BigCat Global',
+  description: 'AI-powered cross-border commerce between Nigeria and China',
   generator: 'v0.app',
   icons: {
     icon: [

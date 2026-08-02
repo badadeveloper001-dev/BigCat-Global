@@ -176,7 +176,7 @@ export function MiniWebsiteProfile({ profile, isOwner = false, buyerId, onEdit }
                     onClick={async () => {
                       const shareData = {
                         title: profile.business_name || 'Store',
-                        text: `Check out ${profile.business_name || 'this store'} on BigCat International`,
+                        text: `Check out ${profile.business_name || 'this store'} on BigCat Global`,
                         url: window.location.href,
                       }
                       if (navigator.share) {

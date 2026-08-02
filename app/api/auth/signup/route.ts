@@ -4,10 +4,26 @@ import { dispatchNotification } from '@/lib/notifications'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name, phone, city, state, role, smedanId, cacId, merchantType } = await request.json()
+    const {
+      email,
+      password,
+      name,
+      phone,
+      city,
+      state,
+      role,
+      smedanId,
+      cacId,
+      merchantType,
+      country,
+      governmentIdNumber,
+      bankVerificationRef,
+      verificationModule,
+    } = await request.json()
     const normalizedCity = typeof city === 'string' ? city.trim() : ''
     const normalizedState = typeof state === 'string' ? state.trim() : ''
     const normalizedMerchantType = merchantType === 'services' ? 'services' : 'products'
+    const normalizedCountry = country === 'CN' ? 'CN' : 'NG'
 
     if (!email || !password || !name || !phone || !role) {
       return NextResponse.json(
@@ -23,9 +39,30 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (role === 'merchant' && normalizedMerchantType !== 'services' && !cacId) {
+    if (role === 'merchant' && normalizedCountry === 'NG' && normalizedMerchantType !== 'services' && !cacId) {
       return NextResponse.json(
         { success: false, error: 'CAC ID is required for merchant accounts' },
+        { status: 400 }
+      )
+    }
+
+    if (role === 'merchant' && normalizedCountry === 'NG' && !governmentIdNumber) {
+      return NextResponse.json(
+        { success: false, error: 'Government-issued ID is required for Nigerian merchant verification' },
+        { status: 400 }
+      )
+    }
+
+    if (role === 'merchant' && normalizedCountry === 'NG' && !bankVerificationRef) {
+      return NextResponse.json(
+        { success: false, error: 'Bank verification reference is required for Nigerian merchant verification' },
+        { status: 400 }
+      )
+    }
+
+    if (role === 'merchant' && normalizedCountry === 'CN' && verificationModule !== 'Chinese Business Verification') {
+      return NextResponse.json(
+        { success: false, error: 'Chinese merchants must use the Chinese Business Verification module placeholder' },
         { status: 400 }
       )
     }
@@ -41,6 +78,11 @@ export async function POST(request: NextRequest) {
       smedanId,
       cacId,
       merchantType: normalizedMerchantType,
+      country: normalizedCountry,
+      governmentIdNumber,
+      bankVerificationRef,
+      verificationModule: role === 'merchant' && normalizedCountry === 'CN' ? 'Chinese Business Verification' : 'Nigerian Merchant Verification',
+      verificationStatus: role === 'merchant' && normalizedCountry === 'CN' ? 'placeholder_pending_api' : 'pending_review',
     })
 
     if (result.success) {
@@ -50,12 +92,12 @@ export async function POST(request: NextRequest) {
           await dispatchNotification({
             userId: createdUserId,
             type: 'system',
-            title: role === 'merchant' ? 'Welcome, merchant!' : 'Welcome to BigCat International!',
+            title: role === 'merchant' ? 'Welcome, merchant!' : 'Welcome to BigCat Global!',
             message: role === 'merchant'
               ? 'Your merchant account is ready. Complete setup and start receiving orders.'
               : 'Your buyer account is ready. Start exploring and placing orders.',
             eventKey: `signup:welcome:${createdUserId}`,
-            emailSubject: role === 'merchant' ? 'Welcome to BigCat International (Merchant)' : 'Welcome to BigCat International',
+            emailSubject: role === 'merchant' ? 'Welcome to BigCat Global (Merchant)' : 'Welcome to BigCat Global',
           })
         } catch (notifyError) {
           console.warn('Signup welcome notification failed:', notifyError)

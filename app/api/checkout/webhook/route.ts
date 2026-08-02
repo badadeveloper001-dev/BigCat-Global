@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     const { paymentReference, status, orderId } = body
 
     // Validate webhook signature
-    // TODO: In production, verify webhook signature from Kora/PalmPay
+    // TODO: In production, verify webhook signature from Kora/Orchid
     // const webhookSecret = process.env.KORA_WEBHOOK_SECRET
     // if (!verifySignature(body, webhookSecret)) {
     //   return NextResponse.json({ error: "Invalid signature" }, { status: 401 })

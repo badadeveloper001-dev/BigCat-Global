@@ -747,9 +747,11 @@ export function MerchantDashboard() {
       : [{ label: "Add Product", icon: Plus, primary: true, action: () => setActiveTab("products") }]
     ),
     { label: "View Orders", icon: ShoppingBag, primary: false, action: () => setActiveTab("orders") },
+    { label: "International Shipping", icon: Truck, primary: false, action: () => setActiveTab("orders") },
+    { label: "Currency Settings", icon: Coins, primary: false, action: () => setShowSettings(true) },
     { label: "Analytics", icon: BarChart3, primary: false, action: () => setActiveTab("analytics") },
     { label: "Withdraw", icon: ArrowUpRight, primary: false, action: () => setShowWithdrawal(true) },
-    { label: "AI BizPilot", icon: Sparkles, primary: false, highlight: true, action: () => setActiveTab("ai") },
+    { label: "AI Trade Assistant", icon: Sparkles, primary: false, highlight: true, action: () => setActiveTab("ai") },
   ]
 
   const aiInsights = [

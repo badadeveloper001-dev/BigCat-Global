@@ -8,6 +8,7 @@ export async function GET(
 ) {
   try {
     const { conversationId } = await params
+    const viewerLanguage = request.nextUrl.searchParams.get('viewerLanguage') === 'zh' ? 'zh' : 'en'
 
     if (!conversationId) {
       return NextResponse.json(
@@ -21,7 +22,7 @@ export async function GET(
 
     await markConversationAsRead(conversationId, auth.user.id)
 
-    const result = await getConversationMessages(conversationId, auth.user.id)
+    const result = await getConversationMessages(conversationId, auth.user.id, viewerLanguage)
     return NextResponse.json(result)
   } catch (error) {
     console.error('Get conversation messages API error:', error)

@@ -235,7 +235,7 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
   const handleShareVendor = async () => {
     const shareData = {
       title: vendor.name,
-      text: `Check out ${vendor.name} on BigCat International`,
+      text: `Check out ${vendor.name} on BigCat Global`,
       url: window.location.href,
     }
 

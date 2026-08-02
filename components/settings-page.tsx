@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRole } from '@/lib/role-context'
+import { COUNTRY_CONFIG, type SupportedCountry, type SupportedCurrency, type SupportedLanguage } from '@/lib/global-market-config'
 import { createClient as createSupabaseClient } from '@/lib/supabase/client'
 import { ArrowLeft, Lock, Mail, Bell, Loader2, Check, AlertCircle, Eye, EyeOff, Trash2 } from 'lucide-react'
 
@@ -11,8 +12,8 @@ interface SettingsMessage {
 }
 
 export function SettingsPage({ onBack }: { onBack: () => void }) {
-  const { user, setRole, setUser } = useRole()
-  const [activeTab, setActiveTab] = useState<'password' | 'email' | 'notifications' | 'delete'>('password')
+  const { user, setRole, setUser, preferences, setPreferences } = useRole()
+  const [activeTab, setActiveTab] = useState<'global' | 'password' | 'email' | 'notifications' | 'delete'>('global')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<SettingsMessage | null>(null)
   const [showPasswords, setShowPasswords] = useState<{ current: boolean; new: boolean; confirm: boolean; delete: boolean }>({
@@ -43,6 +44,24 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
     push_notifications: true,
     sms_notifications: false,
   })
+
+  const [globalSettings, setGlobalSettings] = useState({
+    country: preferences.country,
+    language: preferences.language,
+    currency: preferences.currency,
+    aiLanguage: preferences.aiLanguage,
+    region: preferences.region,
+  })
+
+  useEffect(() => {
+    setGlobalSettings({
+      country: preferences.country,
+      language: preferences.language,
+      currency: preferences.currency,
+      aiLanguage: preferences.aiLanguage,
+      region: preferences.region,
+    })
+  }, [preferences])
 
   useEffect(() => {
     if (!user?.userId) return
@@ -200,6 +219,19 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
     }
   }
 
+  const handleGlobalSettingsSave = () => {
+    setPreferences({
+      ...preferences,
+      country: globalSettings.country,
+      language: globalSettings.language,
+      currency: globalSettings.currency,
+      aiLanguage: globalSettings.aiLanguage,
+      region: globalSettings.region,
+    })
+    setMessage({ type: 'success', text: 'Global settings updated' })
+    setTimeout(() => setMessage(null), 3000)
+  }
+
   // Handle account deletion
   const handleDeleteAccount = async () => {
     if (!confirmDelete) {
@@ -262,6 +294,7 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
       {/* Tabs */}
       <div className="flex border-b border-border bg-card sticky top-[57px] z-40 overflow-x-auto">
         {[
+          { id: 'global', label: 'Global', icon: Bell },
           { id: 'password', label: 'Password', icon: Lock },
           { id: 'email', label: 'Email', icon: Mail },
           { id: 'notifications', label: 'Alerts', icon: Bell },
@@ -299,6 +332,89 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
             )}
             <p className="text-sm font-medium">{message.text}</p>
+          </div>
+        )}
+
+        {activeTab === 'global' && (
+          <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+            <h3 className="font-semibold text-foreground">Global Preferences</h3>
+
+            <div>
+              <label className="text-sm font-semibold text-foreground block mb-2">Country</label>
+              <select
+                value={globalSettings.country}
+                onChange={(e) => {
+                  const nextCountry = e.target.value as SupportedCountry
+                  const preset = COUNTRY_CONFIG[nextCountry]
+                  setGlobalSettings((prev) => ({
+                    ...prev,
+                    country: nextCountry,
+                    language: preset.defaultLanguage,
+                    currency: preset.defaultCurrency,
+                    aiLanguage: preset.defaultLanguage,
+                  }))
+                }}
+                className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary"
+              >
+                <option value="NG">Nigeria</option>
+                <option value="CN">China</option>
+              </select>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-sm font-semibold text-foreground block mb-2">Language</label>
+                <select
+                  value={globalSettings.language}
+                  onChange={(e) => setGlobalSettings((prev) => ({ ...prev, language: e.target.value as SupportedLanguage }))}
+                  className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary"
+                >
+                  <option value="en">English</option>
+                  <option value="zh">Chinese (Simplified)</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground block mb-2">Currency</label>
+                <select
+                  value={globalSettings.currency}
+                  onChange={(e) => setGlobalSettings((prev) => ({ ...prev, currency: e.target.value as SupportedCurrency }))}
+                  className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary"
+                >
+                  <option value="NGN">NGN</option>
+                  <option value="CNY">CNY</option>
+                  <option value="USD">USD</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-semibold text-foreground block mb-2">AI Language</label>
+              <select
+                value={globalSettings.aiLanguage}
+                onChange={(e) => setGlobalSettings((prev) => ({ ...prev, aiLanguage: e.target.value as SupportedLanguage }))}
+                className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary"
+              >
+                <option value="en">English</option>
+                <option value="zh">Chinese (Simplified)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-sm font-semibold text-foreground block mb-2">Region</label>
+              <input
+                value={globalSettings.region}
+                onChange={(e) => setGlobalSettings((prev) => ({ ...prev, region: e.target.value }))}
+                className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary"
+                placeholder="e.g. Lagos, Guangdong"
+              />
+            </div>
+
+            <button
+              onClick={handleGlobalSettingsSave}
+              className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity"
+            >
+              Save Global Settings
+            </button>
           </div>
         )}
 

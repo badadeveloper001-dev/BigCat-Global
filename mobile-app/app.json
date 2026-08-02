@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "BigCat International",
-    "slug": "bigcat-marketplace-mobile-realface",
+    "name": "BigCat Global",
+    "slug": "bigcat-global-mobile",
     "version": "1.0.0",
-    "scheme": "bigcat",
+    "scheme": "bigcatglobal",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,13 +14,13 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.realface.bigcatmarketplace",
+      "bundleIdentifier": "com.realface.bigcatglobal",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.realface.bigcatmarketplace",
+      "package": "com.realface.bigcatglobal",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -31,7 +31,7 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "apiBaseUrl": "https://v0-big-cat-marketplace.vercel.app",
+      "apiBaseUrl": "https://bigcat-global.vercel.app",
       "eas": {
         "projectId": "78a4be03-9570-47fb-9066-613dbdd7e79c"
       }

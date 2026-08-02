@@ -2,7 +2,7 @@
 
 import { CreditCard, Wallet, Building2, Check } from 'lucide-react'
 
-export type PaymentMethod = 'palmpay' | 'bank' | 'card'
+export type PaymentMethod = 'orchid' | 'bank' | 'card'
 
 interface PaymentMethodSelectorProps {
   selectedMethod: PaymentMethod
@@ -11,9 +11,9 @@ interface PaymentMethodSelectorProps {
 
 const paymentMethods = [
   {
-    id: 'palmpay' as PaymentMethod,
-    label: 'PalmPay Wallet',
-    description: 'Pay instantly from your PalmPay account',
+    id: 'orchid' as PaymentMethod,
+    label: 'Orchid Wallet',
+    description: 'Pay instantly from your Orchid account',
     icon: Wallet,
     badge: 'Recommended',
     highlighted: true,

@@ -23,7 +23,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
   const [fulfillmentMethod, setFulfillmentMethod] = useState<'doorstep' | 'pickup'>('doorstep')
   const [deliveryType, setDeliveryType] = useState<'normal' | 'express'>('normal')
   const [deliveryAddress, setDeliveryAddress] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('palmpay')
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('orchid')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -52,7 +52,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
     if (!normalized) return null
     if (normalized === 'card') return 'card'
     if (normalized === 'bank' || normalized === 'bank_transfer' || normalized === 'transfer') return 'bank'
-    if (normalized === 'palmpay') return 'palmpay'
+    if (normalized === 'palmpay' || normalized === 'orchid') return 'orchid'
     return null
   }
 
@@ -120,7 +120,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
   const subtotalAfterPromotion = isServiceCheckout ? serviceTotal : (discountedProductTotal + deliveryFee)
   const effectiveCouponDiscount = isServiceCheckout ? 0 : Math.min(Number(appliedCoupon?.discount || 0), subtotalAfterPromotion + gitFeeAmount)
   const grandTotal = Math.max(0, subtotalAfterPromotion + gitFeeAmount - effectiveCouponDiscount)
-  const isWalletPayment = paymentMethod === 'palmpay'
+  const isWalletPayment = paymentMethod === 'orchid'
   const isWalletInsufficient = isWalletPayment && (isServiceCheckout || deliveryAddress.trim()) && walletBalance < grandTotal
   const walletShortfall = isWalletInsufficient ? grandTotal - walletBalance : 0
 
