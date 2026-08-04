@@ -357,35 +357,78 @@ export function LandingPage() {
       {/* ── HOW IT WORKS ── */}
       <section className="py-24 px-5 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
-        <div className="max-w-5xl mx-auto relative">
-          <div className="text-center mb-16">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-400">Simple Process</span>
+        <div className="max-w-6xl mx-auto relative">
+          <div className="text-center mb-12">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-400">How it works</span>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mt-3 mb-4">
-              Up &amp; running{" "}
-              <span className="bg-gradient-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent">
-                in minutes
+              A simple flow from
+              <span className="block bg-gradient-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent">
+                discovery to delivery
               </span>
             </h2>
-            <p className="text-gray-400 text-lg max-w-xl mx-auto">
-              From sign-up to your first sale — we&apos;ve made every step painless.
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {steps.map((step, i) => (
-              <div key={step.number} className="relative group">
-                {i < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-7 left-full w-full h-px bg-gradient-to-r from-white/10 to-transparent z-0" />
-                )}
-                <div className="relative bg-white/[0.03] border border-white/10 rounded-2xl p-6 hover:bg-white/[0.06] transition-all hover:-translate-y-1">
-                  <div className={`w-14 h-14 rounded-2xl ${step.color} flex items-center justify-center font-extrabold text-white text-lg shadow-lg mb-5`}>
-                    {step.number}
+          <div className="rounded-[32px] border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-6 sm:p-8 lg:p-10">
+            <div className="flex flex-col lg:flex-row items-stretch justify-between gap-4">
+              {[
+                {
+                  title: "Discover",
+                  description: "Browse verified sellers, compare products, and use AI guidance to find the right option.",
+                  icon: ShoppingBag,
+                  gradient: "from-[#00A651] to-[#45c76c]",
+                },
+                {
+                  title: "Connect",
+                  description: "Chat with merchants, confirm details, and move from browsing to a trusted transaction.",
+                  icon: Users,
+                  gradient: "from-violet-500 to-purple-400",
+                },
+                {
+                  title: "Pay & Ship",
+                  description: "Secure your order with protected payments and track delivery all in one place.",
+                  icon: CreditCard,
+                  gradient: "from-sky-500 to-blue-400",
+                },
+                {
+                  title: "Grow",
+                  description: "Review progress, build loyalty, and scale your business with ongoing trade insights.",
+                  icon: TrendingUp,
+                  gradient: "from-orange-500 to-amber-400",
+                },
+              ].map((step, index) => (
+                <div key={step.title} className="flex-1">
+                  <div className="relative h-full rounded-[24px] border border-white/10 bg-[#07120b]/90 p-5 shadow-lg shadow-black/20">
+                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br ${step.gradient} shadow-lg mb-4`}>
+                      <step.icon className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#72d38e] mb-2">
+                      Step {index + 1}
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
+                    <p className="text-sm leading-relaxed text-gray-400">{step.description}</p>
                   </div>
-                  <h3 className={`font-bold text-white mb-2 ${step.textColor}`}>{step.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{step.description}</p>
+                  {index < 3 && (
+                    <div className="hidden lg:flex items-center justify-center py-3 text-[#45c76c]">
+                      <ArrowRight className="w-5 h-5" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 rounded-[24px] border border-[#00A651]/20 bg-[#032c0e]/70 p-5 sm:p-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#72d38e]">Visual flow</p>
+                  <p className="text-white font-semibold mt-1">Buyer → discovery → trusted checkout → delivery &amp; growth</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-gray-300">Verified merchants</span>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-gray-300">Protected payments</span>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-gray-300">Live updates</span>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>

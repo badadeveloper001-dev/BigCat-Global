@@ -2,14 +2,16 @@ import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
 import { getBestPromotionDiscountForItems, incrementPromotionUsage } from "@/lib/promotion-actions"
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Missing Supabase credentials")
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Missing Supabase credentials")
+  }
+
+  return createClient(supabaseUrl, supabaseKey)
 }
-
-const supabase = createClient(supabaseUrl, supabaseKey)
 
 type CachedInitiationResult = {
   expiresAt: number
@@ -156,6 +158,8 @@ export async function POST(request: NextRequest) {
           final_total: finalTotal,
         },
       ]
+
+      const supabase = getSupabaseClient()
 
       let order: any[] | null = null
       let lastError: any = null

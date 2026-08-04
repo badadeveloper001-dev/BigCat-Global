@@ -124,11 +124,11 @@ export async function signup(email: string, password: string, name: string, phon
     }
 
     const supabaseUserId = authData.user.id
-    const profileData = role === 'merchant'
+    const profileData: Record<string, unknown> = role === 'merchant'
       ? { id: supabaseUserId, email, password_hash: '', business_name: name, name, phone, role, token_balance: INITIAL_MERCHANT_TOKENS }
       : { id: supabaseUserId, email, password_hash: '', name, phone, role, token_balance: 0 }
 
-    const { data, error } = await admin.from('auth_users').insert(profileData).select().single()
+    const { data, error } = await admin.from('auth_users').insert(profileData as Record<string, any>).select().single()
 
     if (error) {
       // Clean up orphaned auth user if profile insert fails

@@ -4,14 +4,16 @@ import { NextRequest, NextResponse } from "next/server"
 import { holdFundsInEscrow } from "@/lib/escrow-actions"
 import { dispatchNotification } from "@/lib/notifications"
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Missing Supabase credentials")
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Missing Supabase credentials")
+  }
+
+  return createClient(supabaseUrl, supabaseKey)
 }
-
-const supabase = createClient(supabaseUrl, supabaseKey)
 
 function isMissingColumnError(error: any) {
   const message = String(error?.message || "").toLowerCase()
@@ -43,6 +45,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
       }
     }
+
+    const supabase = getSupabaseClient()
 
     const body = JSON.parse(rawBody)
 
