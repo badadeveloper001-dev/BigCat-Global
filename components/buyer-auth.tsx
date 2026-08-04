@@ -151,6 +151,42 @@ export function BuyerAuth({
     setLoading(true)
 
     try {
+      const hasSupabaseConfig = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+
+      if (!hasSupabaseConfig) {
+        if (isSignUp) {
+          const demoUser = {
+            id: `demo-buyer-${Date.now()}`,
+            email: formData.email,
+            phone: formData.phone,
+            name: formData.name,
+            city: formData.city,
+            state: formData.state,
+            role: 'buyer',
+          }
+          setUser(normalizeBuyerUser(demoUser))
+          setRole('buyer')
+          setSuccessMessage('Demo sign-up complete. You are now signed in locally.')
+          onSuccess?.()
+          return
+        }
+
+        const demoUser = {
+          id: 'demo-buyer-local',
+          email: formData.email,
+          phone: '',
+          name: formData.email.split('@')[0],
+          city: '',
+          state: '',
+          role: 'buyer',
+        }
+        setUser(normalizeBuyerUser(demoUser))
+        setRole('buyer')
+        setSuccessMessage('Demo login successful. You are signed in locally.')
+        onSuccess?.()
+        return
+      }
+
       if (isSignUp) {
         const result = await requestBuyerOtp()
 

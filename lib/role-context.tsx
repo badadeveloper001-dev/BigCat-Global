@@ -51,6 +51,18 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     const supabase = createClient()
     let isActive = true
 
+    const hasSupabaseConfig = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+    if (!hasSupabaseConfig) {
+      const stored = localStorage.getItem('userRole')
+      const storedUser = localStorage.getItem('userData')
+      if (stored) setRoleState(stored)
+      if (storedUser) {
+        try { setUserState(JSON.parse(storedUser)) } catch {}
+      }
+      setIsLoading(false)
+      return
+    }
+
     const clearLocalAuthState = () => {
       localStorage.removeItem('userRole')
       localStorage.removeItem('userData')

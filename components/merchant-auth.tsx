@@ -217,6 +217,46 @@ export function MerchantAuth({
     setLoading(true)
 
     try {
+      const hasSupabaseConfig = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+
+      if (!hasSupabaseConfig) {
+        if (isSignUp) {
+          const demoUser = {
+            id: `demo-merchant-${Date.now()}`,
+            email: formData.email,
+            phone: formData.phone,
+            business_name: formData.businessName,
+            name: formData.businessName,
+            merchant_type: merchantType,
+            city: formData.city,
+            state: formData.state,
+            country: formData.country,
+            role: 'merchant',
+          }
+          setUser(normalizeMerchantUser(demoUser))
+          setRole('merchant')
+          setSuccessMessage('Demo merchant sign-up complete. You are now signed in locally.')
+          return
+        }
+
+        const demoUser = {
+          id: 'demo-merchant-local',
+          email: formData.email,
+          phone: '',
+          business_name: formData.email.split('@')[0],
+          name: formData.email.split('@')[0],
+          merchant_type: merchantType,
+          city: '',
+          state: '',
+          country: formData.country,
+          role: 'merchant',
+        }
+        setUser(normalizeMerchantUser(demoUser))
+        setRole('merchant')
+        setSuccessMessage('Demo merchant login successful. You are signed in locally.')
+        return
+      }
+
       const supabase = createClient()
 
       if (isSignUp) {
