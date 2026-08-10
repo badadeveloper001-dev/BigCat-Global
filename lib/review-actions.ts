@@ -40,7 +40,15 @@ export async function canUserReview(productId: string, userId: string) {
     const { data: existingReview } = await supabase.from('reviews').select('id').eq('product_id', productId).eq('user_id', userId).single()
     if (existingReview) return { success: true, canReview: false }
     
-    const { data: orders } = await supabase.from('orders').select('id, order_items!inner(product_id)').eq('buyer_id', userId).eq('order_items.product_id', productId)
+    const { data: orderItems } = await supabase
+      .from('order_items')
+      .select('order_id')
+      .eq('product_id', productId)
+
+    const orderIds = (orderItems || []).map((oi: any) => oi.order_id).filter(Boolean)
+    const { data: orders } = orderIds.length
+      ? await supabase.from('orders').select('id').eq('buyer_id', userId).in('id', orderIds)
+      : { data: [] }
     return { success: true, canReview: orders && orders.length > 0 }
   } catch (error: any) {
     return { success: false, error: error.message, canReview: false }
