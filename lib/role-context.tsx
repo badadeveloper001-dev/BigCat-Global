@@ -154,10 +154,47 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     initializeSession()
 
     // Sync auth events across tabs and after sign-in/sign-out
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
       if (!isActive) return
 
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+      if (event === 'SIGNED_IN' && session?.user) {
+        // Fetch profile from DB to restore role and user state
+        try {
+          const response = await fetch(`/api/user/profile?userId=${session.user.id}`, {
+            headers: { Authorization: `Bearer ${session.access_token}` },
+            cache: 'no-store',
+          })
+          const result = await response.json()
+          if (result.success && result.data && isActive) {
+            const profile = result.data
+            setRoleState(profile.role)
+            setUserState({
+              userId: profile.id,
+              email: profile.email,
+              phone: profile.phone || '',
+              name: profile.name || profile.full_name || profile.business_name,
+              city: profile.city || '',
+              state: profile.state || '',
+              role: profile.role,
+              merchantType: profile.merchant_type,
+            })
+            localStorage.setItem('userRole', profile.role)
+            localStorage.setItem('userData', JSON.stringify({
+              userId: profile.id,
+              email: profile.email,
+              phone: profile.phone || '',
+              name: profile.name || profile.full_name || profile.business_name,
+              role: profile.role,
+            }))
+          }
+        } catch {
+          // Non-critical: localStorage fallback still applies
+        }
+        setIsLoading(false)
+        return
+      }
+
+      if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
         setIsLoading(false)
         return
       }
