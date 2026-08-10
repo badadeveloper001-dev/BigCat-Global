@@ -307,75 +307,14 @@ export function BuyerAuth({
     setGoogleLoading(true)
 
     try {
-      if (isSignUp) {
-        setError('Use the signup form so your state and city can be saved for delivery and logistics.')
-        return
-      }
-      const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-      if (!googleClientId) {
-        setError('Google sign-in is not configured. Add NEXT_PUBLIC_GOOGLE_CLIENT_ID.')
-        return
-      }
-
-      const loaded = await ensureGoogleScript()
-      if (!loaded || !window.google?.accounts?.id) {
-        setError('Failed to initialize Google sign-in.')
-        return
-      }
-
-      const credential = await new Promise<string>((resolve, reject) => {
-        window.google.accounts.id.initialize({
-          client_id: googleClientId,
-          callback: (response: any) => {
-            if (response?.credential) resolve(response.credential)
-            else reject(new Error('No Google credential received'))
-          },
-        })
-
-        window.google.accounts.id.prompt((notification: any) => {
-          const skipped = notification?.isSkippedMoment?.()
-          const notDisplayed = notification?.isNotDisplayed?.()
-          if (skipped || notDisplayed) {
-            reject(new Error('Google prompt was closed before completing sign in.'))
-          }
-        })
-      })
-
-      const response = await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ credential, role: 'buyer' }),
-      })
-
-      const result = await response.json()
-      if (!result.success || !result.data?.user) {
-        setError(result.error || 'Google sign-in failed')
-        return
-      }
-
       const supabase = createClient()
-      const { error: signInError } = await supabase.auth.signInWithIdToken({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        token: credential,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?role=buyer`,
+        },
       })
-
-      if (signInError) {
-        setError(signInError.message || 'Failed to establish your Google session.')
-        return
-      }
-
-      const user = result.data.user
-      setUser({
-        userId: user.id,
-        email: user.email,
-        phone: user.phone,
-        name: user.name || user.full_name,
-        role: 'buyer',
-      })
-      setRole('buyer')
-      onSuccess?.()
+      if (error) setError(error.message || 'Google sign-in failed')
     } catch (err: any) {
       setError(err?.message || 'Google sign-in failed')
     } finally {
@@ -618,7 +557,7 @@ export function BuyerAuth({
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    {isSignUp ? "Sending OTP..." : "Signing In..."}
+                    {isSignUp ? "Creating account..." : "Signing In..."}
                   </>
                 ) : (
                   <>{isSignUp ? "Create Account" : "Sign In"}</>
@@ -627,20 +566,14 @@ export function BuyerAuth({
             </form>
 
             <div className="mt-4">
-              {isSignUp ? (
-                <div className="rounded-xl border border-border bg-secondary/40 px-4 py-3 text-sm text-muted-foreground">
-                  Buyer sign-up sends a verification code before the account is created so your email is confirmed first.
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  disabled={googleLoading || loading}
-                  className="w-full py-3 px-4 bg-white border border-border text-foreground font-semibold rounded-xl hover:bg-muted/50 transition-colors disabled:opacity-50"
-                >
-                  {googleLoading ? 'Connecting to Google...' : 'Login with Google'}
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={googleLoading || loading}
+                className="w-full py-3 px-4 bg-white border border-border text-foreground font-semibold rounded-xl hover:bg-muted/50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {googleLoading ? 'Connecting to Google...' : isSignUp ? 'Sign up with Google' : 'Login with Google'}
+              </button>
             </div>
 
             <div className="mt-8 text-center">
