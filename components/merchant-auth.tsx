@@ -365,15 +365,21 @@ export function MerchantAuth({
     setGoogleLoading(true)
 
     try {
+      // Store role before redirect so RoleContext can read it back after OAuth
+      localStorage.setItem('pendingOAuthRole', 'merchant')
       const supabase = createClient()
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?role=merchant`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       })
-      if (error) setError(error.message || 'Google sign-in failed')
+      if (error) {
+        localStorage.removeItem('pendingOAuthRole')
+        setError(error.message || 'Google sign-in failed')
+      }
     } catch (err: any) {
+      localStorage.removeItem('pendingOAuthRole')
       setError(err?.message || 'Google sign-in failed')
     } finally {
       setGoogleLoading(false)

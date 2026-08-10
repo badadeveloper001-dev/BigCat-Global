@@ -217,7 +217,8 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       if (!isActive) return
 
       if (event === 'SIGNED_IN' && session?.user) {
-        // Fetch profile from DB to restore role and user state
+        const pendingRole = localStorage.getItem('pendingOAuthRole') as 'buyer' | 'merchant' | null
+
         try {
           const response = await fetch(`/api/user/profile?userId=${session.user.id}`, {
             headers: { Authorization: `Bearer ${session.access_token}` },
@@ -226,7 +227,8 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
           const result = await response.json()
           if (result.success && result.data && isActive) {
             const profile = result.data
-            setRoleState(profile.role)
+            const role = (pendingRole || profile.role || 'buyer') as string
+            setRoleState(role)
             setUserState({
               userId: profile.id,
               email: profile.email,
@@ -234,20 +236,39 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
               name: profile.name || profile.full_name || profile.business_name,
               city: profile.city || '',
               state: profile.state || '',
-              role: profile.role,
+              role: role as any,
               merchantType: profile.merchant_type,
             })
-            localStorage.setItem('userRole', profile.role)
-            localStorage.setItem('userData', JSON.stringify({
-              userId: profile.id,
-              email: profile.email,
-              phone: profile.phone || '',
-              name: profile.name || profile.full_name || profile.business_name,
-              role: profile.role,
-            }))
+            localStorage.setItem('userRole', role)
+            localStorage.setItem('userData', JSON.stringify({ userId: profile.id, email: profile.email, name: profile.name || profile.full_name, role }))
+            if (pendingRole) {
+              localStorage.removeItem('pendingOAuthRole')
+              if (profile.role !== pendingRole) {
+                fetch('/api/user/profile', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+                  body: JSON.stringify({ userId: session.user.id, updates: { role: pendingRole } }),
+                }).catch(() => {})
+              }
+            }
+          } else {
+            const role = pendingRole || 'buyer'
+            if (isActive) {
+              const fallback = { userId: session.user.id, email: session.user.email || '', phone: '', name: session.user.user_metadata?.full_name || '', role: role as any }
+              setRoleState(role)
+              setUserState(fallback)
+              localStorage.setItem('userRole', role)
+              localStorage.setItem('userData', JSON.stringify(fallback))
+              if (pendingRole) localStorage.removeItem('pendingOAuthRole')
+            }
           }
         } catch {
-          // Non-critical: localStorage fallback still applies
+          const role = pendingRole || 'buyer'
+          if (isActive) {
+            setRoleState(role)
+            localStorage.setItem('userRole', role)
+            if (pendingRole) localStorage.removeItem('pendingOAuthRole')
+          }
         }
         setIsLoading(false)
         return

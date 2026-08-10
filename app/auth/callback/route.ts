@@ -6,7 +6,6 @@ import { cookies } from 'next/headers'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const role = searchParams.get('role') || 'buyer'
   const next = searchParams.get('next') ?? '/marketplace'
 
   if (!code) {
@@ -15,7 +14,6 @@ export async function GET(request: NextRequest) {
 
   const cookieStore = await cookies()
 
-  // Must use SSR client with cookies for PKCE code exchange
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -38,22 +36,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/marketplace?error=auth_failed`)
   }
 
-  const userId = data.user.id
-  const userEmail = data.user.email || ''
-  const userName = data.user.user_metadata?.full_name
-    || data.user.user_metadata?.name
-    || userEmail.split('@')[0]
-
-  // Use admin client to bypass RLS for profile operations
-  const admin = createAdminClient()
-
-  // Store role in user_metadata so RoleContext can read it even if auth_users insert fails
-  await admin.auth.admin.updateUserById(userId, {
-    user_metadata: { ...data.user.user_metadata, role },
-  }).catch(() => {})
-
-  // Upsert into auth_users
+  // Upsert into auth_users using admin client (role set client-side via pendingOAuthRole)
   try {
+    const admin = createAdminClient()
+    const userId = data.user.id
+    const userEmail = data.user.email || ''
+    const userName = data.user.user_metadata?.full_name
+      || data.user.user_metadata?.name
+      || userEmail.split('@')[0]
+
     const { data: existing } = await admin
       .from('auth_users')
       .select('id')
@@ -68,15 +59,16 @@ export async function GET(request: NextRequest) {
         full_name: userName,
         avatar_url: data.user.user_metadata?.avatar_url || null,
         google_id: data.user.user_metadata?.sub || null,
-        role,
+        role: 'buyer', // default; client updates via pendingOAuthRole
         password_hash: '',
         phone: '',
         token_balance: 0,
       })
     }
   } catch {
-    // Role is already stored in user_metadata above as fallback
+    // Non-blocking
   }
 
   return NextResponse.redirect(`${origin}${next}`)
 }
+
