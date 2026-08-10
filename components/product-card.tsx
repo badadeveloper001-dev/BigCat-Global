@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { ShoppingCart, Heart, MapPin, Package, Check } from 'lucide-react'
-import { formatNaira } from '@/lib/currency-utils'
+import { formatCurrency, formatNaira } from '@/lib/currency-utils'
 import { useCart } from '@/lib/cart-context'
 import { useWishlist } from '@/lib/wishlist-context'
+import { useRole } from '@/lib/role-context'
 import Image from 'next/image'
 
 interface ProductCardProps {
@@ -57,6 +58,7 @@ export function ProductCard({
   const [addedToCart, setAddedToCart] = useState(false)
   const { addItem } = useCart()
   const { toggleItem, isInWishlist } = useWishlist()
+  const { preferences } = useRole()
 
   const wishlistItem = {
     id,
@@ -82,6 +84,9 @@ export function ProductCard({
     : null
   const verificationLevel = merchant.verification_level || (merchant.logo_url && merchant.location ? 'verified' : 'basic')
   const verificationLabel = verificationLevel === 'trusted' ? 'Trusted Seller' : verificationLevel === 'verified' ? 'Verified Seller' : 'New Seller'
+  const displayCurrency = preferences.currency || 'NGN'
+  const displayPrice = displayCurrency === 'NGN' ? discountedPrice : Math.max(0, Number(price || 0))
+  const displayPriceLabel = displayCurrency === 'NGN' ? formatNaira(displayPrice) : formatCurrency(displayPrice, displayCurrency)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -161,11 +166,11 @@ export function ProductCard({
             {name}
           </h3>
           <div className="mt-1.5 flex items-center gap-2 flex-wrap">
-            <p className="text-lg font-bold text-foreground">{formatNaira(discountedPrice)}</p>
+            <p className="text-lg font-bold text-foreground">{displayPriceLabel}</p>
             {normalizedPromotionPercent > 0 && (
               <>
                 <p className="text-xs font-medium text-muted-foreground line-through decoration-2">
-                  {formatNaira(price)}
+                  {displayCurrency === 'NGN' ? formatNaira(price) : formatCurrency(price, displayCurrency)}
                 </p>
                 <span className="rounded-full bg-red-600 px-2 py-0.5 text-[11px] font-bold text-white">
                   {normalizedPromotionPercent}% OFF

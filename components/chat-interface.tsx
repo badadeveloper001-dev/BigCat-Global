@@ -484,6 +484,10 @@ function ChatConversationScreen({
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 flex items-start gap-2">
+          <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
+          <span>Buyer safety reminder: always ask for photo or video proof before paying, accepting delivery, or confirming the order.</span>
+        </div>
         {warning && (
           <div className="rounded-xl border border-[#E8D7FF] bg-[#F3E8FF] px-3 py-2 text-sm text-[#6C2BD9]">
             {warning}

@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { formatNaira } from '@/lib/currency-utils'
+import { formatCurrency, formatNaira } from '@/lib/currency-utils'
 import { useCart } from '@/lib/cart-context'
 import { useWishlist } from '@/lib/wishlist-context'
-import { ArrowLeft, ShoppingCart, MapPin, Package, Loader2, AlertCircle, Truck, CheckCircle2, ChevronLeft, ChevronRight, ImageIcon, Store, Heart, Bell, BellOff } from 'lucide-react'
+import { useRole } from '@/lib/role-context'
+import { ArrowLeft, ShoppingCart, MapPin, Package, Loader2, AlertCircle, Truck, CheckCircle2, ChevronLeft, ChevronRight, ImageIcon, Store, Heart, Bell, BellOff, ShieldCheck, Camera, Video } from 'lucide-react'
 import { ProductReviews, StarRating } from './product-reviews'
 import { BrandWordmark } from './brand-wordmark'
 
@@ -29,6 +30,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const { addItem, getItemCount, getTotal } = useCart()
   const { toggleItem, isInWishlist } = useWishlist()
+  const { preferences } = useRole()
   const [priceAlertActive, setPriceAlertActive] = useState(false)
   const [priceAlertFeedback, setPriceAlertFeedback] = useState('')
 
@@ -177,6 +179,8 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
   const discountedPrice = promotionPercentOff > 0
     ? currentPrice * (1 - promotionPercentOff / 100)
     : currentPrice
+  const displayCurrency = preferences.currency || 'NGN'
+  const displayPriceLabel = displayCurrency === 'NGN' ? formatNaira(discountedPrice) : formatCurrency(discountedPrice, displayCurrency)
 
   const wishlistItem = {
     id: String(product.id),
@@ -293,7 +297,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
 
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
-              <p className="text-2xl font-bold text-foreground">{formatNaira(discountedPrice)}</p>
+              <p className="text-2xl font-bold text-foreground">{displayPriceLabel}</p>
               {promotionPercentOff > 0 && (
                 <>
                   <p className="text-sm text-muted-foreground line-through">{formatNaira(currentPrice)}</p>
@@ -331,6 +335,26 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
           {priceAlertFeedback && (
             <span className="text-xs text-amber-700">{priceAlertFeedback}</span>
           )}
+        </div>
+
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 flex items-start gap-2">
+          <ShieldCheck className="w-4 h-4 mt-0.5 shrink-0" />
+          <span>Buyer protection: request photo or video proof before payment release, delivery confirmation, or final acceptance.</span>
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-3">
+          <div className="rounded-lg border border-border bg-background/70 p-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground"><Truck className="w-4 h-4 text-primary" /> Shipping</div>
+            <p className="text-xs text-muted-foreground mt-1">Cross-border delivery estimates, customs support, and tracking guidance are available.</p>
+          </div>
+          <div className="rounded-lg border border-border bg-background/70 p-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground"><Camera className="w-4 h-4 text-primary" /> Proof</div>
+            <p className="text-xs text-muted-foreground mt-1">Ask for photos or videos of the item, packaging, and receiving conditions.</p>
+          </div>
+          <div className="rounded-lg border border-border bg-background/70 p-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground"><Video className="w-4 h-4 text-primary" /> Escrow</div>
+            <p className="text-xs text-muted-foreground mt-1">Funds stay protected until the shipment is verified and accepted.</p>
+          </div>
         </div>
 
         {/* Description */}

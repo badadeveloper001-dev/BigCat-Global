@@ -339,6 +339,11 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
           <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
             <h3 className="font-semibold text-foreground">Global Preferences</h3>
 
+            <div className="rounded-xl border border-primary/15 bg-primary/5 p-3 text-sm text-muted-foreground">
+              <p className="font-semibold text-foreground mb-1">Automatic region detection</p>
+              <p>We detect your region from your browser and location settings. English is used for Nigeria and Chinese is used for China, but you can switch manually at any time.</p>
+            </div>
+
             <div>
               <label className="text-sm font-semibold text-foreground block mb-2">Country</label>
               <select

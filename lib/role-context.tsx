@@ -7,6 +7,7 @@ import {
   applyCountryPreset,
   buildDefaultPreferences,
   DEFAULT_GLOBAL_PREFERENCES,
+  detectCountryAndRegionFromBrowser,
   detectCountryFromBrowser,
   type GlobalPreferences,
   type SupportedCountry,
@@ -50,6 +51,23 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const supabase = createClient()
     let isActive = true
+
+    const initializePreferences = async () => {
+      const storedPreferences = localStorage.getItem('globalPreferences')
+      if (storedPreferences) {
+        try {
+          const parsed = JSON.parse(storedPreferences)
+          setPreferencesState({ ...DEFAULT_GLOBAL_PREFERENCES, ...parsed })
+          return
+        } catch {
+          // fall through to browser detection
+        }
+      }
+
+      const detectedPreferences = await detectCountryAndRegionFromBrowser()
+      if (!isActive) return
+      setPreferencesState(detectedPreferences)
+    }
 
     const hasSupabaseConfig = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
     if (!hasSupabaseConfig) {
@@ -102,6 +120,8 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       const detectedCountry = detectCountryFromBrowser()
       setPreferencesState(buildDefaultPreferences(detectedCountry))
     }
+
+    void initializePreferences()
 
     const initializeSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession()

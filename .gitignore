@@ -24,3 +24,4 @@ node_modules/
 # Local workspace/editor and backup exports
 .vscode/
 exports/
+.env*
