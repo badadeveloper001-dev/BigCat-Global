@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
+import { createClient as createAdminClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
@@ -7,51 +9,74 @@ export async function GET(request: NextRequest) {
   const role = searchParams.get('role') || 'buyer'
   const next = searchParams.get('next') ?? '/marketplace'
 
-  if (code) {
-    const supabase = createClient()
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-
-    if (!error && data.user) {
-      const userId = data.user.id
-      const userEmail = data.user.email || ''
-      const userName = data.user.user_metadata?.full_name
-        || data.user.user_metadata?.name
-        || userEmail.split('@')[0]
-
-      // Store role in Supabase user_metadata so RoleContext can read it without querying auth_users
-      await supabase.auth.admin.updateUserById(userId, {
-        user_metadata: { ...data.user.user_metadata, role },
-      }).catch(() => {})
-
-      // Upsert into auth_users — non-blocking, missing columns are handled gracefully
-      try {
-        const { data: existing } = await supabase
-          .from('auth_users')
-          .select('id')
-          .eq('id', userId)
-          .single()
-
-        if (!existing) {
-          await supabase.from('auth_users').insert({
-            id: userId,
-            email: userEmail,
-            name: userName,
-            full_name: userName,
-            avatar_url: data.user.user_metadata?.avatar_url || null,
-            google_id: data.user.user_metadata?.sub || null,
-            role,
-            password_hash: '',
-            phone: '',
-            token_balance: 0,
-          })
-        }
-      } catch {
-        // Non-blocking — role is already in user_metadata above
-      }
-
-      return NextResponse.redirect(`${origin}${next}`)
-    }
+  if (!code) {
+    return NextResponse.redirect(`${origin}/marketplace?error=auth_failed`)
   }
 
-  return NextResponse.redirect(`${origin}/marketplace?error=auth_failed`)
+  const cookieStore = await cookies()
+
+  // Must use SSR client with cookies for PKCE code exchange
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return cookieStore.getAll() },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+
+  if (error || !data.user) {
+    console.error('[auth/callback] exchangeCodeForSession failed:', error?.message)
+    return NextResponse.redirect(`${origin}/marketplace?error=auth_failed`)
+  }
+
+  const userId = data.user.id
+  const userEmail = data.user.email || ''
+  const userName = data.user.user_metadata?.full_name
+    || data.user.user_metadata?.name
+    || userEmail.split('@')[0]
+
+  // Use admin client to bypass RLS for profile operations
+  const admin = createAdminClient()
+
+  // Store role in user_metadata so RoleContext can read it even if auth_users insert fails
+  await admin.auth.admin.updateUserById(userId, {
+    user_metadata: { ...data.user.user_metadata, role },
+  }).catch(() => {})
+
+  // Upsert into auth_users
+  try {
+    const { data: existing } = await admin
+      .from('auth_users')
+      .select('id')
+      .eq('id', userId)
+      .single()
+
+    if (!existing) {
+      await admin.from('auth_users').insert({
+        id: userId,
+        email: userEmail,
+        name: userName,
+        full_name: userName,
+        avatar_url: data.user.user_metadata?.avatar_url || null,
+        google_id: data.user.user_metadata?.sub || null,
+        role,
+        password_hash: '',
+        phone: '',
+        token_balance: 0,
+      })
+    }
+  } catch {
+    // Role is already stored in user_metadata above as fallback
+  }
+
+  return NextResponse.redirect(`${origin}${next}`)
 }
