@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "migrate": "node scripts/migrate.mjs",
+    "setup-db": "node scripts/setup-db.mjs",
+    "verify-supabase": "node scripts/verify-supabase.mjs",
+    "setup:all": "npm run verify-supabase && npm run setup-db"
   },
   "dependencies": {
     "@aws-sdk/dsql-signer": "^3.1024.0",
@@ -78,6 +82,7 @@
     "@types/node": "^22",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "dotenv": "^17.4.2",
     "postcss": "^8.5",
     "tailwindcss": "^4.2.0",
     "tw-animate-css": "1.3.3",
