@@ -621,7 +621,7 @@ export function BuyerAuth({
                     {isSignUp ? "Sending OTP..." : "Signing In..."}
                   </>
                 ) : (
-                  <>{isSignUp ? "Send Verification Code" : "Sign In"}</>
+                  <>{isSignUp ? "Create Account" : "Sign In"}</>
                 )}
               </button>
             </form>
