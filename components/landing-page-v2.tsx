@@ -107,7 +107,7 @@ function HeroSection() {
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
-                href="/auth/signup?role=merchant"
+                href="/marketplace"
                 className="inline-flex items-center gap-2 text-gray-200 hover:text-white text-base font-semibold px-8 py-5 rounded-full border border-white/15 hover:border-white/30 bg-white/5 hover:bg-white/10 transition-all hover:-translate-y-1"
               >
                 Become a Merchant
@@ -600,52 +600,6 @@ function OrderTimelineSection() {
   )
 }
 
-// Download Section
-function DownloadSection() {
-  return (
-    <section className="py-32 px-5 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#dc2626]/20 rounded-full blur-[150px]" />
-      </div>
-
-      <div className="relative max-w-4xl mx-auto text-center">
-        <h2 className="text-5xl font-extrabold text-white mb-6">Download BigCat Global</h2>
-        <p className="text-gray-400 text-lg mb-12 max-w-xl mx-auto">
-          Available on iOS and Android. Trade anywhere, anytime.
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-6 items-center justify-center">
-          <a
-            href="https://apps.apple.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 px-8 py-4 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 transition-all group"
-          >
-            <Phone className="w-6 h-6 text-white" />
-            <div className="text-left">
-              <p className="text-xs text-gray-400">Download on</p>
-              <p className="text-white font-bold">App Store</p>
-            </div>
-          </a>
-
-          <a
-            href="https://play.google.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 px-8 py-4 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 transition-all group"
-          >
-            <Phone className="w-6 h-6 text-white" />
-            <div className="text-left">
-              <p className="text-xs text-gray-400">Get it on</p>
-              <p className="text-white font-bold">Google Play</p>
-            </div>
-          </a>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 // Footer
 function FooterSection() {
   return (
@@ -687,7 +641,6 @@ export function LandingPageV2() {
       <CountriesSection />
       <ProtectionSection />
       <OrderTimelineSection />
-      <DownloadSection />
       <FooterSection />
     </div>
   )
