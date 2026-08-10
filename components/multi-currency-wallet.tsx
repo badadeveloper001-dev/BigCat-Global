@@ -33,6 +33,8 @@ const CURRENCY_META: Record<Currency, { symbol: string; name: string; flag: stri
   CNY: { symbol: "¥", name: "Chinese Yuan", flag: "🇨🇳", color: "#ef4444" },
 }
 
+const DEFAULT_RATES: ExchangeRates = { USD: 1, NGN: 1620, CNY: 7.26 }
+
 function fmt(amount: number, currency: Currency): string {
   const meta = CURRENCY_META[currency]
   return `${meta.symbol}${amount.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -59,8 +61,10 @@ export function MultiCurrencyWallet({
 }: MultiCurrencyWalletProps) {
   const [wallets, setWallets] = useState<WalletBalance[]>([])
   const [transactions, setTransactions] = useState<WalletTx[]>([])
-  const [rates, setRates] = useState<ExchangeRates>({ USD: 1, NGN: 1620, CNY: 7.26 })
+  const [rates, setRates] = useState<ExchangeRates>(DEFAULT_RATES)
   const [rateSource, setRateSource] = useState<"live" | "fallback">("fallback")
+  const [rateProvider, setRateProvider] = useState<string>("fallback")
+  const [rateUpdatedAt, setRateUpdatedAt] = useState<string>("")
   const [loading, setLoading] = useState(true)
   const [ratesLoading, setRatesLoading] = useState(true)
   const [error, setError] = useState("")
@@ -86,17 +90,26 @@ export function MultiCurrencyWallet({
   const fetchRates = useCallback(async () => {
     setRatesLoading(true)
     try {
-      const res = await fetch("/api/exchange-rates")
+      const res = await fetch("/api/exchange-rates", { cache: "no-store" })
       const data = await res.json()
       if (data.success) {
-        setRates(data.rates)
+        const nextRates = {
+          USD: Number(data?.rates?.USD || 1),
+          NGN: Number(data?.rates?.NGN || DEFAULT_RATES.NGN),
+          CNY: Number(data?.rates?.CNY || DEFAULT_RATES.CNY),
+        }
+        setRates(nextRates)
         setRateSource(data.source)
+        setRateProvider(String(data?.provider || "live"))
+        setRateUpdatedAt(String(data?.updatedAt || new Date().toISOString()))
+        return nextRates
       }
     } catch {
       // keep fallback
     } finally {
       setRatesLoading(false)
     }
+    return DEFAULT_RATES
   }, [])
 
   const fetchWallet = useCallback(async () => {
@@ -122,8 +135,31 @@ export function MultiCurrencyWallet({
   useEffect(() => {
     fetchRates()
     fetchWallet()
-    const interval = setInterval(fetchRates, 5 * 60 * 1000) // refresh rates every 5 min
-    return () => clearInterval(interval)
+    const interval = setInterval(() => {
+      if (typeof document === "undefined" || document.visibilityState === "visible") {
+        void fetchRates()
+      }
+    }, 30 * 1000)
+
+    const onFocus = () => { void fetchRates() }
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        void fetchRates()
+      }
+    }
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("focus", onFocus)
+      document.addEventListener("visibilitychange", onVisibility)
+    }
+
+    return () => {
+      clearInterval(interval)
+      if (typeof window !== "undefined") {
+        window.removeEventListener("focus", onFocus)
+        document.removeEventListener("visibilitychange", onVisibility)
+      }
+    }
   }, [fetchRates, fetchWallet])
 
   const getBalance = (currency: Currency) => {
@@ -165,10 +201,11 @@ export function MultiCurrencyWallet({
     setConvertLoading(true)
     setConvertMsg("")
     try {
+      const latestRates = await fetchRates()
       const res = await fetch("/api/wallet/convert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, fromCurrency, toCurrency, amount, rates }),
+        body: JSON.stringify({ userId, fromCurrency, toCurrency, amount, rates: latestRates }),
       })
       const data = await res.json()
       if (data.success) {
@@ -226,6 +263,11 @@ export function MultiCurrencyWallet({
             {rateSource === "live" ? "Live rates" : "Fallback rates"}
           </div>
         </div>
+        <p className="text-[11px] text-muted-foreground">
+          {rateSource === "live"
+            ? `Provider: ${rateProvider} · Updated ${new Date(rateUpdatedAt || Date.now()).toLocaleTimeString()}`
+            : "Using fallback rates while live provider is unavailable."}
+        </p>
 
         {currencies.map((c) => {
           const meta = CURRENCY_META[c]
@@ -302,10 +344,15 @@ export function MultiCurrencyWallet({
           </span>
           <button onClick={() => { fetchRates(); fetchWallet() }}
             className="p-1.5 rounded-lg hover:bg-secondary transition-colors text-muted-foreground">
-            <RefreshCw className="w-3.5 h-3.5" />
+            <RefreshCw className={`w-3.5 h-3.5 ${ratesLoading ? "animate-spin" : ""}`} />
           </button>
         </div>
       </div>
+      <p className="text-[11px] text-muted-foreground">
+        {rateSource === "live"
+          ? `Provider: ${rateProvider} · Last sync ${new Date(rateUpdatedAt || Date.now()).toLocaleString()}`
+          : "Live FX temporarily unavailable. Using resilient fallback rates."}
+      </p>
 
       {/* Wallet cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

@@ -79,6 +79,9 @@ export default function TermsPage() {
             <h2 className="font-bold text-base mb-3">5. Payments, GIT Fee & Escrow</h2>
             <ul className="text-muted-foreground space-y-2 list-disc list-inside">
               <li>All payments are processed through Orchid&rsquo;s secure infrastructure.</li>
+              <li>All users have access to a multi-currency wallet (NGN, USD, and CNY) that supports funding and currency conversion features.</li>
+              <li>When you convert or pay across currencies, the applicable exchange rate shown at execution time is used for settlement.</li>
+              <li>Exchange rates are sourced from live third-party market data providers where available, with resilient fallback rates used only when live providers are unavailable.</li>
               <li>Funds are held in escrow until the buyer confirms receipt and releases payment.</li>
               <li>A Goods in Transit (GIT) fee of 1.5% is applied to goods and services at checkout to cover goods damaged in transit only. The GIT fee is not charged on delivery fees and does not cover return delivery.</li>
               <li>Escrow funds are auto-released to the merchant after 7 days if the buyer does not confirm or dispute.</li>

@@ -48,7 +48,7 @@ export default function PrivacyPage() {
               </div>
               <div>
                 <p className="font-medium text-foreground">Transaction Information</p>
-                <p className="text-muted-foreground">Order history, payment records, escrow transactions, delivery addresses, and dispute history.</p>
+                <p className="text-muted-foreground">Order history, payment records, escrow transactions, multi-currency wallet balances, conversion records, delivery addresses, and dispute history.</p>
               </div>
               <div>
                 <p className="font-medium text-foreground">Usage Information</p>
@@ -66,6 +66,7 @@ export default function PrivacyPage() {
             <ul className="text-muted-foreground space-y-2 list-disc list-inside">
               <li>To create and manage your account.</li>
               <li>To process orders, payments, and escrow transactions.</li>
+              <li>To process wallet funding, currency conversion, and cross-currency settlements using live exchange-rate data.</li>
               <li>To connect buyers and merchants and facilitate transactions.</li>
               <li>To verify merchant identity and business registration.</li>
               <li>To send order updates, support responses, and important notices.</li>
@@ -92,7 +93,8 @@ export default function PrivacyPage() {
             <ul className="text-muted-foreground space-y-2 list-disc list-inside">
               <li><strong className="text-foreground">With merchants</strong> — your delivery address and contact name are shared with the merchant fulfilling your order.</li>
               <li><strong className="text-foreground">With buyers</strong> — your store name, description, and listing information are publicly visible on your merchant profile.</li>
-              <li><strong className="text-foreground">Payment processors</strong> — Orchid processes payments and receives necessary transaction data.</li>
+              <li><strong className="text-foreground">Payment processors</strong> — Orchid processes payments and receives necessary transaction data for wallet funding, conversion, and settlement.</li>
+              <li><strong className="text-foreground">Exchange-rate providers</strong> — we query third-party market data providers for current currency rates; no full card or password data is shared for rate lookup.</li>
               <li><strong className="text-foreground">Regulatory bodies</strong> — relevant tax, customs, and business regulators in applicable jurisdictions when legally required.</li>
               <li><strong className="text-foreground">Service providers</strong> — hosting (Vercel/Supabase), email delivery, and analytics tools, all under strict data processing agreements.</li>
               <li><strong className="text-foreground">Law enforcement</strong> — when required by a valid court order or law enforcement request.</li>

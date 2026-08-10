@@ -5,6 +5,7 @@ import { ArrowLeft, Loader2, Wallet, Landmark, RefreshCw, ArrowDownLeft, ArrowUp
 import { useRole } from "@/lib/role-context"
 import { formatNaira } from "@/lib/currency-utils"
 import { MerchantWithdrawal } from "@/components/merchant-withdrawal"
+import { MultiCurrencyWallet } from "@/components/multi-currency-wallet"
 
 interface PaymentMethodsPageProps {
   onBack: () => void
@@ -728,6 +729,7 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
   const [showBankModal, setShowBankModal] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
   const [showAllTx, setShowAllTx] = useState(false)
+  const [walletView, setWalletView] = useState<'multi' | 'details'>('multi')
   const [fundRef] = useState(() => `BCM-${Math.random().toString(36).slice(2, 10).toUpperCase()}`)
 
   const isMerchant = user?.role === "merchant"
@@ -879,7 +881,32 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
       </header>
 
       <main className="mx-auto max-w-xl px-4 py-5 space-y-5">
-        {isMerchant ? (
+        {authUserId ? (
+          <section className="rounded-2xl border border-border bg-card p-2">
+            <div className="grid grid-cols-2 gap-1">
+              <button
+                onClick={() => setWalletView('multi')}
+                className={`rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${walletView === 'multi' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-secondary'}`}
+              >
+                Multi-Currency Wallet
+              </button>
+              <button
+                onClick={() => setWalletView('details')}
+                className={`rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${walletView === 'details' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-secondary'}`}
+              >
+                Account Details
+              </button>
+            </div>
+          </section>
+        ) : null}
+
+        {authUserId && walletView === 'multi' && (
+          <section className="rounded-2xl border border-border bg-card p-4">
+            <MultiCurrencyWallet userId={authUserId} compact />
+          </section>
+        )}
+
+        {authUserId && walletView === 'details' && (isMerchant ? (
           <>
             {/* ── Bank Transfer Modal ── */}
             {showBankModal && (
@@ -1160,7 +1187,7 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
           </>
         ) : (
           <BuyerWalletSection userId={authUserId} />
-        )}
+        ))}
       </main>
     </div>
   )
