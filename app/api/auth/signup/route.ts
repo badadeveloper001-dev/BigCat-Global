@@ -88,20 +88,18 @@ export async function POST(request: NextRequest) {
     if (result.success) {
       const createdUserId = String((result as any)?.data?.id || '')
       if (createdUserId) {
-        try {
-          await dispatchNotification({
-            userId: createdUserId,
-            type: 'system',
-            title: role === 'merchant' ? 'Welcome, merchant!' : 'Welcome to BigCat Global!',
-            message: role === 'merchant'
-              ? 'Your merchant account is ready. Complete setup and start receiving orders.'
-              : 'Your buyer account is ready. Start exploring and placing orders.',
-            eventKey: `signup:welcome:${createdUserId}`,
-            emailSubject: role === 'merchant' ? 'Welcome to BigCat Global (Merchant)' : 'Welcome to BigCat Global',
-          })
-        } catch (notifyError) {
-          console.warn('Signup welcome notification failed:', notifyError)
-        }
+        dispatchNotification({
+          userId: createdUserId,
+          type: 'system',
+          title: role === 'merchant' ? 'Welcome, merchant!' : 'Welcome to BigCat Global!',
+          message: role === 'merchant'
+            ? 'Your merchant account is ready. Complete setup and start receiving orders.'
+            : 'Your buyer account is ready. Start exploring and placing orders.',
+          eventKey: `signup:welcome:${createdUserId}`,
+          emailSubject: role === 'merchant' ? 'Welcome to BigCat Global (Merchant)' : 'Welcome to BigCat Global',
+        }).catch((notifyError) => {
+          console.warn('Signup welcome notification failed (non-blocking):', notifyError)
+        })
       }
 
       return NextResponse.json(result)
