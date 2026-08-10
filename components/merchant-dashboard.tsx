@@ -119,7 +119,7 @@ export function MerchantDashboard() {
   const [unreadMessages, setUnreadMessages] = useState(0)
   const [reportMonth, setReportMonth] = useState(() => formatMonthValue(new Date()))
   const merchantKind = user?.merchantType || user?.merchantProfile?.merchant_type || 'products'
-  const walletMerchantId = String(user?.email || user?.userId || '').trim()
+  const walletMerchantId = String(user?.userId || '').trim()
   const isServiceMerchant = merchantKind === 'services'
 
   useEffect(() => {
@@ -1245,7 +1245,7 @@ export function MerchantDashboard() {
 
   if (showWithdrawal) {
     return <MerchantWithdrawal 
-      merchantId={walletMerchantId || user?.userId || ""} 
+      merchantId={walletMerchantId || user?.userId || ""}
       walletBalance={walletBalance}
       onBack={() => setShowWithdrawal(false)}
       onSuccess={() => {

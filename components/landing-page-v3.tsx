@@ -250,9 +250,9 @@ function HeroSection() {
   }, [])
 
   const flowItems = [
-    { label: "Product Order", y: 0.25 },
-    { label: "Payment", y: 0.5 },
-    { label: "Shipment", y: 0.75 },
+    { label: "Service Booking", y: 0.25 },
+    { label: "Secure Payment", y: 0.5 },
+    { label: "Delivery / Completion", y: 0.75 },
   ]
 
   return (
@@ -286,23 +286,23 @@ function HeroSection() {
           </h1>
 
           <p className="text-gray-300/80 text-lg sm:text-xl max-w-lg mx-auto lg:mx-0 mb-12 leading-relaxed">
-            Buy and sell seamlessly between Nigeria and China with AI-powered translation,
-            secure international payments, and trusted cross-border logistics.
+            Discover trusted services, book with confidence, and trade across Nigeria and China with
+            AI-powered translation, secure payments, and verified logistics.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Link
-              href="/marketplace"
+              href="/marketplace?view=services"
               className="group inline-flex items-center justify-center gap-2 bg-[#dc2626] hover:bg-[#ef4444] text-white text-base font-bold px-10 py-4 rounded-full shadow-xl shadow-red-900/40 transition-all duration-300 hover:-translate-y-0.5"
             >
-              Start Trading
+              Explore Services
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link
               href="/marketplace"
               className="inline-flex items-center justify-center gap-2 text-gray-200 hover:text-white text-base font-semibold px-8 py-4 rounded-full border border-white/10 hover:border-white/25 bg-white/[0.04] hover:bg-white/[0.08] transition-all duration-300 hover:-translate-y-0.5"
             >
-              Become a Merchant
+              Browse Marketplace
             </Link>
           </div>
 

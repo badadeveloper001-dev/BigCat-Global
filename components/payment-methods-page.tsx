@@ -732,7 +732,7 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
 
   const isMerchant = user?.role === "merchant"
   const authUserId = String(user?.userId || "").trim()
-  const merchantId = String(user?.email || user?.userId || "").trim()
+  const merchantId = authUserId
 
   const virtualAccount = deriveVirtualAccount(merchantId || authUserId)
 
@@ -797,7 +797,7 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
     }
 
     if (!authUserId || !merchantId) {
-      setError('Merchant identity is missing. Please sign in again.')
+      setError('Account identity is missing. Please sign in again.')
       return
     }
 
@@ -812,7 +812,7 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
           authUserId,
           merchantId,
           amount,
-          reason: `Merchant funded wallet with ${formatNaira(amount)}`,
+          reason: `Account wallet funded with ${formatNaira(amount)}`,
         }),
       })
 

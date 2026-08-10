@@ -79,7 +79,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
   const [aiFullscreenOpen, setAiFullscreenOpen] = useState(false)
   const [selectedVendor, setSelectedVendor] = useState<any | null>(null)
   const [showProducts, setShowProducts] = useState(false)
-  const [showAllMerchants, setShowAllMerchants] = useState(false)
+  const [showAllServices, setShowAllServices] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [productSearchQuery, setProductSearchQuery] = useState("")
   const [showCart, setShowCart] = useState(false)
@@ -89,10 +89,10 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
   const [orderSuccess, setOrderSuccess] = useState<string | null>(null)
   const { items: cartItems, getItemCount: getCartItemCount } = useCart()
   const { items: wishlistItems, getItemCount: getWishlistCount, clearWishlist } = useWishlist()
-  const [merchants, setMerchants] = useState<any[]>([])
+  const [services, setServices] = useState<any[]>([])
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([])
   const [recentOrders, setRecentOrders] = useState<any[]>([])
-  const [loadingMerchants, setLoadingMerchants] = useState(true)
+  const [loadingServices, setLoadingServices] = useState(true)
   const [loadingProducts, setLoadingProducts] = useState(true)
   const [loadingOrders, setLoadingOrders] = useState(true)
   const [showNotifications, setShowNotifications] = useState(false)
@@ -223,7 +223,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
   }, [user?.userId])
 
   useEffect(() => {
-    loadMerchants()
+    loadServices()
     loadProducts()
     loadOrders()
     loadUnreadMessages()
@@ -453,8 +453,8 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
     )
   }
 
-  const loadMerchants = async () => {
-    setLoadingMerchants(true)
+  const loadServices = async () => {
+    setLoadingServices(true)
     try {
       const searchParams = new URLSearchParams()
       if (buyerCoordinates?.latitude && buyerCoordinates?.longitude) {
@@ -462,41 +462,16 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
         searchParams.set('buyerLng', String(buyerCoordinates.longitude))
       }
 
-      const endpoint = searchParams.toString() ? `/api/admin/merchants?${searchParams.toString()}` : '/api/admin/merchants'
+      const endpoint = searchParams.toString() ? `/api/services?${searchParams.toString()}` : '/api/services'
       const response = await fetch(endpoint, { cache: 'no-store' })
       const result = await response.json()
       if (result.success) {
-        const merchantsData = result.data.map((m: any) => {
-          const numericDistance = Number(m.distance_km)
-          const hasDistance = Number.isFinite(numericDistance)
-          const isNearby = hasDistance && numericDistance <= 50
-          const ratingValue = Number(m.average_rating)
-          const reviewCountValue = Number(m.review_count)
-
-          return {
-            id: m.id,
-            name: m.business_name || m.full_name || "Unknown",
-            category: m.business_category || "General",
-            rating: Number.isFinite(ratingValue) && ratingValue > 0 ? ratingValue : null,
-            reviews: Number.isFinite(reviewCountValue) && reviewCountValue >= 0 ? reviewCountValue : 0,
-            location: m.location || [m.city, m.state].filter(Boolean).join(', ') || "Nigeria",
-            badge: isNearby ? "Near you" : "Verified",
-            badgeColor: isNearby ? "bg-emerald-100 text-emerald-700" : "bg-primary/15 text-primary",
-            bgColor: "bg-blue-100",
-            initials: (m.business_name || m.full_name || "UN").substring(0, 2).toUpperCase(),
-            iconColor: "text-blue-600",
-            description: m.business_description || "Quality products and services",
-            logo_url: m.logo_url || m.avatar_url || "",
-            avatar_url: m.avatar_url || m.logo_url || "",
-            distance_km: hasDistance ? numericDistance : null,
-          }
-        })
-        setMerchants(merchantsData)
+        setServices((result.data || []).slice(0, 12))
       }
     } catch (error) {
-      console.error("Error loading merchants:", error)
+      console.error("Error loading services:", error)
     } finally {
-      setLoadingMerchants(false)
+      setLoadingServices(false)
     }
   }
 
@@ -1001,7 +976,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
   }
 
   const displayName = user?.name || (user ? "Customer" : "Guest")
-  const displayMerchants = showAllMerchants ? merchants : merchants.slice(0, 6)
+  const displayServices = showAllServices ? services : services.slice(0, 6)
   const formatDistanceLabel = (distance: unknown) => {
     const numericDistance = Number(distance)
     if (!Number.isFinite(numericDistance)) return null
@@ -1283,86 +1258,56 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
           />
         </section>
 
-        {/* SME/Merchants */}
+        {/* Services */}
         <section className="px-4 mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-foreground text-lg">SME/Merchants</h2>
+            <h2 className="font-semibold text-foreground text-lg">Services</h2>
             <button 
-              onClick={() => setShowAllMerchants((current) => !current)}
+              onClick={() => setShowAllServices((current) => !current)}
               className="text-sm text-primary font-medium flex items-center gap-0.5"
             >
-              {showAllMerchants ? 'Show less' : 'Browse all'} <ChevronRight className="w-4 h-4" />
+              {showAllServices ? 'Show less' : 'Browse all'} <ChevronRight className="w-4 h-4" />
             </button>
           </div>
-          {loadingMerchants ? (
+          {loadingServices ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
             </div>
-          ) : displayMerchants.length === 0 ? (
+          ) : displayServices.length === 0 ? (
             <div className="p-8 text-center">
               <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">No SME/Merchants yet</p>
+              <p className="text-sm text-muted-foreground">No services yet</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-              {displayMerchants.map((vendor) => (
+            <div className="space-y-3">
+              {displayServices.map((service) => (
                 <button
-                  key={vendor.id}
-                  onClick={async () => {
+                  key={service.id}
+                  onClick={() => {
                     if (guardSuspendedAction()) return
-
-                    if (user) {
-                      try {
-                        const response = await fetch('/api/merchant/tokens/charge-view', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({ merchantId: String(vendor.id) }),
-                        })
-
-                        const result = await response.json()
-                        if (!result.success) {
-                          setPolicyNotice(result.error || 'This merchant has exhausted tokens and is temporarily unavailable.')
-                          return
-                        }
-                      } catch {
-                        setPolicyNotice('Unable to open vendor right now. Please try again.')
-                        return
-                      }
-                    }
-
-                    setSelectedVendor(vendor)
+                    setShowServices(true)
                   }}
-                  className="p-3 bg-card border border-border rounded-2xl shadow-sm hover:border-primary/30 hover:shadow-md transition-all text-left"
+                  className="w-full rounded-2xl border border-border bg-card p-4 text-left shadow-sm hover:border-primary/30 hover:shadow-md transition-all"
                 >
-                  <div className={`w-12 h-12 rounded-2xl ${vendor.bgColor} flex items-center justify-center mb-3`}>
-                    <span className={`font-bold text-base ${vendor.iconColor}`}>{vendor.initials}</span>
-                  </div>
-                  <div className="flex items-start justify-between gap-2 mb-1.5">
-                    <h3 className="font-semibold text-sm text-foreground line-clamp-2">{vendor.name}</h3>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                  </div>
-                  <span className={`inline-flex text-[10px] px-2 py-0.5 rounded-full font-medium mb-2 ${vendor.badgeColor}`}>
-                    {vendor.badge}
-                  </span>
-                  <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{vendor.description}</p>
-                  <div className="space-y-1.5">
-                    {typeof vendor.rating === 'number' && vendor.rating > 0 && (
-                      <div className="flex items-center gap-1 text-xs">
-                        <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                        <span className="font-medium text-foreground">{vendor.rating.toFixed(1)}</span>
-                        <span className="text-muted-foreground">({vendor.reviews || 0})</span>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-semibold text-sm text-foreground">{service.title}</h3>
+                        {service.category && (
+                          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                            {service.category}
+                          </span>
+                        )}
                       </div>
-                    )}
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <MapPin className="w-3 h-3" />
-                      <span className="truncate">
-                        {formatDistanceLabel(vendor.distance_km)
-                          ? `${formatDistanceLabel(vendor.distance_km)} • ${vendor.location}`
-                          : vendor.location}
-                      </span>
+                      <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                        {service.description || 'Professional service listing with clear pricing.'}
+                      </p>
                     </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-1" />
+                  </div>
+                  <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{service.merchant_name || 'Verified provider'}</span>
+                    <span>{service.base_price ? `₦${Number(service.base_price).toLocaleString()}` : 'Custom quote'}</span>
                   </div>
                 </button>
               ))}
