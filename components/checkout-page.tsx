@@ -10,6 +10,7 @@ import { formatNaira } from "@/lib/currency-utils"
 import { PaymentMethodSelector, type PaymentMethod } from "@/components/payment-method-selector"
 import { getUserStrikeCount, isUserSuspended, resetSafetyState } from "@/lib/trust-safety"
 import { createEscrowRecord } from "@/lib/escrow"
+import { MultiCurrencyWallet } from "@/components/multi-currency-wallet"
 import { sendOrderToLogistics } from "@/lib/logistics"
 
 interface CheckoutPageProps {
@@ -41,6 +42,10 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
   const [topUpError, setTopUpError] = useState('')
   const [suspended, setSuspended] = useState(false)
   const [strikeCount, setStrikeCount] = useState(0)
+  // Multi-currency wallet state
+  const [payCurrency, setPayCurrency] = useState<"NGN" | "USD" | "CNY">("NGN")
+  const [payRates, setPayRates] = useState<{ USD: number; NGN: number; CNY: number }>({ USD: 1, NGN: 1620, CNY: 7.26 })
+  const [payAmountInCurrency, setPayAmountInCurrency] = useState(0)
 
   const [savedAddresses, setSavedAddresses] = useState<Array<{ id: string; label: string; address: string }>>([])
   const [serviceBooking, setServiceBooking] = useState<any>(null)
@@ -131,6 +136,65 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
   const getWalletBalance = () => {
     // Prefer DB balance; localStorage is only a fallback during the same session
     return walletBalance
+  }
+
+  const convertAmountToCurrency = (amount: number, fromCurrency: "NGN" | "USD" | "CNY", toCurrency: "NGN" | "USD" | "CNY") => {
+    if (fromCurrency === toCurrency) return amount
+    const fromRate = payRates[fromCurrency]
+    const toRate = payRates[toCurrency]
+    if (!Number.isFinite(fromRate) || !Number.isFinite(toRate) || fromRate <= 0 || toRate <= 0) return amount
+    return (amount / fromRate) * toRate
+  }
+
+  const getSelectedWalletPaymentAmount = (baseAmount: number) => {
+    if (!isWalletPayment) return 0
+    if (payCurrency === 'NGN') return Number(baseAmount || 0)
+    const selectedAmount = payAmountInCurrency > 0 ? payAmountInCurrency : convertAmountToCurrency(baseAmount, 'NGN', payCurrency)
+    return Number(Math.max(0, selectedAmount).toFixed(2))
+  }
+
+  const finalizeWalletPayment = async (orderId: string, amount: number) => {
+    if (!user?.userId) throw new Error('Please log in to continue')
+
+    const payAmount = getSelectedWalletPaymentAmount(amount)
+    const response = await fetch('/api/wallet/pay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: user.userId,
+        payCurrency,
+        payAmount,
+        targetCurrency: 'NGN',
+        targetAmount: amount,
+        orderId,
+        description: `Payment for order #${String(orderId).slice(0, 8).toUpperCase()}`,
+        rates: payRates,
+      }),
+    })
+
+    const result = await response.json()
+    if (!result?.success) {
+      if (payCurrency === 'NGN') {
+        const fallbackRes = await fetch('/api/buyer/wallet/debit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            buyerId: user.userId,
+            amount,
+            orderId,
+            reason: `Payment for order #${String(orderId).slice(0, 8).toUpperCase()}`,
+          }),
+        })
+        const fallbackData = await fallbackRes.json()
+        if (!fallbackData?.success) {
+          throw new Error(fallbackData?.error || result?.error || 'Wallet payment failed')
+        }
+        return fallbackData
+      }
+      throw new Error(result?.error || 'Wallet payment failed')
+    }
+
+    return result
   }
 
   const loadWalletBalance = async (showLoader = false) => {
@@ -333,32 +397,15 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
       const bookingId = String(result.data?.id || `booking_${Date.now()}`)
       createEscrowRecord(bookingId, Number(serviceBooking.basePrice || 0), 0, Number(serviceBooking.basePrice || 0))
 
-      // Update wallet if using palmpay
+      // Update wallet if using Orchid wallet
       if (isWalletPayment) {
         const serviceAmount = Number(serviceBooking.basePrice || 0)
         try {
-          const debitRes = await fetch('/api/buyer/wallet/debit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              buyerId: user?.userId,
-              amount: serviceAmount,
-              orderId: bookingId,
-              reason: `Payment for service booking #${bookingId.slice(0, 8).toUpperCase()}`,
-            }),
-          })
-          const debitData = await debitRes.json()
-          const newBalance = Number(debitData?.newBalance ?? Math.max(0, walletBalance - serviceAmount))
-          setWalletBalance(newBalance)
-          if (typeof window !== 'undefined') {
-            localStorage.setItem(getWalletStorageKey(), String(newBalance))
-          }
-        } catch {
-          const fallback = Math.max(0, walletBalance - serviceAmount)
-          setWalletBalance(fallback)
-          if (typeof window !== 'undefined') {
-            localStorage.setItem(getWalletStorageKey(), String(fallback))
-          }
+          await finalizeWalletPayment(bookingId, serviceAmount)
+        } catch (walletError) {
+          setError(String(walletError instanceof Error ? walletError.message : walletError))
+          setIsSubmitting(false)
+          return
         }
         setSuccess('Service booking confirmed! Payment secured in escrow.')
       } else {
@@ -411,7 +458,13 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
       }
 
       if (isWalletPayment) {
-        await loadWalletBalance()
+        try {
+          await finalizeWalletPayment(String(result.bookingId || serviceBillPayment.billId || `bill_${Date.now()}`), Number(serviceBillPayment.totalAmount || 0))
+        } catch (walletError) {
+          setError(String(walletError instanceof Error ? walletError.message : walletError))
+          setIsSubmitting(false)
+          return
+        }
       }
 
       if (typeof window !== 'undefined') {
@@ -464,7 +517,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
     }
 
     const currentWalletBalance = isWalletPayment ? getWalletBalance() : 0
-    if (isWalletPayment && currentWalletBalance < grandTotal) {
+    if (isWalletPayment && payCurrency === 'NGN' && currentWalletBalance < grandTotal) {
       setWalletBalance(currentWalletBalance)
       setError('Insufficient funds in wallet')
       return
@@ -541,33 +594,14 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
       })
 
       if (isWalletPayment) {
-        // Debit the DB wallet; also update localStorage as a fast-path cache
         try {
-          const debitRes = await fetch('/api/buyer/wallet/debit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              buyerId: user.userId,
-              amount: grandTotal,
-              orderId,
-              reason: `Payment for order #${orderId.slice(0, 8).toUpperCase()}`,
-            }),
-          })
-          const debitData = await debitRes.json()
-          const newBalance = Number(debitData?.newBalance ?? Math.max(0, currentWalletBalance - grandTotal))
-          setWalletBalance(newBalance)
-          if (typeof window !== 'undefined') {
-            localStorage.setItem(getWalletStorageKey(), String(newBalance))
-          }
-        } catch {
-          // Best-effort: update localStorage even if API call fails
-          const fallback = Math.max(0, currentWalletBalance - grandTotal)
-          setWalletBalance(fallback)
-          if (typeof window !== 'undefined') {
-            localStorage.setItem(getWalletStorageKey(), String(fallback))
-          }
+          await finalizeWalletPayment(orderId, grandTotal)
+          setSuccess('Payment successful and funds secured in escrow')
+        } catch (walletError) {
+          setError(String(walletError instanceof Error ? walletError.message : walletError))
+          setIsSubmitting(false)
+          return
         }
-        setSuccess('Payment successful and funds secured in escrow')
       } else {
         setSuccess(
           paymentMethod === 'bank'
@@ -831,101 +865,17 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
         <section className="p-4 border-b border-border space-y-4">
           <PaymentMethodSelector selectedMethod={paymentMethod} onSelect={setPaymentMethod} />
 
-          {isWalletPayment && (
-            <div className="rounded-xl border border-[#E8D7FF] bg-[#F9F5FF] space-y-3 p-3">
-              {/* Balance row */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Wallet className="w-4 h-4 text-[#5B21B6]" />
-                  <span className="text-sm text-[#5B21B6] font-medium">Wallet Balance</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {walletLoading
-                    ? <Loader2 className="w-4 h-4 animate-spin text-[#6C2BD9]" />
-                    : <span className="text-base font-bold text-[#6C2BD9]">{formatNaira(walletBalance)}</span>
-                  }
-                  <button
-                    onClick={() => loadWalletBalance(true)}
-                    className="p-1 rounded-full hover:bg-[#E8D7FF] transition-colors"
-                    title="Refresh balance"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5 text-[#6C2BD9]" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Sufficiency indicator */}
-              {(deliveryAddress.trim() || isServiceCheckout) && !walletLoading && (
-                <div className={`rounded-lg px-3 py-2 text-xs font-medium ${
-                  isWalletInsufficient
-                    ? 'bg-red-50 border border-red-200 text-red-700'
-                    : 'bg-emerald-50 border border-emerald-200 text-emerald-700'
-                }`}>
-                  {isWalletInsufficient
-                    ? `Shortfall: ${formatNaira(walletShortfall)} — top up to continue`
-                    : `Balance sufficient ✓ — ${formatNaira(walletBalance - grandTotal)} will remain after payment`}
-                </div>
-              )}
-
-              {/* Inline top-up when insufficient */}
-              {isWalletInsufficient && (
-                <div className="space-y-2 border-t border-[#E8D7FF] pt-2">
-                  {!showTopUp ? (
-                    <button
-                      onClick={() => { setShowTopUp(true); setTopUpAmount(String(Math.ceil(walletShortfall / 100) * 100)) }}
-                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#6C2BD9] text-white text-sm font-semibold py-2.5 hover:bg-[#5B21B6] transition-colors"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Add {formatNaira(Math.ceil(walletShortfall / 100) * 100)} to Wallet
-                    </button>
-                  ) : (
-                    <div className="space-y-2">
-                      <p className="text-xs font-semibold text-[#5B21B6]">Quick top-up</p>
-                      <div className="grid grid-cols-4 gap-1.5">
-                        {[500, 1000, 2000, 5000].map(amt => (
-                          <button
-                            key={amt}
-                            onClick={() => setTopUpAmount(String(amt))}
-                            className={`rounded-xl border py-2 text-xs font-semibold transition-colors ${
-                              topUpAmount === String(amt)
-                                ? 'bg-[#6C2BD9] text-white border-[#6C2BD9]'
-                                : 'border-[#E8D7FF] text-[#5B21B6] hover:bg-[#E8D7FF]'
-                            }`}
-                          >
-                            {amt >= 1000 ? `₦${amt / 1000}k` : `₦${amt}`}
-                          </button>
-                        ))}
-                      </div>
-                      <div className="flex gap-2">
-                        <div className="relative flex-1">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#5B21B6] font-medium">₦</span>
-                          <input
-                            type="number" min="100" max="1000000"
-                            value={topUpAmount}
-                            onChange={e => setTopUpAmount(e.target.value)}
-                            className="w-full rounded-xl border border-[#E8D7FF] bg-white pl-7 pr-3 py-2 text-sm outline-none focus:border-[#6C2BD9]"
-                            placeholder="Amount"
-                          />
-                        </div>
-                        <button
-                          onClick={handleInlineTopUp}
-                          disabled={topUpLoading}
-                          className="rounded-xl bg-[#6C2BD9] text-white text-sm font-semibold px-4 py-2 hover:bg-[#5B21B6] disabled:opacity-60 transition-colors"
-                        >
-                          {topUpLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Add'}
-                        </button>
-                        <button
-                          onClick={() => { setShowTopUp(false); setTopUpError('') }}
-                          className="rounded-xl border border-[#E8D7FF] text-[#5B21B6] text-sm px-3 py-2 hover:bg-[#E8D7FF] transition-colors"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                      {topUpError && <p className="text-xs text-red-600">{topUpError}</p>}
-                    </div>
-                  )}
-                </div>
-              )}
+          {isWalletPayment && user?.userId && (
+            <div className="rounded-xl border border-border overflow-hidden">
+              <MultiCurrencyWallet
+                userId={user.userId}
+                orderAmountNGN={grandTotal}
+                onPaymentSelect={(currency, amount, rates) => {
+                  setPayCurrency(currency)
+                  setPayAmountInCurrency(amount)
+                  setPayRates(rates)
+                }}
+              />
             </div>
           )}
         </section>

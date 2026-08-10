@@ -63,8 +63,8 @@ export async function getRequestAuthUser(request?: Request) {
   return { user: null, error: error?.message || null }
 }
 
-export async function requireAuthenticatedUser(expectedUserId?: string, request?: Request) {
-  const { user, error } = await getRequestAuthUser(request)
+export async function requireAuthenticatedUser(expectedUserId?: string, request?: Request | null) {
+  const { user, error } = await getRequestAuthUser(request ?? undefined)
 
   if (error || !user) {
     return {
