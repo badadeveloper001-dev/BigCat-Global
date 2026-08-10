@@ -12,23 +12,33 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error && data.user) {
-      // Upsert user profile in auth_users table
+      const userId = data.user.id
+      const userEmail = data.user.email || ''
+      const userName = data.user.user_metadata?.full_name
+        || data.user.user_metadata?.name
+        || userEmail.split('@')[0]
+
+      // Store role in Supabase user_metadata so RoleContext can read it without querying auth_users
+      await supabase.auth.admin.updateUserById(userId, {
+        user_metadata: { ...data.user.user_metadata, role },
+      }).catch(() => {})
+
+      // Upsert into auth_users — non-blocking, missing columns are handled gracefully
       try {
-        const existing = await supabase
+        const { data: existing } = await supabase
           .from('auth_users')
-          .select('id, role')
-          .eq('id', data.user.id)
+          .select('id')
+          .eq('id', userId)
           .single()
 
-        if (existing.error && existing.error.code === 'PGRST116') {
-          // New Google user — create profile
+        if (!existing) {
           await supabase.from('auth_users').insert({
-            id: data.user.id,
-            email: data.user.email,
-            name: data.user.user_metadata?.full_name || data.user.email?.split('@')[0],
-            full_name: data.user.user_metadata?.full_name,
-            avatar_url: data.user.user_metadata?.avatar_url,
-            google_id: data.user.user_metadata?.sub,
+            id: userId,
+            email: userEmail,
+            name: userName,
+            full_name: userName,
+            avatar_url: data.user.user_metadata?.avatar_url || null,
+            google_id: data.user.user_metadata?.sub || null,
             role,
             password_hash: '',
             phone: '',
@@ -36,11 +46,10 @@ export async function GET(request: NextRequest) {
           })
         }
       } catch {
-        // Non-blocking
+        // Non-blocking — role is already in user_metadata above
       }
 
-      const redirectPath = role === 'merchant' ? '/marketplace' : next
-      return NextResponse.redirect(`${origin}${redirectPath}`)
+      return NextResponse.redirect(`${origin}${next}`)
     }
   }
 
