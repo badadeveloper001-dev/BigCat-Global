@@ -188,24 +188,40 @@ export function BuyerAuth({
       }
 
       if (isSignUp) {
-        const result = await requestBuyerOtp()
+        const result = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            name: formData.name,
+            phone: formData.phone,
+            city: formData.city,
+            state: formData.state,
+            role: 'buyer',
+          }),
+        }).then(r => r.json())
 
-        if (result.success) {
-          const resolvedMethod = result.data?.deliveryMethod === 'whatsapp' ? 'whatsapp' : 'email'
-          setOtpDeliveryMethod(resolvedMethod)
-          setShowOtpVerification(true)
-          setSuccessMessage(
-            resolvedMethod === 'whatsapp'
-              ? 'Verification code sent via WhatsApp. Enter the OTP to finish creating your account.'
-              : 'Verification code sent via email. Enter the OTP to finish creating your account.'
-          )
-          if (result.data?.warning) {
-            setWarningMessage(String(result.data.warning))
-          }
-        } else {
-          setError(result.error || 'Failed to send verification code')
+        if (!result.success) {
+          setError(result.error || 'Failed to create account')
+          return
         }
 
+        const supabase = createClient()
+        const { error: sessionError } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        })
+
+        if (sessionError) {
+          setError(sessionError.message || 'Account created but failed to sign in. Please try logging in.')
+          return
+        }
+
+        setUser(normalizeBuyerUser(result.data))
+        setRole('buyer')
+        setSuccessMessage('Account created successfully!')
+        onSuccess?.()
         return
       }
 
@@ -254,30 +270,6 @@ export function BuyerAuth({
     } finally {
       setLoading(false)
     }
-  }
-
-  if (showOtpVerification) {
-    return (
-      <OTPVerification
-        email={formData.email}
-        deliveryMethod={otpDeliveryMethod}
-        onBack={() => {
-          setShowOtpVerification(false)
-          setError('')
-          setWarningMessage('')
-          setSuccessMessage('')
-        }}
-        onResend={requestBuyerOtp}
-        initialWarning={warningMessage}
-        onVerify={verifyBuyerOtp}
-        onVerifySuccess={() => {
-          if (!verifiedBuyer) return
-          setUser(normalizeBuyerUser(verifiedBuyer))
-          setRole('buyer')
-          onSuccess?.()
-        }}
-      />
-    )
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

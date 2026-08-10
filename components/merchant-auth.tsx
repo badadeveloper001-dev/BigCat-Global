@@ -260,23 +260,46 @@ export function MerchantAuth({
       const supabase = createClient()
 
       if (isSignUp) {
-        const result = await requestMerchantOtp()
+        const result = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            name: formData.businessName,
+            phone: formData.phone,
+            city: formData.city,
+            state: formData.state,
+            role: 'merchant',
+            smedanId: formData.smedanId,
+            cacId: formData.cacId,
+            merchantType,
+            country: formData.country,
+            governmentIdNumber: formData.governmentIdNumber,
+            bankVerificationRef: formData.bankVerificationRef,
+            verificationModule: formData.country === 'CN' ? 'Chinese Business Verification' : 'Nigerian Merchant Verification',
+          }),
+        }).then(r => r.json())
+
         if (!result.success) {
-          setError(result.error || 'Failed to send verification code')
+          setError(result.error || 'Failed to create account')
           return
         }
 
-        const resolvedMethod = result.data?.deliveryMethod === 'whatsapp' ? 'whatsapp' : 'email'
-        setOtpDeliveryMethod(resolvedMethod)
-        setShowOtpVerification(true)
-        setSuccessMessage(
-          resolvedMethod === 'whatsapp'
-            ? 'Verification code sent via WhatsApp. Enter the OTP to finish creating your account.'
-            : 'Verification code sent via email. Enter the OTP to finish creating your account.'
-        )
-        if (result.data?.warning) {
-          setWarningMessage(String(result.data.warning))
+        const { data: sessionData, error: sessionError } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        })
+
+        if (sessionError || !sessionData.session || !sessionData.user) {
+          setError(sessionError?.message || 'Account created but failed to sign in. Please try logging in.')
+          return
         }
+
+        const profile = await loadMerchantProfile(sessionData.user.id, sessionData.session.access_token)
+        setUser(normalizeMerchantUser(profile))
+        setRole('merchant')
+        setSuccessMessage('Account created successfully!')
         return
       }
 
@@ -305,29 +328,6 @@ export function MerchantAuth({
     } finally {
       setLoading(false)
     }
-  }
-
-  if (showOtpVerification) {
-    return (
-      <OTPVerification
-        email={formData.email}
-        deliveryMethod={otpDeliveryMethod}
-        onBack={() => {
-          setShowOtpVerification(false)
-          setError('')
-          setWarningMessage('')
-          setSuccessMessage('')
-        }}
-        onResend={requestMerchantOtp}
-        initialWarning={warningMessage}
-        onVerify={verifyMerchantOtp}
-        onVerifySuccess={() => {
-          if (!verifiedMerchantProfile) return
-          setUser(normalizeMerchantUser(verifiedMerchantProfile))
-          setRole('merchant')
-        }}
-      />
-    )
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
