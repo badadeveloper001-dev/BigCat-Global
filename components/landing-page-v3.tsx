@@ -189,8 +189,8 @@ function JourneyTimeline({
   return (
     <div className="py-8 px-4 max-w-2xl mx-auto">
       <div className="text-center mb-12">
-        <h3 className="text-4xl sm:text-5xl font-extrabold text-white mb-3">{heading}</h3>
-        <p className="text-gray-400 text-base">{sub}</p>
+        <h3 className="text-4xl sm:text-5xl font-extrabold text-[#1f1412] mb-3">{heading}</h3>
+        <p className="text-[#5f4b46] text-base">{sub}</p>
       </div>
 
       <div className="relative">
@@ -226,9 +226,9 @@ function JourneyTimeline({
                     </span>
                     {isActive && <Dot color={step.color} pulse />}
                   </div>
-                  <p className="font-bold text-lg text-white leading-tight">{step.label}</p>
+                  <p className="font-bold text-lg text-[#1f1412] leading-tight">{step.label}</p>
                   {isActive && (
-                    <p className="text-gray-400 text-sm mt-1 animate-in fade-in duration-300">{step.detail}</p>
+                    <p className="text-[#5f4b46] text-sm mt-1 animate-in fade-in duration-300">{step.detail}</p>
                   )}
                 </div>
               </button>
@@ -257,49 +257,49 @@ function HeroSection() {
   ]
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#14060a] flex items-center pt-16">
+    <section className="relative min-h-screen overflow-hidden bg-[#fff8f5] flex items-center pt-16">
       {/* Ambient glows */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-20 blur-[180px]"
-          style={{ background: "radial-gradient(ellipse, #dc2626, transparent 70%)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(239,68,68,0.24), transparent 70%)" }} />
         <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full opacity-10 blur-[120px]"
-          style={{ background: "radial-gradient(ellipse, #7c3aed, transparent 70%)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.18), transparent 70%)" }} />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-5 gap-12 items-center py-20">
         {/* Left: Copy — spans 3 cols */}
         <div className="lg:col-span-3 text-center lg:text-left">
           <div className="mb-7 flex items-center justify-center lg:justify-start">
-            <div className="w-[160px] sm:w-[220px] drop-shadow-[0_20px_40px_rgba(220,38,38,0.25)]">
+            <div className="w-[160px] sm:w-[220px] drop-shadow-[0_20px_40px_rgba(220,38,38,0.18)]">
               <Image
-                src="/image.png"
+                src="/bigcat-logo-transparent.png"
                 alt="BigCat Global"
                 width={640}
                 height={420}
                 priority
-                className="h-auto w-full"
+                className="h-auto w-full object-contain"
               />
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#dc2626]/30 bg-[#dc2626]/10 text-[#fca5a5] text-xs font-medium mb-8 tracking-wide">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#dc2626]/20 bg-[#fff0ee] text-[#7f1d1d] text-xs font-medium mb-8 tracking-wide">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
             Nigeria · China · Global Trade
           </div>
 
-          <h1 className="text-[clamp(3rem,8vw,6rem)] font-black text-white leading-[0.9] tracking-tighter mb-8">
+          <h1 className="text-[clamp(3rem,8vw,6rem)] font-black text-[#1f1412] leading-[0.9] tracking-tighter mb-8">
             Trade
             <br />
             Globally.
             <br />
-            <span className="bg-gradient-to-r from-[#f87171] via-[#fb923c] to-[#fde68a] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#b91c1c] via-[#ef4444] to-[#f59e0b] bg-clip-text text-transparent">
               Sell Without
               <br />
               Borders.
             </span>
           </h1>
 
-          <p className="text-gray-300/80 text-lg sm:text-xl max-w-lg mx-auto lg:mx-0 mb-6 leading-relaxed">
+          <p className="text-[#4b3b37] text-lg sm:text-xl max-w-lg mx-auto lg:mx-0 mb-6 leading-relaxed">
             Discover trusted services, book with confidence, and trade across Nigeria and China with
             AI-powered translation, secure payments, and verified logistics.
           </p>
@@ -339,9 +339,9 @@ function HeroSection() {
               { val: "AI", unit: "Translation", sub: "Built in" },
             ].map((s) => (
               <div key={s.unit} className="text-center lg:text-left">
-                <div className="text-2xl font-black text-white">{s.val}</div>
-                <div className="text-xs text-gray-400 font-medium">{s.unit}</div>
-                <div className="text-xs text-gray-600">{s.sub}</div>
+                <div className="text-2xl font-black text-[#1f1412]">{s.val}</div>
+                <div className="text-xs text-[#5f4b46] font-medium">{s.unit}</div>
+                <div className="text-xs text-[#8a726d]">{s.sub}</div>
               </div>
             ))}
           </div>
@@ -413,7 +413,7 @@ function HeroSection() {
 
       {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-        style={{ background: "linear-gradient(to bottom, transparent, #14060a)" }} />
+        style={{ background: "linear-gradient(to bottom, transparent, #fffaf7)" }} />
     </section>
   )
 }
@@ -437,11 +437,11 @@ function ExperienceSection() {
 
   if (selected) {
     return (
-      <section className="min-h-screen bg-[#14060a] py-16 px-5">
+      <section className="min-h-screen bg-[#fffaf7] py-16 px-5">
         <div className="max-w-3xl mx-auto">
           <button
             onClick={() => setSelected(null)}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-10 text-sm font-medium"
+            className="flex items-center gap-2 text-[#5f4b46] hover:text-[#1f1412] transition-colors mb-10 text-sm font-medium"
           >
             <ChevronLeft className="w-4 h-4" />
             Back to all experiences
@@ -469,18 +469,18 @@ function ExperienceSection() {
   }
 
   return (
-    <section className="py-28 px-5 bg-[#14060a] border-t border-white/[0.04]">
+    <section className="py-28 px-5 bg-[#fffaf7] border-t border-[#f2d7d0]">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
-          <p className="text-[#dc2626] text-sm font-bold uppercase tracking-[0.2em] mb-4">Your Experience</p>
-          <h2 className="text-[clamp(2.2rem,6vw,4.5rem)] font-black text-white leading-tight">
+          <p className="text-[#b91c1c] text-sm font-bold uppercase tracking-[0.2em] mb-4">Your Experience</p>
+          <h2 className="text-[clamp(2.2rem,6vw,4.5rem)] font-black text-[#1f1412] leading-tight">
             How will you use
             <br />
-            <span className="bg-gradient-to-r from-[#f87171] to-[#fb923c] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#b91c1c] to-[#f59e0b] bg-clip-text text-transparent">
               BigCat Global?
             </span>
           </h2>
-          <p className="text-gray-400 mt-5 text-lg max-w-md mx-auto">
+          <p className="text-[#5f4b46] mt-5 text-lg max-w-md mx-auto">
             Pick your role to see your complete journey — step by step.
           </p>
         </div>
@@ -499,11 +499,11 @@ function ExperienceSection() {
                     style={{ background: `${role.color}20`, border: `1.5px solid ${role.color}40` }}>
                     <Icon className="w-6 h-6" style={{ color: role.color }} />
                   </div>
-                  <ArrowRight className="w-5 h-5 text-gray-600 group-hover:text-white group-hover:translate-x-1 transition-all duration-300" />
+                  <ArrowRight className="w-5 h-5 text-[#5f4b46] group-hover:text-[#1f1412] group-hover:translate-x-1 transition-all duration-300" />
                 </div>
 
-                <h3 className="text-2xl font-extrabold text-white mb-2">{role.label}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{role.sub}</p>
+                <h3 className="text-2xl font-extrabold text-[#1f1412] mb-2">{role.label}</h3>
+                <p className="text-[#5f4b46] text-sm leading-relaxed">{role.sub}</p>
 
                 <div className="mt-6 flex items-center gap-2">
                   <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ color: role.color, background: `${role.color}15` }}>
@@ -521,7 +521,7 @@ function ExperienceSection() {
 
 function WhySection() {
   return (
-    <section className="py-28 px-5 relative overflow-hidden" style={{ background: "linear-gradient(to bottom, #14060a, #180a0e)" }}>
+    <section className="py-28 px-5 relative overflow-hidden" style={{ background: "linear-gradient(to bottom, #fff8f5, #fffaf7)" }}>
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-[120px]"
           style={{ background: "radial-gradient(ellipse, #dc262620, transparent 70%)" }} />
@@ -529,8 +529,8 @@ function WhySection() {
 
       <div className="relative max-w-6xl mx-auto">
         <div className="text-center mb-20">
-          <p className="text-[#dc2626] text-sm font-bold uppercase tracking-[0.2em] mb-4">Built Different</p>
-          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-white">Why BigCat Global?</h2>
+          <p className="text-[#b91c1c] text-sm font-bold uppercase tracking-[0.2em] mb-4">Built Different</p>
+          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]">Why BigCat Global?</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -538,7 +538,7 @@ function WhySection() {
             const Icon = b.icon
             return (
               <div key={b.title}
-                className="group relative overflow-hidden rounded-3xl p-8 border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-300">
+                className="group relative overflow-hidden rounded-3xl p-8 border border-[#f2d7d0] bg-white/80 hover:bg-white transition-all duration-300">
                 <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-[80px] opacity-10 transition-opacity group-hover:opacity-20"
                   style={{ background: b.color }} />
 
@@ -547,8 +547,8 @@ function WhySection() {
                     style={{ background: `${b.color}18`, border: `1.5px solid ${b.color}30` }}>
                     <Icon className="w-5 h-5" style={{ color: b.color }} />
                   </div>
-                  <h3 className="text-xl font-extrabold text-white mb-3">{b.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">{b.detail}</p>
+                  <h3 className="text-xl font-extrabold text-[#1f1412] mb-3">{b.title}</h3>
+                  <p className="text-[#5f4b46] text-sm leading-relaxed">{b.detail}</p>
                 </div>
               </div>
             )
@@ -561,12 +561,12 @@ function WhySection() {
 
 function CountriesSection() {
   return (
-    <section className="py-28 px-5 bg-[#14060a]">
+    <section className="py-28 px-5 bg-[#fffaf7]">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
-          <p className="text-[#dc2626] text-sm font-bold uppercase tracking-[0.2em] mb-4">Coverage</p>
-          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-white">Supported Countries</h2>
-          <p className="text-gray-400 mt-4 text-lg">Two powerhouse economies. One marketplace.</p>
+          <p className="text-[#b91c1c] text-sm font-bold uppercase tracking-[0.2em] mb-4">Coverage</p>
+          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]">Supported Countries</h2>
+          <p className="text-[#5f4b46] mt-4 text-lg">Two powerhouse economies. One marketplace.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
@@ -583,11 +583,11 @@ function CountriesSection() {
             },
           ].map((c) => (
             <div key={c.name}
-              className="relative overflow-hidden rounded-3xl p-10 border border-white/[0.06] bg-white/[0.02]">
+              className="relative overflow-hidden rounded-3xl p-10 border border-[#f2d7d0] bg-white/80">
               <div className="absolute top-4 right-4 text-6xl opacity-15">{c.flag}</div>
               <div className="text-5xl mb-4">{c.flag}</div>
-              <h3 className="text-3xl font-black text-white mb-1">{c.name}</h3>
-              <p className="text-gray-500 text-sm mb-6">{c.role}</p>
+              <h3 className="text-3xl font-black text-[#1f1412] mb-1">{c.name}</h3>
+              <p className="text-[#5f4b46] text-sm mb-6">{c.role}</p>
               <div className="flex flex-wrap gap-2">
                 {c.items.map((item) => (
                   <span key={item} className="text-xs font-medium px-3 py-1.5 rounded-full"
@@ -600,7 +600,7 @@ function CountriesSection() {
           ))}
         </div>
 
-        <div className="text-center py-6 rounded-2xl border border-dashed border-white/10 text-gray-500 text-sm">
+        <div className="text-center py-6 rounded-2xl border border-dashed border-[#f2d7d0] text-[#5f4b46] text-sm">
           🌍 &nbsp; More countries coming soon — UK, UAE, Ghana and beyond
         </div>
       </div>
@@ -631,12 +631,12 @@ function ProtectionSection() {
   ]
 
   return (
-    <section className="py-28 px-5" style={{ background: "linear-gradient(to bottom, #14060a, #180a0e)" }}>
+    <section className="py-28 px-5" style={{ background: "linear-gradient(to bottom, #fff8f5, #fffaf7)" }}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
-          <p className="text-[#dc2626] text-sm font-bold uppercase tracking-[0.2em] mb-4">Order Protection</p>
-          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-white">You're covered.</h2>
-          <p className="text-gray-400 mt-4 text-lg max-w-md mx-auto">
+          <p className="text-[#b91c1c] text-sm font-bold uppercase tracking-[0.2em] mb-4">Order Protection</p>
+          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]">You're covered.</h2>
+          <p className="text-[#5f4b46] mt-4 text-lg max-w-md mx-auto">
             Every transaction on BigCat is protected end-to-end.
           </p>
         </div>
@@ -646,7 +646,7 @@ function ProtectionSection() {
             const Icon = card.icon
             return (
               <div key={card.title}
-                className="relative overflow-hidden rounded-3xl p-8 border border-white/[0.06] bg-white/[0.02]">
+                className="relative overflow-hidden rounded-3xl p-8 border border-[#f2d7d0] bg-white/80">
                 <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-[100px] opacity-[0.07]"
                   style={{ background: card.color }} />
 
@@ -662,13 +662,13 @@ function ProtectionSection() {
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-extrabold text-white mb-5">{card.title}</h3>
+                  <h3 className="text-xl font-extrabold text-[#1f1412] mb-5">{card.title}</h3>
 
                   {/* Flow */}
                   <div className="flex items-center gap-1 mb-6 overflow-x-auto">
                     {card.flow.map((step, i) => (
                       <div key={step} className="flex items-center gap-1 flex-shrink-0">
-                        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-white/[0.06] text-gray-300">{step}</span>
+                        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#fff1ee] text-[#4b3b37]">{step}</span>
                         {i < card.flow.length - 1 && <span className="text-gray-700 text-xs">→</span>}
                       </div>
                     ))}
@@ -679,12 +679,12 @@ function ProtectionSection() {
                     {card.covers.map((item) => (
                       <div key={item} className="flex items-center gap-2.5">
                         <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: card.color }} />
-                        <span className="text-gray-400 text-sm">{item}</span>
+                        <span className="text-[#5f4b46] text-sm">{item}</span>
                       </div>
                     ))}
                   </div>
 
-                  <p className="text-gray-600 text-xs border-t border-white/[0.05] pt-4">{card.note}</p>
+                  <p className="text-[#6b514e] text-xs border-t border-[#f2d7d0] pt-4">{card.note}</p>
                 </div>
               </div>
             )
@@ -704,12 +704,12 @@ function OrderTimelineSection() {
   }, [])
 
   return (
-    <section className="py-28 px-5 bg-[#14060a]">
+    <section className="py-28 px-5 bg-[#fffaf7]">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
-          <p className="text-[#dc2626] text-sm font-bold uppercase tracking-[0.2em] mb-4">Order Journey</p>
-          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-white">Every stage. Tracked.</h2>
-          <p className="text-gray-400 mt-4">Real-time milestones from order to delivery.</p>
+          <p className="text-[#b91c1c] text-sm font-bold uppercase tracking-[0.2em] mb-4">Order Journey</p>
+          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]">Every stage. Tracked.</h2>
+          <p className="text-[#5f4b46] mt-4">Real-time milestones from order to delivery.</p>
         </div>
 
         <div className="relative">
@@ -744,9 +744,9 @@ function OrderTimelineSection() {
           </div>
 
           {/* Active stage detail */}
-          <div className="mt-8 text-center p-8 rounded-3xl border border-white/[0.06] bg-white/[0.02]">
-            <div className="text-sm text-gray-500 mb-1">Currently at stage {active + 1} of {ORDER_STAGES.length}</div>
-            <div className="text-2xl font-black text-white">{ORDER_STAGES[active].label}</div>
+          <div className="mt-8 text-center p-8 rounded-3xl border border-[#f2d7d0] bg-white/80">
+            <div className="text-sm text-[#5f4b46] mb-1">Currently at stage {active + 1} of {ORDER_STAGES.length}</div>
+            <div className="text-2xl font-black text-[#1f1412]">{ORDER_STAGES[active].label}</div>
           </div>
         </div>
       </div>
@@ -756,12 +756,12 @@ function OrderTimelineSection() {
 
 function FooterSection() {
   return (
-    <footer className="border-t border-white/[0.05] bg-[#14060a] py-16 px-5">
+    <footer className="border-t border-[#f2d7d0] bg-[#fffaf7] py-16 px-5">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-14">
           <div className="col-span-2 sm:col-span-1">
-            <div className="text-xl font-black text-white mb-3">BigCat Global</div>
-            <p className="text-gray-500 text-sm leading-relaxed">
+            <div className="text-xl font-black text-[#1f1412] mb-3">BigCat Global</div>
+            <p className="text-[#5f4b46] text-sm leading-relaxed">
               Trade between Nigeria and China — powered by AI, secured by escrow.
             </p>
           </div>
@@ -772,19 +772,19 @@ function FooterSection() {
             { label: "Company", links: [{ name: "Contact", href: "/contact" }, { name: "Become a Merchant", href: "/marketplace" }] },
           ].map((col) => (
             <div key={col.label}>
-              <p className="text-white font-bold text-sm mb-4">{col.label}</p>
+              <p className="text-[#1f1412] font-bold text-sm mb-4">{col.label}</p>
               <div className="space-y-3">
                 {col.links.map((l) => (
-                  <Link key={l.name} href={l.href} className="block text-gray-500 hover:text-gray-300 text-sm transition-colors">{l.name}</Link>
+                  <Link key={l.name} href={l.href} className="block text-[#5f4b46] hover:text-[#1f1412] text-sm transition-colors">{l.name}</Link>
                 ))}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="border-t border-white/[0.05] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-gray-600 text-xs">© 2026 BigCat Global. All rights reserved.</p>
-          <div className="flex items-center gap-2 text-xs text-gray-600">
+        <div className="border-t border-[#f2d7d0] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-[#5f4b46] text-xs">© 2026 BigCat Global. All rights reserved.</p>
+          <div className="flex items-center gap-2 text-xs text-[#5f4b46]">
             <Shield className="w-3.5 h-3.5" />
             Protected by Orchid Escrow
           </div>
@@ -797,7 +797,7 @@ function FooterSection() {
 /* ─── Main Export ────────────────────────────────────────── */
 export function LandingPageV3() {
   return (
-    <div className="min-h-screen bg-[#14060a] overflow-x-hidden">
+    <div className="min-h-screen bg-[#fffaf7] overflow-x-hidden text-[#1f1412]">
       <HeroSection />
       <ExperienceSection />
       <WhySection />
