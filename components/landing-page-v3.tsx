@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import {
@@ -268,7 +269,20 @@ function HeroSection() {
       <div className="relative max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-5 gap-12 items-center py-20">
         {/* Left: Copy — spans 3 cols */}
         <div className="lg:col-span-3 text-center lg:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 text-xs font-medium mb-8 tracking-wide">
+          <div className="mb-7 flex items-center justify-center lg:justify-start">
+            <div className="w-[160px] sm:w-[220px] drop-shadow-[0_20px_40px_rgba(220,38,38,0.25)]">
+              <Image
+                src="/image.png"
+                alt="BigCat Global"
+                width={640}
+                height={420}
+                priority
+                className="h-auto w-full"
+              />
+            </div>
+          </div>
+
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#dc2626]/30 bg-[#dc2626]/10 text-[#fca5a5] text-xs font-medium mb-8 tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
             Nigeria · China · Global Trade
           </div>
@@ -285,10 +299,21 @@ function HeroSection() {
             </span>
           </h1>
 
-          <p className="text-gray-300/80 text-lg sm:text-xl max-w-lg mx-auto lg:mx-0 mb-12 leading-relaxed">
+          <p className="text-gray-300/80 text-lg sm:text-xl max-w-lg mx-auto lg:mx-0 mb-6 leading-relaxed">
             Discover trusted services, book with confidence, and trade across Nigeria and China with
             AI-powered translation, secure payments, and verified logistics.
           </p>
+
+          <div className="mb-10 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3.5 py-2 text-sm font-medium text-emerald-200">
+              <Lock className="w-4 h-4" />
+              100% Escrow Protected
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-medium text-gray-200">
+              <Shield className="w-4 h-4 text-[#f87171]" />
+              Buyer & seller protection
+            </div>
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Link
