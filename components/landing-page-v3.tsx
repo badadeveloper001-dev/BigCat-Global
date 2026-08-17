@@ -164,6 +164,39 @@ function AnimatedLine({ active }: { active: boolean }) {
   )
 }
 
+function NigeriaFlag() {
+  return (
+    <svg viewBox="0 0 3 2" className="h-9 w-12 sm:h-11 sm:w-16 rounded-md shadow-lg shadow-black/10 overflow-hidden" aria-label="Nigeria flag">
+      <rect width="3" height="2" fill="#008753" />
+      <rect x="1" width="1" height="2" fill="#fff" />
+      <rect x="2" width="1" height="2" fill="#008753" />
+    </svg>
+  )
+}
+
+function ChinaFlag() {
+  return (
+    <svg viewBox="0 0 3 2" className="h-9 w-12 sm:h-11 sm:w-16 rounded-md shadow-lg shadow-black/10 overflow-hidden" aria-label="China flag">
+      <rect width="3" height="2" fill="#de2910" />
+      <g transform="translate(0.75 0.55) scale(0.24)">
+        <polygon points="0,-1 0.2245,-0.309 0.9511,-0.309 0.3633,0.118 0.5878,0.809 0,0.382 -0.5878,0.809 -0.3633,0.118 -0.9511,-0.309 -0.2245,-0.309" fill="#ffde00" />
+      </g>
+      <g transform="translate(1.3 0.38) scale(0.11)">
+        <polygon points="0,-1 0.2245,-0.309 0.9511,-0.309 0.3633,0.118 0.5878,0.809 0,0.382 -0.5878,0.809 -0.3633,0.118 -0.9511,-0.309 -0.2245,-0.309" fill="#ffde00" />
+      </g>
+      <g transform="translate(1.55 0.72) scale(0.09)">
+        <polygon points="0,-1 0.2245,-0.309 0.9511,-0.309 0.3633,0.118 0.5878,0.809 0,0.382 -0.5878,0.809 -0.3633,0.118 -0.9511,-0.309 -0.2245,-0.309" fill="#ffde00" />
+      </g>
+      <g transform="translate(1.38 0.95) scale(0.07)">
+        <polygon points="0,-1 0.2245,-0.309 0.9511,-0.309 0.3633,0.118 0.5878,0.809 0,0.382 -0.5878,0.809 -0.3633,0.118 -0.9511,-0.309 -0.2245,-0.309" fill="#ffde00" />
+      </g>
+      <g transform="translate(1.68 0.9) scale(0.07)">
+        <polygon points="0,-1 0.2245,-0.309 0.9511,-0.309 0.3633,0.118 0.5878,0.809 0,0.382 -0.5878,0.809 -0.3633,0.118 -0.9511,-0.309 -0.2245,-0.309" fill="#ffde00" />
+      </g>
+    </svg>
+  )
+}
+
 /* ─── Journey Timeline ───────────────────────────────────── */
 function JourneyTimeline({
   steps,
@@ -257,20 +290,23 @@ function HeroSection() {
   ]
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#fff2f2] flex items-center pt-16">
+    <section className="relative min-h-screen overflow-hidden bg-[#b60d0d] flex items-center pt-16 text-white">
       {/* Ambient glows */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-20 blur-[180px]"
-          style={{ background: "radial-gradient(ellipse, rgba(239,68,68,0.28), transparent 70%)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(255,255,255,0.24), transparent 70%)" }} />
         <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full opacity-10 blur-[120px]"
-          style={{ background: "radial-gradient(ellipse, rgba(244,114,182,0.18), transparent 70%)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(255,255,255,0.16), transparent 70%)" }} />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-5 gap-12 items-center py-20">
         {/* Left: Copy — spans 3 cols */}
         <div className="lg:col-span-3 text-center lg:text-left">
-          <div className="mb-7 flex items-center justify-center lg:justify-start">
-            <div className="w-[160px] sm:w-[220px] drop-shadow-[0_20px_40px_rgba(220,38,38,0.18)]">
+          <div className="mb-7 flex items-center justify-center lg:justify-start gap-4 sm:gap-6">
+            <div className="shrink-0 rounded-full bg-white/10 p-1.5 backdrop-blur-sm">
+              <ChinaFlag />
+            </div>
+            <div className="w-[160px] sm:w-[220px] drop-shadow-[0_20px_40px_rgba(0,0,0,0.18)]">
               <Image
                 src="/bigcat-logo-transparent.png"
                 alt="BigCat Global"
@@ -280,37 +316,40 @@ function HeroSection() {
                 className="h-auto w-full object-contain"
               />
             </div>
+            <div className="shrink-0 rounded-full bg-white/10 p-1.5 backdrop-blur-sm">
+              <NigeriaFlag />
+            </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-red-200 bg-red-50 text-red-700 text-xs font-medium mb-8 tracking-wide">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-            Nigeria · China · Global Trade
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/30 bg-white/10 text-white text-xs font-medium mb-8 tracking-wide">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            Trusted cross-border trade
           </div>
 
-          <h1 className="text-[clamp(3rem,8vw,6rem)] font-black text-[#1f1412] leading-[0.9] tracking-tighter mb-8">
+          <h1 className="text-[clamp(3rem,8vw,6rem)] font-black text-white leading-[0.9] tracking-tighter mb-8">
             Trade
             <br />
             Globally.
             <br />
-            <span className="bg-gradient-to-r from-[#b91c1c] via-[#ef4444] to-[#f59e0b] bg-clip-text text-transparent">
+            <span className="text-white/90">
               Sell Without
               <br />
               Borders.
             </span>
           </h1>
 
-          <p className="text-[#4b3b37] text-lg sm:text-xl max-w-lg mx-auto lg:mx-0 mb-6 leading-relaxed">
+          <p className="text-white/85 text-lg sm:text-xl max-w-lg mx-auto lg:mx-0 mb-6 leading-relaxed">
             Discover trusted services, book with confidence, and trade across Nigeria and China with
             AI-powered translation, secure payments, and verified logistics.
           </p>
 
           <div className="mb-10 flex flex-wrap items-center justify-center lg:justify-start gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3.5 py-2 text-sm font-medium text-red-700">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3.5 py-2 text-sm font-medium text-white">
               <Lock className="w-4 h-4" />
               100% Escrow Protected
             </div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-red-100 bg-[#fff8f8] px-3.5 py-2 text-sm font-medium text-red-700">
-              <Shield className="w-4 h-4 text-red-600" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3.5 py-2 text-sm font-medium text-white">
+              <Shield className="w-4 h-4 text-white" />
               Buyer & seller protection
             </div>
           </div>
@@ -318,14 +357,14 @@ function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Link
               href="/marketplace?view=services"
-              className="group inline-flex items-center justify-center gap-2 bg-[#dc2626] hover:bg-[#ef4444] text-white text-base font-bold px-10 py-4 rounded-full shadow-xl shadow-red-900/40 transition-all duration-300 hover:-translate-y-0.5"
+              className="group inline-flex items-center justify-center gap-2 bg-white hover:bg-[#fff0f0] text-[#d94a4a] text-base font-bold px-10 py-4 rounded-full shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-0.5"
             >
               Explore Services
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link
               href="/marketplace"
-              className="inline-flex items-center justify-center gap-2 text-red-700 hover:text-red-900 text-base font-semibold px-8 py-4 rounded-full border border-red-200 bg-[#fff7f7] hover:bg-red-50 transition-all duration-300 hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center gap-2 text-white hover:text-white/80 text-base font-semibold px-8 py-4 rounded-full border border-white/30 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:-translate-y-0.5"
             >
               Browse Marketplace
             </Link>
@@ -355,8 +394,13 @@ function HeroSection() {
               <circle cx="150" cy="65" r="52" fill="#dc2626" fillOpacity="0.08" />
               <circle cx="150" cy="65" r="52" stroke="#dc2626" strokeWidth="1.5" strokeOpacity="0.4" />
               <circle cx="150" cy="65" r="38" fill="#dc2626" fillOpacity="0.12" />
-              <text x="150" y="58" textAnchor="middle" fill="white" fontSize="13" fontWeight="700" opacity="0.9">NIGERIA</text>
-              <text x="150" y="74" textAnchor="middle" fill="#dc2626" fontSize="10" opacity="0.7">🇳🇬  Seller · Buyer</text>
+              <g transform="translate(106 33)">
+                <rect width="88" height="58" rx="16" fill="rgba(255,255,255,0.1)" />
+                <rect x="10" y="10" width="68" height="38" fill="#008753" />
+                <rect x="42" y="10" width="14" height="38" fill="#fff" />
+                <rect x="10" y="10" width="32" height="38" fill="#008753" />
+                <rect x="46" y="10" width="32" height="38" fill="#008753" />
+              </g>
             </g>
 
             {/* Connector NG → Hub */}
@@ -393,8 +437,13 @@ function HeroSection() {
               <circle cx="150" cy="455" r="52" fill="#1d4ed8" fillOpacity="0.08" />
               <circle cx="150" cy="455" r="52" stroke="#3b82f6" strokeWidth="1.5" strokeOpacity="0.4" />
               <circle cx="150" cy="455" r="38" fill="#1d4ed8" fillOpacity="0.12" />
-              <text x="150" y="448" textAnchor="middle" fill="white" fontSize="13" fontWeight="700" opacity="0.9">CHINA</text>
-              <text x="150" y="464" textAnchor="middle" fill="#60a5fa" fontSize="10" opacity="0.7">🇨🇳  Factory · Merchant</text>
+              <g transform="translate(106 425)">
+                <rect width="88" height="58" rx="16" fill="rgba(255,255,255,0.1)" />
+                <rect x="10" y="10" width="68" height="38" fill="#de2910" />
+                <g transform="translate(32 18) scale(0.6)">
+                  <polygon points="0,-10 2.2,-3.1 9.5,-3.1 3.6,1.2 5.8,8 0,3.8 -5.8,8 -3.6,1.2 -9.5,-3.1 -2.2,-3.1" fill="#ffde00" />
+                </g>
+              </g>
             </g>
 
             {/* Flow labels on the side */}
@@ -413,7 +462,7 @@ function HeroSection() {
 
       {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-        style={{ background: "linear-gradient(to bottom, transparent, #fff1f2)" }} />
+        style={{ background: "linear-gradient(to bottom, transparent, rgba(182, 13, 13, 0.7))" }} />
     </section>
   )
 }
@@ -437,11 +486,11 @@ function ExperienceSection() {
 
   if (selected) {
     return (
-      <section className="min-h-screen bg-[#fff2f2] py-16 px-5">
+      <section className="min-h-screen bg-[#b60d0d] py-16 px-5 text-white">
         <div className="max-w-3xl mx-auto">
           <button
             onClick={() => setSelected(null)}
-            className="flex items-center gap-2 text-[#5f4b46] hover:text-[#1f1412] transition-colors mb-10 text-sm font-medium"
+            className="flex items-center gap-2 text-white/80 hover:text-white transition-colors mb-10 text-sm font-medium"
           >
             <ChevronLeft className="w-4 h-4" />
             Back to all experiences
@@ -469,18 +518,18 @@ function ExperienceSection() {
   }
 
   return (
-    <section className="py-28 px-5 bg-[#fff2f2] border-t border-red-100">
+    <section className="py-28 px-5 bg-[#b60d0d] border-t border-white/10">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
-          <p className="text-[#b91c1c] text-sm font-bold uppercase tracking-[0.2em] mb-4">Your Experience</p>
-          <h2 className="text-[clamp(2.2rem,6vw,4.5rem)] font-black text-[#1f1412] leading-tight">
+          <p className="text-white/80 text-sm font-bold uppercase tracking-[0.2em] mb-4">Your Experience</p>
+          <h2 className="text-[clamp(2.2rem,6vw,4.5rem)] font-black text-white leading-tight">
             How will you use
             <br />
-            <span className="bg-gradient-to-r from-[#b91c1c] to-[#f59e0b] bg-clip-text text-transparent">
+            <span className="text-white/90">
               BigCat Global?
             </span>
           </h2>
-          <p className="text-[#5f4b46] mt-5 text-lg max-w-md mx-auto">
+          <p className="text-white/80 mt-5 text-lg max-w-md mx-auto">
             Pick your role to see your complete journey — step by step.
           </p>
         </div>
@@ -529,7 +578,7 @@ function WhySection() {
 
       <div className="relative max-w-6xl mx-auto">
         <div className="text-center mb-20">
-          <p className="text-[#b91c1c] text-sm font-bold uppercase tracking-[0.2em] mb-4">Built Different</p>
+          <p className="text-[#FF0000] text-sm font-bold uppercase tracking-[0.2em] mb-4">Built Different</p>
           <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]">Why BigCat Global?</h2>
         </div>
 
@@ -564,7 +613,7 @@ function CountriesSection() {
     <section className="py-28 px-5 bg-[#fffaf7]">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
-          <p className="text-[#b91c1c] text-sm font-bold uppercase tracking-[0.2em] mb-4">Coverage</p>
+          <p className="text-[#FF0000] text-sm font-bold uppercase tracking-[0.2em] mb-4">Coverage</p>
           <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]">Supported Countries</h2>
           <p className="text-[#5f4b46] mt-4 text-lg">Two powerhouse economies. One marketplace.</p>
         </div>
@@ -634,7 +683,7 @@ function ProtectionSection() {
     <section className="py-28 px-5" style={{ background: "linear-gradient(to bottom, #fff5f5, #fff1f2)" }}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
-          <p className="text-[#b91c1c] text-sm font-bold uppercase tracking-[0.2em] mb-4">Order Protection</p>
+          <p className="text-[#FF0000] text-sm font-bold uppercase tracking-[0.2em] mb-4">Order Protection</p>
           <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]">You're covered.</h2>
           <p className="text-[#5f4b46] mt-4 text-lg max-w-md mx-auto">
             Every transaction on BigCat is protected end-to-end.
@@ -707,7 +756,7 @@ function OrderTimelineSection() {
     <section className="py-28 px-5 bg-[#fff2f2]">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
-          <p className="text-[#b91c1c] text-sm font-bold uppercase tracking-[0.2em] mb-4">Order Journey</p>
+          <p className="text-[#FF0000] text-sm font-bold uppercase tracking-[0.2em] mb-4">Order Journey</p>
           <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]">Every stage. Tracked.</h2>
           <p className="text-[#5f4b46] mt-4">Real-time milestones from order to delivery.</p>
         </div>
@@ -728,16 +777,16 @@ function OrderTimelineSection() {
                   <div className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 border-2"
                     style={{
                       borderColor: isCurrent ? "#dc2626" : isDone ? "#dc262660" : "rgba(255,255,255,0.08)",
-                      background: isCurrent ? "#dc262618" : isDone ? "#dc262608" : "transparent",
+                      background: isCurrent ? "#FF000010" : isDone ? "#FF000008" : "transparent",
                     }}>
                     <Icon className="w-4 h-4 transition-all duration-500"
-                      style={{ color: isCurrent ? "#dc2626" : isDone ? "#dc262670" : "rgba(255,255,255,0.2)" }} />
+                      style={{ color: isCurrent ? "#FF0000" : isDone ? "#FF000070" : "rgba(255,255,255,0.2)" }} />
                   </div>
                   <span className="text-xs text-center w-16 leading-tight transition-all duration-500"
                     style={{ color: isCurrent ? "white" : isDone ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)" }}>
                     {stage.label}
                   </span>
-                  {isCurrent && <div className="w-1.5 h-1.5 rounded-full bg-[#dc2626] animate-pulse" />}
+                  {isCurrent && <div className="w-1.5 h-1.5 rounded-full bg-[#FF0000] animate-pulse" />}
                 </button>
               )
             })}
