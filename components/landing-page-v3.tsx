@@ -257,13 +257,13 @@ function HeroSection() {
   ]
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#fff8f5] flex items-center pt-16">
+    <section className="relative min-h-screen overflow-hidden bg-[#fff2f2] flex items-center pt-16">
       {/* Ambient glows */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-20 blur-[180px]"
-          style={{ background: "radial-gradient(ellipse, rgba(239,68,68,0.24), transparent 70%)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(239,68,68,0.28), transparent 70%)" }} />
         <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full opacity-10 blur-[120px]"
-          style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.18), transparent 70%)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(244,114,182,0.18), transparent 70%)" }} />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-5 gap-12 items-center py-20">
@@ -282,7 +282,7 @@ function HeroSection() {
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#dc2626]/20 bg-[#fff0ee] text-[#7f1d1d] text-xs font-medium mb-8 tracking-wide">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-red-200 bg-red-50 text-red-700 text-xs font-medium mb-8 tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
             Nigeria · China · Global Trade
           </div>
@@ -305,12 +305,12 @@ function HeroSection() {
           </p>
 
           <div className="mb-10 flex flex-wrap items-center justify-center lg:justify-start gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3.5 py-2 text-sm font-medium text-emerald-200">
+            <div className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3.5 py-2 text-sm font-medium text-red-700">
               <Lock className="w-4 h-4" />
               100% Escrow Protected
             </div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-medium text-gray-200">
-              <Shield className="w-4 h-4 text-[#f87171]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-red-100 bg-[#fff8f8] px-3.5 py-2 text-sm font-medium text-red-700">
+              <Shield className="w-4 h-4 text-red-600" />
               Buyer & seller protection
             </div>
           </div>
@@ -325,7 +325,7 @@ function HeroSection() {
             </Link>
             <Link
               href="/marketplace"
-              className="inline-flex items-center justify-center gap-2 text-gray-200 hover:text-white text-base font-semibold px-8 py-4 rounded-full border border-white/10 hover:border-white/25 bg-white/[0.04] hover:bg-white/[0.08] transition-all duration-300 hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center gap-2 text-red-700 hover:text-red-900 text-base font-semibold px-8 py-4 rounded-full border border-red-200 bg-[#fff7f7] hover:bg-red-50 transition-all duration-300 hover:-translate-y-0.5"
             >
               Browse Marketplace
             </Link>
@@ -413,7 +413,7 @@ function HeroSection() {
 
       {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-        style={{ background: "linear-gradient(to bottom, transparent, #fffaf7)" }} />
+        style={{ background: "linear-gradient(to bottom, transparent, #fff1f2)" }} />
     </section>
   )
 }
@@ -437,7 +437,7 @@ function ExperienceSection() {
 
   if (selected) {
     return (
-      <section className="min-h-screen bg-[#fffaf7] py-16 px-5">
+      <section className="min-h-screen bg-[#fff2f2] py-16 px-5">
         <div className="max-w-3xl mx-auto">
           <button
             onClick={() => setSelected(null)}
@@ -469,7 +469,7 @@ function ExperienceSection() {
   }
 
   return (
-    <section className="py-28 px-5 bg-[#fffaf7] border-t border-[#f2d7d0]">
+    <section className="py-28 px-5 bg-[#fff2f2] border-t border-red-100">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
           <p className="text-[#b91c1c] text-sm font-bold uppercase tracking-[0.2em] mb-4">Your Experience</p>
@@ -521,7 +521,7 @@ function ExperienceSection() {
 
 function WhySection() {
   return (
-    <section className="py-28 px-5 relative overflow-hidden" style={{ background: "linear-gradient(to bottom, #fff8f5, #fffaf7)" }}>
+    <section className="py-28 px-5 relative overflow-hidden" style={{ background: "linear-gradient(to bottom, #fff5f5, #fff1f2)" }}>
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-[120px]"
           style={{ background: "radial-gradient(ellipse, #dc262620, transparent 70%)" }} />
@@ -538,7 +538,7 @@ function WhySection() {
             const Icon = b.icon
             return (
               <div key={b.title}
-                className="group relative overflow-hidden rounded-3xl p-8 border border-[#f2d7d0] bg-white/80 hover:bg-white transition-all duration-300">
+                className="group relative overflow-hidden rounded-3xl p-8 border border-red-100 bg-[#fff8f8] hover:bg-[#fff1f1] transition-all duration-300">
                 <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-[80px] opacity-10 transition-opacity group-hover:opacity-20"
                   style={{ background: b.color }} />
 
@@ -583,7 +583,7 @@ function CountriesSection() {
             },
           ].map((c) => (
             <div key={c.name}
-              className="relative overflow-hidden rounded-3xl p-10 border border-[#f2d7d0] bg-white/80">
+              className="relative overflow-hidden rounded-3xl p-10 border border-red-100 bg-[#fff8f8]">
               <div className="absolute top-4 right-4 text-6xl opacity-15">{c.flag}</div>
               <div className="text-5xl mb-4">{c.flag}</div>
               <h3 className="text-3xl font-black text-[#1f1412] mb-1">{c.name}</h3>
@@ -631,7 +631,7 @@ function ProtectionSection() {
   ]
 
   return (
-    <section className="py-28 px-5" style={{ background: "linear-gradient(to bottom, #fff8f5, #fffaf7)" }}>
+    <section className="py-28 px-5" style={{ background: "linear-gradient(to bottom, #fff5f5, #fff1f2)" }}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
           <p className="text-[#b91c1c] text-sm font-bold uppercase tracking-[0.2em] mb-4">Order Protection</p>
@@ -646,7 +646,7 @@ function ProtectionSection() {
             const Icon = card.icon
             return (
               <div key={card.title}
-                className="relative overflow-hidden rounded-3xl p-8 border border-[#f2d7d0] bg-white/80">
+                className="relative overflow-hidden rounded-3xl p-8 border border-red-100 bg-[#fff8f8]">
                 <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-[100px] opacity-[0.07]"
                   style={{ background: card.color }} />
 
@@ -704,7 +704,7 @@ function OrderTimelineSection() {
   }, [])
 
   return (
-    <section className="py-28 px-5 bg-[#fffaf7]">
+    <section className="py-28 px-5 bg-[#fff2f2]">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-[#b91c1c] text-sm font-bold uppercase tracking-[0.2em] mb-4">Order Journey</p>
@@ -744,7 +744,7 @@ function OrderTimelineSection() {
           </div>
 
           {/* Active stage detail */}
-          <div className="mt-8 text-center p-8 rounded-3xl border border-[#f2d7d0] bg-white/80">
+          <div className="mt-8 text-center p-8 rounded-3xl border border-red-100 bg-[#fff8f8]">
             <div className="text-sm text-[#5f4b46] mb-1">Currently at stage {active + 1} of {ORDER_STAGES.length}</div>
             <div className="text-2xl font-black text-[#1f1412]">{ORDER_STAGES[active].label}</div>
           </div>
@@ -756,7 +756,7 @@ function OrderTimelineSection() {
 
 function FooterSection() {
   return (
-    <footer className="border-t border-[#f2d7d0] bg-[#fffaf7] py-16 px-5">
+    <footer className="border-t border-red-100 bg-[#fff2f2] py-16 px-5">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-14">
           <div className="col-span-2 sm:col-span-1">
@@ -782,7 +782,7 @@ function FooterSection() {
           ))}
         </div>
 
-        <div className="border-t border-[#f2d7d0] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="border-t border-red-100 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-[#5f4b46] text-xs">© 2026 BigCat Global. All rights reserved.</p>
           <div className="flex items-center gap-2 text-xs text-[#5f4b46]">
             <Shield className="w-3.5 h-3.5" />
@@ -797,7 +797,7 @@ function FooterSection() {
 /* ─── Main Export ────────────────────────────────────────── */
 export function LandingPageV3() {
   return (
-    <div className="min-h-screen bg-[#fffaf7] overflow-x-hidden text-[#1f1412]">
+    <div className="min-h-screen bg-[#fff2f2] overflow-x-hidden text-[#1f1412]">
       <HeroSection />
       <ExperienceSection />
       <WhySection />
