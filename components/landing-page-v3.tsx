@@ -222,8 +222,8 @@ function JourneyTimeline({
   return (
     <div className="py-8 px-4 max-w-2xl mx-auto">
       <div className="text-center mb-12">
-        <h3 className="text-4xl sm:text-5xl font-extrabold text-[#1f1412] mb-3">{heading}</h3>
-        <p className="text-[#5f4b46] text-base">{sub}</p>
+        <h3 className="text-4xl sm:text-5xl font-extrabold text-white mb-3">{heading}</h3>
+        <p className="text-white/75 text-base">{sub}</p>
       </div>
 
       <div className="relative">
@@ -259,9 +259,9 @@ function JourneyTimeline({
                     </span>
                     {isActive && <Dot color={step.color} pulse />}
                   </div>
-                  <p className="font-bold text-lg text-[#1f1412] leading-tight">{step.label}</p>
+                  <p className="font-bold text-lg text-white leading-tight">{step.label}</p>
                   {isActive && (
-                    <p className="text-[#5f4b46] text-sm mt-1 animate-in fade-in duration-300">{step.detail}</p>
+                    <p className="text-white/75 text-sm mt-1 animate-in fade-in duration-300">{step.detail}</p>
                   )}
                 </div>
               </button>
@@ -290,7 +290,7 @@ function HeroSection() {
   ]
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#b60d0d] flex items-center pt-16 text-white">
+    <section className="relative min-h-screen overflow-hidden bg-[#8d0909] flex items-center pt-16 text-white">
       {/* Ambient glows */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-20 blur-[180px]"
@@ -314,6 +314,7 @@ function HeroSection() {
                 height={420}
                 priority
                 className="h-auto w-full object-contain"
+                style={{ filter: "brightness(0) invert(1)" }}
               />
             </div>
             <div className="shrink-0 rounded-full bg-white/10 p-1.5 backdrop-blur-sm">
@@ -378,9 +379,9 @@ function HeroSection() {
               { val: "AI", unit: "Translation", sub: "Built in" },
             ].map((s) => (
               <div key={s.unit} className="text-center lg:text-left">
-                <div className="text-2xl font-black text-[#1f1412]">{s.val}</div>
-                <div className="text-xs text-[#5f4b46] font-medium">{s.unit}</div>
-                <div className="text-xs text-[#8a726d]">{s.sub}</div>
+                <div className="text-2xl font-black text-white">{s.val}</div>
+                <div className="text-xs text-white/80 font-medium">{s.unit}</div>
+                <div className="text-xs text-white/60">{s.sub}</div>
               </div>
             ))}
           </div>
@@ -486,7 +487,7 @@ function ExperienceSection() {
 
   if (selected) {
     return (
-      <section className="min-h-screen bg-[#b60d0d] py-16 px-5 text-white">
+      <section className="min-h-screen bg-[#8d0909] py-16 px-5 text-white">
         <div className="max-w-3xl mx-auto">
           <button
             onClick={() => setSelected(null)}
@@ -518,7 +519,7 @@ function ExperienceSection() {
   }
 
   return (
-    <section className="py-28 px-5 bg-[#b60d0d] border-t border-white/10">
+    <section className="py-28 px-5 bg-[#8d0909] border-t border-white/10">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
           <p className="text-white/80 text-sm font-bold uppercase tracking-[0.2em] mb-4">Your Experience</p>
