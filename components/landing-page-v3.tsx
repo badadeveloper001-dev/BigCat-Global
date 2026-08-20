@@ -125,7 +125,7 @@ const WHY_BLOCKS = [
   },
   {
     icon: Lock,
-    title: "Orchid Escrow Payments",
+    title: "BigCat Escrow Payments",
     detail: "Funds locked in escrow until buyer confirms delivery. No trust required — only verification.",
     color: "#10b981",
   },
