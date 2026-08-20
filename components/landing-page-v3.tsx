@@ -836,7 +836,7 @@ function FooterSection() {
           <p className="text-[#5f4b46] text-xs">© 2026 BigCat Global. All rights reserved.</p>
           <div className="flex items-center gap-2 text-xs text-[#5f4b46]">
             <Shield className="w-3.5 h-3.5" />
-            Protected by Orchid Escrow
+            Protected by BigCat Escrow
           </div>
         </div>
       </div>
