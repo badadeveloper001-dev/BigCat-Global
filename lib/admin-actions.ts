@@ -361,26 +361,43 @@ export async function getMerchantGrowthHistory(limit = 50) {
 
 export async function getPlatformStats() {
   try {
-    const supabase = await createClient()
-    const { count: userCount } = await supabase.from('auth_users').select('*', { count: 'exact', head: true })
-    const { count: merchantCount } = await supabase.from('auth_users').select('*', { count: 'exact', head: true }).eq('role', 'merchant')
-    const { count: orderCount } = await supabase.from('orders').select('*', { count: 'exact', head: true })
+    const supabase = createClient()
+    const [
+      { count: userCount, error: userError },
+      { count: merchantCount, error: merchantError },
+      { count: orderCount, error: orderCountError },
+    ] = await Promise.all([
+      supabase.from('auth_users').select('id', { count: 'exact', head: true }),
+      supabase.from('auth_users').select('id', { count: 'exact', head: true }).eq('role', 'merchant'),
+      supabase.from('orders').select('id', { count: 'exact', head: true }),
+    ])
 
-    const orderAttempts = ['total_amount, grand_total', 'grand_total', 'total_amount']
-    let orders: any[] = []
+    if (userError) throw userError
+    if (merchantError) throw merchantError
+    if (orderCountError) throw orderCountError
+
+    const orderAttempts = [
+      'total_amount, grand_total, status, payment_status, escrow_status',
+      'total_amount, grand_total, status, payment_status',
+      'total_amount, grand_total, status',
+    ]
+    let orders: any[] | null = null
+    let lastError: any = null
+
     for (const selectClause of orderAttempts) {
       const result = await (supabase.from('orders') as any).select(selectClause)
       if (!result.error) {
         orders = result.data || []
         break
       }
-
-      if (!isMissingResourceError(result.error)) {
-        throw result.error
-      }
+      lastError = result.error
+      if (!isMissingResourceError(result.error)) throw result.error
     }
 
-    const totalRevenue = (orders || []).reduce(
+    if (!orders) throw lastError || new Error('Unable to read order totals')
+
+    const recognizedOrders = orders.filter(isRecognizedSale)
+    const recognizedRevenue = recognizedOrders.reduce(
       (sum: number, order: any) => sum + toAmount(order?.grand_total ?? order?.total_amount),
       0,
     )
@@ -388,11 +405,14 @@ export async function getPlatformStats() {
     return {
       success: true,
       stats: {
-        totalUsers: userCount || 0,
-        totalMerchants: merchantCount || 0,
-        totalOrders: orderCount || 0,
-        totalRevenue,
-        activeNow: 0,
+        totalUsers: userCount ?? 0,
+        totalMerchants: merchantCount ?? 0,
+        totalOrders: orderCount ?? 0,
+        recognizedOrders: recognizedOrders.length,
+        totalRevenue: recognizedRevenue,
+        revenueBasis: 'completed_payment_or_fulfilled_order',
+        activeNow: null,
+        activeNowAvailable: false,
       },
     }
   } catch (error: any) {
@@ -424,8 +444,12 @@ export async function rejectMerchant(merchantId: string) {
 
 export async function getRecentUsers() {
   try {
-    const supabase = await createClient()
-    const { data, error } = await supabase.from('auth_users').select('*').order('created_at', { ascending: false }).limit(10)
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('auth_users')
+      .select('id, email, full_name, name, business_name, role, city, state, setup_completed, is_suspended, created_at')
+      .order('created_at', { ascending: false })
+      .limit(10)
     if (error) throw error
     return { success: true, data: data || [] }
   } catch (error: any) {
@@ -446,12 +470,38 @@ export async function getRecentOrders() {
 
 export async function getLogisticsStats() {
   try {
-    const supabase = await createClient()
-    // Placeholder - implement logistics/delivery stats
-    const { count: totalDeliveries } = await supabase.from('orders').select('*', { count: 'exact', head: true }).not('status', 'eq', 'pending')
-    const { count: pendingDeliveries } = await supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending')
-    const { count: completedDeliveries } = await supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'delivered')
-    return { success: true, data: { total: totalDeliveries || 0, pending: pendingDeliveries || 0, completed: completedDeliveries || 0 } }
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('logistics_order_assignments')
+      .select('logistics_status')
+
+    if (error) {
+      if (isMissingResourceError(error)) {
+        return {
+          success: false,
+          unavailable: true,
+          error: 'Logistics reporting is unavailable until the logistics migration is applied.',
+        }
+      }
+      throw error
+    }
+
+    const rows = data || []
+    const completedStatuses = new Set(['completed', 'return_completed'])
+    const activeStatuses = new Set(['assigned', 'in_transit', 'return_assigned', 'return_in_transit'])
+    const completed = rows.filter((row: any) => completedStatuses.has(String(row?.logistics_status || '').toLowerCase())).length
+    const active = rows.filter((row: any) => activeStatuses.has(String(row?.logistics_status || '').toLowerCase())).length
+
+    return {
+      success: true,
+      data: {
+        total: rows.length,
+        pending: Math.max(0, rows.length - active - completed),
+        active,
+        completed,
+        source: 'logistics_order_assignments',
+      },
+    }
   } catch (error: any) {
     return { success: false, error: error.message }
   }
@@ -497,88 +547,102 @@ export async function getMerchantStats() {
 
 export async function getTransactions() {
   try {
-    const supabase = await createClient()
-    // Assuming there's a transactions table or using orders as transactions
-    const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(20)
-    if (error) throw error
-    return { success: true, data: data || [] }
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('id, buyer_id, order_id, type, amount, status, reason, created_at')
+      .order('created_at', { ascending: false })
+      .limit(50)
+
+    if (error) {
+      if (isMissingResourceError(error)) {
+        return {
+          success: false,
+          unavailable: true,
+          error: 'Transaction ledger reporting is unavailable until the transactions table is configured.',
+          data: [],
+        }
+      }
+      throw error
+    }
+
+    return { success: true, data: data || [], source: 'transactions' }
   } catch (error: any) {
     return { success: false, error: error.message, data: [] }
   }
 }
 
+
 export async function getTransactionStats() {
   try {
-    const supabase = await createClient()
-    const { data: orders, error } = await selectOrdersForTransactionStats(supabase)
+    const supabase = createClient()
+    const [transactionsResult, ordersResult, escrowResult] = await Promise.all([
+      supabase.from('transactions').select('type, amount, status'),
+      selectOrdersForTransactionStats(supabase),
+      supabase.from('escrow').select('type, amount, status'),
+    ])
 
-    if (error) throw error
+    const transactionLedgerAvailable = !transactionsResult.error
+    if (transactionsResult.error && !isMissingResourceError(transactionsResult.error)) {
+      throw transactionsResult.error
+    }
+    if (ordersResult.error) throw ordersResult.error
 
-    const orderRows = orders || []
-    const totalRevenue = orderRows.reduce(
-      (sum: number, order: any) => sum + toAmount(order?.grand_total ?? order?.total_amount),
-      0,
+    const transactions = transactionsResult.data || []
+    const completedStatuses = new Set(['completed', 'successful', 'success', 'paid'])
+    const revenueTypes = new Set(['payment', 'payment_received', 'card_payment', 'bank_transfer'])
+    const completedTransactions = transactions.filter((row: any) =>
+      completedStatuses.has(String(row?.status || '').toLowerCase()),
     )
+    const recognizedRevenue = completedTransactions
+      .filter((row: any) => revenueTypes.has(String(row?.type || '').toLowerCase()))
+      .reduce((sum: number, row: any) => sum + toAmount(row?.amount), 0)
 
-    const completedPayments = orderRows.filter(
-      (order: any) => String(order?.payment_status || '').toLowerCase() === 'completed',
-    ).length
-
-    const pendingPayments = orderRows.filter(
-      (order: any) => String(order?.payment_status || '').toLowerCase() !== 'completed',
-    ).length
-
+    const orderRows = ordersResult.data || []
     const completedOrders = orderRows.filter((order: any) => {
       const status = String(order?.status || '').toLowerCase()
       return status === 'completed' || status === 'delivered'
     }).length
 
-    const pendingOrders = Math.max(0, orderRows.length - completedOrders)
+    let productEscrow: number | null = 0
+    let deliveryEscrow: number | null = 0
+    let disbursedAmount: number | null = 0
+    let escrowAvailable = true
 
-    let productEscrow = 0
-    let deliveryEscrow = 0
-    let disbursedAmount = 0
-
-    try {
-      const { data: escrowRows, error: escrowError } = await supabase
-        .from('escrow')
-        .select('type, amount, status')
-
-      if (escrowError) throw escrowError
-
-      for (const row of escrowRows || []) {
+    if (escrowResult.error) {
+      if (!isMissingResourceError(escrowResult.error)) throw escrowResult.error
+      productEscrow = null
+      deliveryEscrow = null
+      disbursedAmount = null
+      escrowAvailable = false
+    } else {
+      for (const row of escrowResult.data || []) {
         const amount = toAmount((row as any)?.amount)
         const type = String((row as any)?.type || '').toLowerCase()
         const status = String((row as any)?.status || '').toLowerCase()
-
-        if (status === 'held') {
-          if (type === 'product') productEscrow += amount
-          if (type === 'delivery') deliveryEscrow += amount
-        }
-
-        if (status === 'released') {
-          disbursedAmount += amount
-        }
-      }
-    } catch (escrowError: any) {
-      const message = String(escrowError?.message || '')
-      if (!message.includes("Could not find the table 'public.escrow'")) {
-        throw escrowError
+        if (status === 'held' && type === 'product') productEscrow! += amount
+        if (status === 'held' && type === 'delivery') deliveryEscrow! += amount
+        if (status === 'released') disbursedAmount! += amount
       }
     }
 
     return {
       success: true,
       data: {
-        totalRevenue,
-        successful: completedPayments,
-        pending: pendingPayments,
-        pendingOrders,
+        totalTransactions: transactionLedgerAvailable ? transactions.length : null,
+        totalRevenue: transactionLedgerAvailable ? recognizedRevenue : null,
+        successful: transactionLedgerAvailable ? completedTransactions.length : null,
+        pending: transactionLedgerAvailable ? transactions.length - completedTransactions.length : null,
+        pendingOrders: Math.max(0, orderRows.length - completedOrders),
         completedOrders,
         productEscrow,
         deliveryEscrow,
-        totalEscrow: productEscrow + deliveryEscrow,
+        totalEscrow: escrowAvailable ? Number(productEscrow) + Number(deliveryEscrow) : null,
         disbursedAmount,
+        transactionLedgerAvailable,
+        escrowAvailable,
+        revenueBasis: 'completed_payment_transactions',
+        testingMode: true,
       },
     }
   } catch (error: any) {
