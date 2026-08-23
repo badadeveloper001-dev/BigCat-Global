@@ -27,11 +27,6 @@ export function PalmpayAdminDashboard({ bypassAccessCheck = false, embedded = fa
       setAuthorized(true)
       return
     }
-    const access = typeof window !== "undefined" ? sessionStorage.getItem("adminAccess") : null
-    if (access === "ORCHID_012") {
-      setAuthorized(true)
-      return
-    }
     router.replace("/admin-portal")
   }, [bypassAccessCheck, router])
 
