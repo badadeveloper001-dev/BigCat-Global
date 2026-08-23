@@ -7,10 +7,10 @@ import { formatCurrency } from "@/lib/currency-utils"
 import { createClient } from "@/lib/supabase/client"
 
 type PlatformStats = {
-  totalUsers: number
-  totalMerchants: number
-  totalOrders: number
-  totalRevenue: number
+  totalUsers: number | null
+  totalMerchants: number | null
+  totalOrders: number | null
+  totalRevenue: number | null
 }
 
 interface BigcatAdminDashboardProps {
