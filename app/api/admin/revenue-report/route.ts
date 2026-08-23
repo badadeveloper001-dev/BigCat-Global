@@ -131,8 +131,6 @@ export async function GET(request: NextRequest) {
 
     const summaryRows = [
       '',
-      const summaryRows = [
-      '',
       'SUMMARY',
       `Report Period,${period}`,
       `Generated At,${new Date().toISOString()}`,
