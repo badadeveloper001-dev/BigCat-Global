@@ -555,7 +555,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
                 id: product.id,
                 productId: product.id,
                 name: product.name,
-                price: discountedPrice,
+                price: currentPrice,
                 quantity,
                 maxStock: availableStock,
                 merchantId: product.merchant_id,
@@ -633,7 +633,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
                 </div>
                 <p className="text-sm font-medium text-foreground line-clamp-2">{product.name}</p>
                 <p className="text-xs text-muted-foreground mt-1">Quantity: {quantity}</p>
-                <p className="text-sm font-bold text-primary mt-2">{formatNaira(discountedPrice * quantity)}</p>
+                <p className="text-sm font-bold text-primary mt-2">{formatNaira(currentPrice * quantity)}</p>
               </div>
             </div>
             <div className="mt-4 space-y-2">
