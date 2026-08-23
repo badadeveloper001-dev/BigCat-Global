@@ -2,8 +2,18 @@
 -- Apply after the canonical order/product migrations.
 
 ALTER TABLE public.orders
+  ADD COLUMN IF NOT EXISTS merchant_id UUID,
+  ADD COLUMN IF NOT EXISTS payment_status TEXT NOT NULL DEFAULT 'pending',
+  ADD COLUMN IF NOT EXISTS payment_method TEXT,
+  ADD COLUMN IF NOT EXISTS total_amount NUMERIC(12, 2) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS applied_coupon_code TEXT,
+  ADD COLUMN IF NOT EXISTS coupon_discount NUMERIC(12, 2) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS final_total NUMERIC(12, 2),
   ADD COLUMN IF NOT EXISTS idempotency_key TEXT,
   ADD COLUMN IF NOT EXISTS pickup_token TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_orders_merchant_id
+  ON public.orders (merchant_id);
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_orders_idempotency_key
   ON public.orders (idempotency_key)
@@ -159,7 +169,7 @@ BEGIN
     coupon_discount, final_total, total_amount, pickup_token, idempotency_key
   )
   VALUES (
-    p_order_id, p_buyer_id, p_merchant_id, 'paid', 'completed',
+    p_order_id, p_buyer_id, p_merchant_id, 'pending', 'completed',
     grand_total, product_total, safe_delivery_fee, p_delivery_type,
     p_delivery_address, p_payment_method, p_coupon_code,
     safe_coupon_discount, grand_total, grand_total, p_pickup_token, p_idempotency_key
