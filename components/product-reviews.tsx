@@ -231,6 +231,12 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
                     <span className="font-medium text-foreground">
                       {review.user_name || "Anonymous"}
                     </span>
+                    {review.verified_purchase ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-[11px] font-medium text-green-700 dark:text-green-400">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Verified purchase
+                      </span>
+                    ) : null}
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     {renderStars(review.rating)}
