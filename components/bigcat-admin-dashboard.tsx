@@ -12,7 +12,11 @@ type PlatformStats = {
   totalRevenue: number
 }
 
-export function BigcatAdminDashboard() {
+interface BigcatAdminDashboardProps {
+  bypassAccessCheck?: boolean
+}
+
+export function BigcatAdminDashboard({ bypassAccessCheck = false }: BigcatAdminDashboardProps = {}) {
   const router = useRouter()
   const [authorized, setAuthorized] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -24,13 +28,12 @@ export function BigcatAdminDashboard() {
   })
 
   useEffect(() => {
-    const access = typeof window !== "undefined" ? sessionStorage.getItem("adminAccess") : null
-    if (access === "BIGCAT_00") {
+    if (bypassAccessCheck) {
       setAuthorized(true)
       return
     }
     router.replace("/admin-portal")
-  }, [router])
+  }, [bypassAccessCheck, router])
 
   useEffect(() => {
     if (!authorized) return
