@@ -620,9 +620,9 @@ export async function getTransactionStats() {
         const amount = toAmount((row as any)?.amount)
         const type = String((row as any)?.type || '').toLowerCase()
         const status = String((row as any)?.status || '').toLowerCase()
-        if (status === 'held' && type === 'product') productEscrow! += amount
-        if (status === 'held' && type === 'delivery') deliveryEscrow! += amount
-        if (status === 'released') disbursedAmount! += amount
+        if (status === 'held' && type === 'product') productEscrow = Number(productEscrow) + amount
+        if (status === 'held' && type === 'delivery') deliveryEscrow = Number(deliveryEscrow) + amount
+        if (status === 'released') disbursedAmount = Number(disbursedAmount) + amount
       }
     }
 
