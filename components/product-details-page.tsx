@@ -174,7 +174,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
   const savedToWishlist = isInWishlist(String(product.id))
   const availableStock = Math.max(0, Number(product.stock || 0))
   const isOutOfStock = availableStock <= 0
-  const promotionPercentOff = Math.max(0, Number(product.promotion_percent_off || 0))
+  const promotionPercentOff = Math.max(0, Math.min(100, Number(product.promotion_percent_off || 0)))
   const currentPrice = Math.max(0, Number(product.price || 0))
   const discountedPrice = promotionPercentOff > 0
     ? currentPrice * (1 - promotionPercentOff / 100)
@@ -555,8 +555,9 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
                 id: product.id,
                 productId: product.id,
                 name: product.name,
-                price: parseFloat(product.price),
-                quantity: quantity,
+                price: discountedPrice,
+                quantity,
+                maxStock: availableStock,
                 merchantId: product.merchant_id,
                 merchantName: product.merchant_profiles?.business_name || 'Unknown',
               })
@@ -632,7 +633,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
                 </div>
                 <p className="text-sm font-medium text-foreground line-clamp-2">{product.name}</p>
                 <p className="text-xs text-muted-foreground mt-1">Quantity: {quantity}</p>
-                <p className="text-sm font-bold text-primary mt-2">{formatNaira(Number(product.price) * quantity)}</p>
+                <p className="text-sm font-bold text-primary mt-2">{formatNaira(discountedPrice * quantity)}</p>
               </div>
             </div>
             <div className="mt-4 space-y-2">
