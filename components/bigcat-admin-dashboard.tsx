@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Globe2, Landmark, Shield, Ship, Store, Users } from "lucide-react"
 import { formatCurrency } from "@/lib/currency-utils"
+import { createClient } from "@/lib/supabase/client"
 
 type PlatformStats = {
   totalUsers: number
@@ -127,11 +128,14 @@ export function BigcatAdminDashboard({ bypassAccessCheck = false }: BigcatAdminD
             <p className="text-sm text-muted-foreground mt-1">Freight, customs status, milestones, and international shipment visibility.</p>
           </button>
           <button
-            onClick={() => router.push("/admin-portal")}
+            onClick={async () => {
+              await createClient().auth.signOut()
+              router.replace("/admin-portal")
+            }}
             className="rounded-xl border border-border bg-card p-4 text-left hover:border-primary/40 transition-colors"
           >
-            <h3 className="font-semibold">Security Access</h3>
-            <p className="text-sm text-muted-foreground mt-1">Manage privileged access for BigCat, Orchid, and Trade & Logistics admins.</p>
+            <h3 className="font-semibold">Sign out</h3>
+            <p className="text-sm text-muted-foreground mt-1">End this administrator session securely.</p>
           </button>
         </section>
 
