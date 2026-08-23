@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminUser } from '@/lib/supabase/admin-auth'
 import { createClient } from '@/lib/supabase/server'
 
 // GET /api/admin/revenue-report?format=csv|json
 // Returns platform revenue breakdown for download
 
 export async function GET(request: NextRequest) {
+  const adminAuth = await requireAdminUser(request)
+  if (adminAuth.response) return adminAuth.response
+
   const { searchParams } = new URL(request.url)
   const format = searchParams.get('format') || 'csv'
   const period = searchParams.get('period') || '30d'  // 30d, 90d, all
