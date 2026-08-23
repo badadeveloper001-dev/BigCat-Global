@@ -6,9 +6,8 @@ import { getUserSafetyStatus } from '@/lib/server-trust-safety'
 import { registerOrderForLogistics } from '@/lib/logistics-actions'
 import { dispatchNotification } from '@/lib/notifications'
 import {
-  applyCoupon,
   getBestPromotionDiscountForItems,
-  incrementPromotionUsage,
+  validateCoupon,
 } from '@/lib/promotion-actions'
 
 function isMissingColumnError(error: any) {
@@ -356,8 +355,7 @@ export async function createOrder(
   shippingAddressArg?: string,
 ) {
   try {
-    const supabase = await createClient()
-
+    const supabase = createClient()
     const payload: CreateOrderInput = typeof payloadOrBuyerId === 'string'
       ? {
           buyerId: payloadOrBuyerId,
@@ -370,335 +368,213 @@ export async function createOrder(
           deliveryType: 'normal',
           deliveryAddress: shippingAddressArg || '',
           paymentMethod: 'card',
-          deliveryFee: Math.max(0, (totalAmountArg || 0) - (itemsArg || []).reduce((sum, item) => sum + (item.price * item.quantity), 0)),
+          deliveryFee: Math.max(0, Number(totalAmountArg || 0)),
         }
       : payloadOrBuyerId
 
-    const idempotencyKey = getCheckoutIdempotencyKey(payload)
-    const now = Date.now()
-    const cachedResult = checkoutResultCache.get(idempotencyKey)
-    if (cachedResult && cachedResult.expiresAt > now) {
-      return cachedResult.result
+    if (!payload.buyerId || !payload.items?.length) {
+      return { success: false, error: 'Order items are required.' }
+    }
+    if (!payload.deliveryAddress?.trim()) {
+      return { success: false, error: 'Delivery address is required.' }
     }
 
-    const inFlight = checkoutInFlight.get(idempotencyKey)
-    if (inFlight) {
-      return await inFlight
-    }
-
-    const checkoutPromise = (async () => {
-      if (!payload.buyerId || !payload.items?.length) {
-        return { success: false, error: 'Order items are required.' }
-      }
-
-      const safetyStatus = await getUserSafetyStatus(payload.buyerId)
-      if (safetyStatus.suspended) {
-        return {
-          success: false,
-          error: 'Your account is temporarily suspended for violating platform policies.',
-          code: 'POLICY_USER_SUSPENDED',
-        }
-      }
-
-      const groupedItems = payload.items.reduce<Record<string, CreateOrderInput['items']>>((acc, item) => {
-        const key = String(item.merchantId || '').trim() || 'unknown_merchant'
-        if (!acc[key]) acc[key] = []
-        acc[key].push(item)
-        return acc
-      }, {})
-
-      const createdOrders: any[] = []
-
-      for (const [merchantId, merchantItems] of Object.entries(groupedItems)) {
-        const normalizedMerchantId = String(merchantId || '').trim()
-        if (!normalizedMerchantId || normalizedMerchantId === 'unknown_merchant') {
-          return { success: false, error: 'One or more cart items are missing merchant information. Please remove the item and add it again.' }
-        }
-
-      const stockCheck = await checkStockAvailability(
-        supabase,
-        normalizedMerchantId,
-        merchantItems.map((item) => ({
-          productId: item.productId,
-          quantity: Number(item.quantity || 0),
-          productName: item.productName,
-        })),
-      )
-      if (!stockCheck.success) {
-        return { success: false, error: stockCheck.error }
-      }
-
-      const productTotal = merchantItems.reduce((sum, item) => sum + (Number(item.unitPrice) * Number(item.quantity)), 0)
-      const appliedPromotion = await getBestPromotionDiscountForItems(
-        normalizedMerchantId,
-        merchantItems.map((item) => ({
-          productId: String(item.productId),
-          quantity: Number(item.quantity || 0),
-          unitPrice: Number(item.unitPrice || 0),
-        })),
-      )
-      const promotionDiscount = Math.min(Number(appliedPromotion?.discountAmount || 0), productTotal)
-      const discountedProductTotal = Math.max(0, productTotal - promotionDiscount)
-      const allocatedDeliveryFee = payload.deliveryType === 'pickup' ? 0 : (createdOrders.length === 0 ? Number(payload.deliveryFee || 0) : 0)
-      const GIT_FEE_RATE = 0.015 // Goods in Transit (GIT) fee: 1.5%
-      const gitFeeAmount = Math.round(discountedProductTotal * GIT_FEE_RATE)
-      const subtotal = discountedProductTotal + allocatedDeliveryFee + gitFeeAmount
-      
-      // Apply coupon discount (only on first order for multi-merchant orders)
-      const requestedCouponDiscount = createdOrders.length === 0 && payload.appliedCoupon
-        ? Number(payload.appliedCoupon.discount) || 0
-        : 0
-      const couponDiscount = Math.min(requestedCouponDiscount, subtotal)
-      const grandTotal = Math.max(0, subtotal - couponDiscount)
-      const orderId = crypto.randomUUID()
-      const pickupToken = payload.deliveryType === 'pickup' ? generatePickupToken(orderId) : null
-
-      const resolvedPaymentMethod = payload.paymentMethod || 'card'
-
-      const baseOrderInsert = {
-        id: orderId,
-        buyer_id: payload.buyerId,
-        merchant_id: normalizedMerchantId,
-        status: 'paid',
-        grand_total: grandTotal,
-        product_total: productTotal,
-        delivery_fee: allocatedDeliveryFee,
-        delivery_type: payload.deliveryType,
-        delivery_address: payload.deliveryAddress,
-        payment_method: resolvedPaymentMethod,
-        payment_status: 'completed',
-      }
-
-      const orderInsertAttempts = [
-        ...(pickupToken ? [{
-          ...baseOrderInsert,
-          applied_coupon_code: payload.appliedCoupon?.code || null,
-          coupon_discount: couponDiscount,
-          final_total: grandTotal,
-          total_amount: grandTotal,
-          shipping_address: payload.deliveryAddress,
-          pickup_token: pickupToken,
-        }] : []),
-        {
-          ...baseOrderInsert,
-          applied_coupon_code: payload.appliedCoupon?.code || null,
-          coupon_discount: couponDiscount,
-          final_total: grandTotal,
-          total_amount: grandTotal,
-          shipping_address: payload.deliveryAddress,
-        },
-        {
-          ...baseOrderInsert,
-          total_amount: grandTotal,
-          delivery_address: payload.deliveryAddress,
-        },
-        {
-          ...baseOrderInsert,
-          total_amount: grandTotal,
-          delivery_address: payload.deliveryAddress,
-        },
-        {
-          ...baseOrderInsert,
-          delivery_address: payload.deliveryAddress,
-        },
-      ]
-
-      let orderResult: any = null
-      let lastOrderError: any = null
-
-      for (const attempt of orderInsertAttempts) {
-        const result = await (supabase.from('orders') as any).insert(attempt).select().single()
-        if (!result.error) {
-          orderResult = result
-          break
-        }
-
-        if (!isMissingColumnError(result.error)) {
-          throw result.error
-        }
-
-        lastOrderError = result.error
-      }
-
-      if (!orderResult?.data) {
-        throw lastOrderError || new Error('Failed to create order')
-      }
-
-      const richOrderItems = merchantItems.map((item) => ({
-        id: crypto.randomUUID(),
-        order_id: orderResult.data?.id || orderId,
-        product_id: item.productId,
-        merchant_id: normalizedMerchantId,
-        product_name: item.productName || 'Product',
-        quantity: item.quantity,
-        unit_price: item.unitPrice,
-        total_price: Number(item.unitPrice) * Number(item.quantity),
-        weight: item.weight ?? 0.5,
-      }))
-
-      let itemsResult = await (supabase.from('order_items') as any).insert(richOrderItems)
-
-      if (itemsResult.error) {
-        itemsResult = await (supabase.from('order_items') as any).insert(
-          merchantItems.map((item) => ({
-            order_id: orderResult.data?.id || orderId,
-            product_id: item.productId,
-            quantity: item.quantity,
-            price: item.unitPrice,
-          }))
-        )
-      }
-
-      if (itemsResult.error) throw itemsResult.error
-
-      await decrementStockLevels(
-        supabase,
-        normalizedMerchantId,
-        merchantItems.map((item) => ({
-          productId: item.productId,
-          quantity: Number(item.quantity || 0),
-        })),
-      )
-
-      await holdFundsInEscrow(
-        supabase,
-        {
-          ...(orderResult.data || {}),
-          id: orderResult.data?.id || orderId,
-          merchant_id: normalizedMerchantId,
-          product_total: productTotal,
-          grand_total: grandTotal,
-          total_amount: grandTotal,
-          delivery_fee: allocatedDeliveryFee,
-          payment_method: resolvedPaymentMethod,
-          status: orderResult.data?.status || 'pending',
-        },
-        resolvedPaymentMethod,
-      )
-
-      const orderIdRef = String(orderResult.data?.id || orderId)
-
-      await dispatchNotification({
-        userId: normalizedMerchantId,
-        type: 'order',
-        title: 'You have a new order',
-        message: `Order ${orderIdRef} was placed and is awaiting processing.`,
-        eventKey: `order:new:merchant:${orderIdRef}`,
-        emailSubject: 'New order received',
-      })
-
-      await dispatchNotification({
-        userId: payload.buyerId,
-        type: 'order',
-        title: 'Your order has been received',
-        message: `Order ${orderIdRef} has been received by the merchant.`,
-        eventKey: `order:new:buyer:${orderIdRef}`,
-        emailSubject: 'Order received',
-      })
-
-      await dispatchNotification({
-        userId: payload.buyerId,
-        type: 'order',
-        title: 'Payment confirmation',
-        message: pickupToken
-          ? `Payment for order ${orderIdRef} has been confirmed. Your pickup token is ${pickupToken}.`
-          : `Payment for order ${orderIdRef} has been confirmed.`,
-        eventKey: `order:payment-confirmed:${orderIdRef}`,
-        metadata: {
-          orderId: orderIdRef,
-          trackingId: getTrackingId(orderIdRef),
-          pickupToken,
-          orderItems: merchantItems.map((item: any) => ({
-            product_name: item.productName,
-            quantity: item.quantity,
-            unit_price: item.unitPrice,
-            total_price: Number(item.unitPrice) * Number(item.quantity),
-            image_url: item.imageUrl || item.image || '',
-            product_id: item.productId,
-          })),
-          subtotal: discountedProductTotal,
-          originalSubtotal: productTotal,
-          deliveryFee: allocatedDeliveryFee,
-          promotionName: appliedPromotion?.promotionName || null,
-          promotionDiscount,
-          couponCode: payload.appliedCoupon?.code || null,
-          couponDiscount: couponDiscount,
-          grandTotal: grandTotal,
-          finalTotal: grandTotal,
-          action: 'track_package',
-          actionPath: `/track/${orderIdRef}`,
-        },
-        emailSubject: 'Payment confirmation',
-      })
-
-      // Apply coupon usage tracking if one was used
-      if (payload.appliedCoupon?.code && createdOrders.length === 0) {
-        try {
-          await applyCoupon(payload.appliedCoupon.code, payload.buyerId)
-        } catch (couponError) {
-          console.error('Failed to apply coupon usage tracking:', couponError)
-        }
-      }
-
-      if (appliedPromotion?.promotionId && promotionDiscount > 0) {
-        try {
-          await incrementPromotionUsage(appliedPromotion.promotionId)
-        } catch (promotionError) {
-          console.error('Failed to increment promotion usage:', promotionError)
-        }
-      }
-
-      const logisticsRegisteredAt: string | null = null
-
-      try {
-        await (supabase.from('order_automation_state') as any).upsert({
-          order_id: orderIdRef,
-          merchant_id: normalizedMerchantId,
-          buyer_id: payload.buyerId,
-          buyer_notified_at: new Date().toISOString(),
-          merchant_notified_at: new Date().toISOString(),
-          payment_notified_at: new Date().toISOString(),
-          logistics_registered_at: logisticsRegisteredAt,
-        }, { onConflict: 'order_id' })
-      } catch (stateError: any) {
-        if (!isMissingResourceError(stateError)) {
-          throw stateError
-        }
-      }
-
-        createdOrders.push(orderResult.data)
-      }
-
+    const safetyStatus = await getUserSafetyStatus(payload.buyerId)
+    if (safetyStatus.suspended) {
       return {
-        success: true,
-        data: {
-          id: createdOrders[0]?.id,
-          orderId: createdOrders[0]?.id,
-          orders: createdOrders,
-        },
+        success: false,
+        error: 'Your account is temporarily suspended for violating platform policies.',
+        code: 'POLICY_USER_SUSPENDED',
       }
-    })()
+    }
 
-    checkoutInFlight.set(idempotencyKey, checkoutPromise)
+    const rawIdempotencyKey = getCheckoutIdempotencyKey(payload)
+    const groupedItems = payload.items.reduce<Record<string, CreateOrderInput['items']>>((groups, item) => {
+      const merchantId = String(item.merchantId || '').trim()
+      const productId = String(item.productId || '').trim()
+      const quantity = Number(item.quantity || 0)
+      if (!merchantId || !productId || !Number.isInteger(quantity) || quantity <= 0) return groups
+      if (!groups[merchantId]) groups[merchantId] = []
+      const existing = groups[merchantId].find((entry) => String(entry.productId) === productId)
+      if (existing) existing.quantity += quantity
+      else groups[merchantId].push({ ...item, merchantId, productId, quantity })
+      return groups
+    }, {})
 
-    try {
-      const result = await checkoutPromise
-      if (result?.success) {
-        checkoutResultCache.set(idempotencyKey, {
-          expiresAt: Date.now() + CHECKOUT_IDEMPOTENCY_TTL_MS,
-          result,
-        })
+    const merchantGroups = Object.entries(groupedItems)
+    if (!merchantGroups.length) {
+      return { success: false, error: 'Every order item must have a valid product, merchant, and quantity.' }
+    }
+
+    // Resolve all products and prices from the database before any order is written.
+    const preparedGroups: Array<{
+      merchantId: string
+      items: Array<{ productId: string; merchantId: string; productName: string; quantity: number; unitPrice: number; weight: number }>
+      productTotal: number
+      promotion: Awaited<ReturnType<typeof getBestPromotionDiscountForItems>>
+      coupon: any | null
+      couponDiscount: number
+      deliveryFee: number
+    }> = []
+
+    for (const [merchantId, items] of merchantGroups) {
+      const productIds = items.map((item) => String(item.productId))
+      const { data: products, error: productsError } = await (supabase.from('products') as any)
+        .select('id, merchant_id, name, price, stock, is_active, weight')
+        .in('id', productIds)
+        .eq('merchant_id', merchantId)
+
+      if (productsError) throw productsError
+      if (!Array.isArray(products) || products.length !== productIds.length) {
+        return { success: false, error: 'One or more products are unavailable.' }
       }
-      return result
-    } finally {
-      checkoutInFlight.delete(idempotencyKey)
-      const cached = checkoutResultCache.get(idempotencyKey)
-      if (cached && cached.expiresAt <= Date.now()) {
-        checkoutResultCache.delete(idempotencyKey)
+
+      const productById = new Map(products.map((product: any) => [String(product.id), product]))
+      const canonicalItems = items.map((item) => {
+        const product = productById.get(String(item.productId))
+        if (!product || product.is_active === false) {
+          throw new Error(`${item.productName || 'A product'} is no longer available.`)
+        }
+        const stock = Math.max(0, Number(product.stock || 0))
+        if (stock < item.quantity) {
+          throw new Error(`${product.name || 'A product'} has only ${stock} item(s) left.`)
+        }
+        return {
+          productId: String(product.id),
+          merchantId,
+          productName: String(product.name || item.productName || 'Product'),
+          quantity: item.quantity,
+          unitPrice: Number(product.price || 0),
+          weight: Number(product.weight || item.weight || 0.5),
+        }
+      })
+
+      const productTotal = canonicalItems.reduce(
+        (sum, item) => sum + item.unitPrice * item.quantity,
+        0,
+      )
+      const promotion = await getBestPromotionDiscountForItems(merchantId, canonicalItems)
+      preparedGroups.push({
+        merchantId,
+        items: canonicalItems,
+        productTotal,
+        promotion,
+        coupon: null,
+        couponDiscount: 0,
+        deliveryFee: payload.deliveryType === 'pickup' || preparedGroups.length > 0
+          ? 0
+          : Math.max(0, Number(payload.deliveryFee || 0)),
+      })
+    }
+
+    if (payload.appliedCoupon?.code && preparedGroups[0]) {
+      const first = preparedGroups[0]
+      const promotionDiscount = Math.min(Number(first.promotion?.discountAmount || 0), first.productTotal)
+      const couponBase = Math.max(0, first.productTotal - promotionDiscount + first.deliveryFee)
+      const couponResult = await validateCoupon(payload.appliedCoupon.code, payload.buyerId, couponBase)
+      if (!couponResult.success) {
+        return { success: false, error: couponResult.error || 'Coupon is no longer valid.' }
       }
+      if (String(couponResult.coupon?.merchant_id || '') !== first.merchantId) {
+        return { success: false, error: 'This coupon does not apply to the selected merchant.' }
+      }
+      first.coupon = couponResult.coupon
+      first.couponDiscount = Number(couponResult.discount || 0)
+    }
+
+    const createdOrders: any[] = []
+
+    for (const group of preparedGroups) {
+      const orderId = crypto.randomUUID()
+      const merchantIdempotencyKey = `${rawIdempotencyKey}:${group.merchantId}`
+      const pickupToken = payload.deliveryType === 'pickup' ? generatePickupToken(orderId) : null
+      const { data, error } = await (supabase as any).rpc('create_marketplace_order_atomic', {
+        p_order_id: orderId,
+        p_buyer_id: payload.buyerId,
+        p_merchant_id: group.merchantId,
+        p_delivery_type: payload.deliveryType,
+        p_delivery_address: payload.deliveryAddress.trim(),
+        p_payment_method: payload.paymentMethod || 'test',
+        p_delivery_fee: group.deliveryFee,
+        p_promotion_id: group.promotion?.promotionId || null,
+        p_promotion_discount: Number(group.promotion?.discountAmount || 0),
+        p_coupon_id: group.coupon?.id || null,
+        p_coupon_code: group.coupon?.code || null,
+        p_coupon_discount: group.couponDiscount,
+        p_pickup_token: pickupToken,
+        p_idempotency_key: merchantIdempotencyKey,
+        p_items: group.items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          weight: item.weight,
+        })),
+      })
+
+      if (error) {
+        const message = String(error.message || '')
+        if (message.includes('create_marketplace_order_atomic')) {
+          return {
+            success: false,
+            error: 'Atomic checkout is not installed. Apply migration 030-atomic-order-inventory.sql before creating orders.',
+            code: 'ATOMIC_CHECKOUT_NOT_INSTALLED',
+          }
+        }
+        throw error
+      }
+
+      const atomicResult = data || {}
+      const orderIdRef = String(atomicResult.id || orderId)
+      const { data: order } = await (supabase.from('orders') as any)
+        .select('*')
+        .eq('id', orderIdRef)
+        .single()
+
+      createdOrders.push(order || { id: orderIdRef, ...atomicResult })
+
+      // These are post-commit side effects; a delivery failure cannot corrupt order stock.
+      await Promise.allSettled([
+        holdFundsInEscrow(
+          supabase,
+          {
+            ...(order || {}),
+            id: orderIdRef,
+            merchant_id: group.merchantId,
+            product_total: Number(atomicResult.productTotal || group.productTotal),
+            grand_total: Number(atomicResult.grandTotal || 0),
+            total_amount: Number(atomicResult.grandTotal || 0),
+            delivery_fee: group.deliveryFee,
+          },
+          payload.paymentMethod || 'test',
+        ),
+        dispatchNotification({
+          userId: group.merchantId,
+          type: 'order',
+          title: 'You have a new order',
+          message: `Order ${orderIdRef} was placed and is awaiting processing.`,
+          eventKey: `order:new:merchant:${orderIdRef}`,
+          emailSubject: 'New order received',
+        }),
+        dispatchNotification({
+          userId: payload.buyerId,
+          type: 'order',
+          title: 'Your order has been received',
+          message: `Order ${orderIdRef} has been received by the merchant.`,
+          eventKey: `order:new:buyer:${orderIdRef}`,
+          emailSubject: 'Order received',
+        }),
+      ])
+    }
+
+    return {
+      success: true,
+      data: {
+        id: createdOrders[0]?.id,
+        orderId: createdOrders[0]?.id,
+        orders: createdOrders,
+      },
     }
   } catch (error: any) {
-    return { success: false, error: error.message }
+    return { success: false, error: error.message || 'Failed to create order.' }
   }
 }
 
