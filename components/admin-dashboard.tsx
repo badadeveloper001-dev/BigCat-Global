@@ -51,10 +51,10 @@ export function AdminDashboard() {
       if (result.success && result.platform) {
         const s = result.platform
         const stats = [
-          { label: "Total Users", value: s.totalUsers || "0", change: "+12.5%", icon: Users },
-          { label: "Merchants", value: s.totalMerchants || "0", change: "+8.2%", icon: Store },
-          { label: "Revenue", value: `₦${(s.totalRevenue || 0).toLocaleString()}`, change: "+23.1%", icon: DollarSign },
-          { label: "Active Now", value: s.activeNow || "0", change: "", icon: Activity },
+          { label: "Total Users", value: s.totalUsers ?? "Unavailable", change: "", icon: Users },
+          { label: "Merchants", value: s.totalMerchants ?? "Unavailable", change: "", icon: Store },
+          { label: "Recognized Revenue", value: s.totalRevenue == null ? "Unavailable" : `₦${Number(s.totalRevenue).toLocaleString()}`, change: "", icon: DollarSign },
+          { label: "Orders", value: s.totalOrders ?? "Unavailable", change: "", icon: Activity },
         ]
         setPlatformStats(stats)
       }
