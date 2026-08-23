@@ -45,7 +45,7 @@ async function getReviewEligibility(productId: string, userId: string) {
 
   const { data: orders, error: orderError } = await supabase
     .from('orders')
-    .select('id, status')
+    .select('id, status, created_at')
     .eq('buyer_id', userId)
     .in('id', orderIds)
     .in('status', ['delivered', 'completed', 'order_received_and_satisfied'])
