@@ -96,7 +96,7 @@ export function ProductCard({
       id,
       productId: id,
       name,
-      price: discountedPrice,
+      price,
       quantity: 1,
       maxStock: availableStock,
       merchantId: merchant.id,
