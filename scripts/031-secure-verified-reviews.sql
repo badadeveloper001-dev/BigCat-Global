@@ -3,6 +3,36 @@
 -- duplicate buyer/product reviews already exist so they can be reviewed rather
 -- than silently deleting customer content.
 
+DO $
+DECLARE
+  invalid_rows integer;
+  duplicate_groups integer;
+BEGIN
+  SELECT count(*) INTO invalid_rows
+  FROM reviews
+  WHERE comment IS NULL
+     OR char_length(btrim(comment)) NOT BETWEEN 10 AND 1000
+     OR rating NOT BETWEEN 1 AND 5
+     OR verified_purchase IS DISTINCT FROM true
+     OR order_id IS NULL;
+
+  SELECT count(*) INTO duplicate_groups
+  FROM (
+    SELECT product_id, user_id
+    FROM reviews
+    GROUP BY product_id, user_id
+    HAVING count(*) > 1
+  ) duplicates;
+
+  IF invalid_rows > 0 OR duplicate_groups > 0 THEN
+    RAISE EXCEPTION
+      'Review migration preflight failed: % invalid/unverified row(s), % duplicate buyer/product group(s). Review these records before rerunning migration 031.',
+      invalid_rows,
+      duplicate_groups;
+  END IF;
+END;
+$;
+
 ALTER TABLE reviews
   ALTER COLUMN comment SET NOT NULL,
   ALTER COLUMN verified_purchase SET DEFAULT true,
