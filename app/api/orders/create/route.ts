@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
       paymentMethod,
       deliveryFee,
       appliedCoupon,
+      idempotencyKey,
     } = body
 
     if (!buyerId || !Array.isArray(items) || items.length === 0 || !deliveryType || !deliveryAddress) {
@@ -42,9 +43,13 @@ export async function POST(request: NextRequest) {
       paymentMethod,
       deliveryFee: Number(deliveryFee || 0),
       appliedCoupon: appliedCoupon || null,
+      idempotencyKey: String(idempotencyKey || request.headers.get('idempotency-key') || crypto.randomUUID()),
     })
 
-    return NextResponse.json(result)
+    return NextResponse.json(result, {
+      status: result.success ? 200 : result.code === 'ATOMIC_CHECKOUT_NOT_INSTALLED' ? 503 : 400,
+      headers: { 'Cache-Control': 'no-store' },
+    })
   } catch (error) {
     console.error('Create order API error:', error)
     return NextResponse.json(
