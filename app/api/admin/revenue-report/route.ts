@@ -57,17 +57,30 @@ export async function GET(request: NextRequest) {
 
     const rows = (orders || []) as any[]
 
-    const totalGMV = rows.reduce((s: number, o: any) => s + Number(o.grand_total || o.total_amount || 0), 0)
-    const totalDeliveryFees = rows.reduce((s: number, o: any) => s + Number(o.delivery_fee || 0), 0)
-    const totalProductRevenue = rows.reduce((s: number, o: any) => s + Number(o.product_total || o.grand_total || o.total_amount || 0), 0)
-    const deliveredOrders = rows.filter((o: any) => o.status === 'delivered' || o.escrow_status === 'released')
-    const deliveredGMV = deliveredOrders.reduce((s: number, o: any) => s + Number(o.grand_total || o.total_amount || 0), 0)
-    const pendingOrders = rows.filter((o: any) => ['pending', 'paid', 'processing', 'shipped'].includes(o.status))
-    const pendingGMV = pendingOrders.reduce((s: number, o: any) => s + Number(o.grand_total || o.total_amount || 0), 0)
+    const orderValue = (order: any) => Number(order.grand_total || order.total_amount || 0)
+    const isRecognized = (order: any) => {
+      const orderStatus = String(order.status || '').toLowerCase()
+      const paymentStatus = String(order.payment_status || '').toLowerCase()
+      const escrowStatus = String(order.escrow_status || '').toLowerCase()
+      return paymentStatus === 'completed'
+        || escrowStatus === 'released'
+        || orderStatus === 'delivered'
+        || orderStatus === 'completed'
+    }
 
-    // Platform fee estimate: 5% of product revenue
-    const platformFeeRate = 0.05
-    const estimatedPlatformFee = totalProductRevenue * platformFeeRate
+    const recognizedOrders = rows.filter(isRecognized)
+    const pendingOrders = rows.filter((order: any) => !isRecognized(order) && !['cancelled', 'refunded', 'failed'].includes(String(order.status || '').toLowerCase()))
+    const submittedOrderValue = rows.reduce((sum: number, order: any) => sum + orderValue(order), 0)
+    const recognizedRevenue = recognizedOrders.reduce((sum: number, order: any) => sum + orderValue(order), 0)
+    const recognizedDeliveryFees = recognizedOrders.reduce((sum: number, order: any) => sum + Number(order.delivery_fee || 0), 0)
+    const configuredFeeRate = Number(process.env.PLATFORM_FEE_RATE)
+    const platformFeeRate = Number.isFinite(configuredFeeRate) && configuredFeeRate >= 0 ? configuredFeeRate : null
+    const estimatedPlatformFee = platformFeeRate === null
+      ? null
+      : recognizedOrders.reduce(
+          (sum: number, order: any) => sum + Number(order.product_total || Math.max(0, orderValue(order) - Number(order.delivery_fee || 0))),
+          0,
+        ) * platformFeeRate
 
     if (format === 'json') {
       return NextResponse.json({
@@ -76,13 +89,15 @@ export async function GET(request: NextRequest) {
         generatedAt: new Date().toISOString(),
         summary: {
           totalOrders: rows.length,
-          deliveredOrders: deliveredOrders.length,
+          recognizedOrders: recognizedOrders.length,
           pendingOrders: pendingOrders.length,
-          totalGMV,
-          deliveredGMV,
-          pendingGMV,
-          totalDeliveryFees,
+          submittedOrderValue,
+          recognizedRevenue,
+          recognizedDeliveryFees,
           estimatedPlatformFee,
+          platformFeeRate,
+          testingMode: true,
+          revenueBasis: 'completed_payment_or_fulfilled_order',
         },
         orders: rows.map((o: any) => ({
           orderId: o.id,
@@ -99,35 +114,37 @@ export async function GET(request: NextRequest) {
     }
 
     // CSV format
-    const csvHeader = 'Order ID,Date,Status,Grand Total (₦),Product Total (₦),Delivery Fee (₦),Platform Fee Est. (₦),Merchant ID,Buyer ID'
-    const csvRows = rows.map((o: any) => {
-      const platformFee = (Number(o.product_total || 0) * platformFeeRate).toFixed(2)
-      return [
-        o.id,
-        new Date(o.created_at).toLocaleDateString('en-NG'),
-        o.status,
-        Number(o.grand_total || o.total_amount || 0).toFixed(2),
-        Number(o.product_total || o.grand_total || o.total_amount || 0).toFixed(2),
-        Number(o.delivery_fee || 0).toFixed(2),
-        (Number(o.product_total || o.grand_total || o.total_amount || 0) * platformFeeRate).toFixed(2),
-        o.merchant_id || '',
-        o.buyer_id || '',
-      ].join(',')
-    })
+    const csvHeader = 'Order ID,Date,Order Status,Payment Status,Escrow Status,Recognized,Grand Total (₦),Product Total (₦),Delivery Fee (₦),Merchant ID,Buyer ID'
+    const csvRows = rows.map((order: any) => [
+      order.id,
+      new Date(order.created_at).toISOString(),
+      order.status || '',
+      order.payment_status || '',
+      order.escrow_status || '',
+      isRecognized(order) ? 'yes' : 'no',
+      orderValue(order).toFixed(2),
+      Number(order.product_total || Math.max(0, orderValue(order) - Number(order.delivery_fee || 0))).toFixed(2),
+      Number(order.delivery_fee || 0).toFixed(2),
+      order.merchant_id || '',
+      order.buyer_id || '',
+    ].map((value) => `"${String(value).replace(/"/g, '""')}"`).join(','))
 
     const summaryRows = [
+      '',
+      const summaryRows = [
       '',
       'SUMMARY',
       `Report Period,${period}`,
       `Generated At,${new Date().toISOString()}`,
+      'Testing Mode,true',
       `Total Orders,${rows.length}`,
-      `Delivered Orders,${deliveredOrders.length}`,
+      `Recognized Orders,${recognizedOrders.length}`,
       `Pending Orders,${pendingOrders.length}`,
-      `Total GMV (₦),${totalGMV.toFixed(2)}`,
-      `Delivered GMV (₦),${deliveredGMV.toFixed(2)}`,
-      `Pending GMV (₦),${pendingGMV.toFixed(2)}`,
-      `Total Delivery Fees (₦),${totalDeliveryFees.toFixed(2)}`,
-      `Estimated Platform Fee (5%) (₦),${estimatedPlatformFee.toFixed(2)}`,
+      `Submitted Order Value (₦),${submittedOrderValue.toFixed(2)}`,
+      `Recognized Revenue (₦),${recognizedRevenue.toFixed(2)}`,
+      `Recognized Delivery Fees (₦),${recognizedDeliveryFees.toFixed(2)}`,
+      `Configured Platform Fee Rate,${platformFeeRate === null ? 'Not configured' : platformFeeRate}`,
+      `Estimated Platform Fee (₦),${estimatedPlatformFee === null ? 'Unavailable' : estimatedPlatformFee.toFixed(2)}`,
     ]
 
     const csv = [csvHeader, ...csvRows, ...summaryRows].join('\n')
