@@ -1,7 +1,11 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminUser } from '@/lib/supabase/admin-auth'
 import { getPlatformStats, getLogisticsStats, getMerchantStats, getTransactionStats } from '@/lib/admin-actions'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const adminAuth = await requireAdminUser(request)
+  if (adminAuth.response) return adminAuth.response
+
   try {
     const [platformResult, logisticsResult, merchantResult, transactionResult] = await Promise.all([
       getPlatformStats(),
