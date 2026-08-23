@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminUser } from '@/lib/supabase/admin-auth'
 import { getAdminSupportIssues, updateSupportIssueStatus } from '@/lib/support-issues-actions'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const adminAuth = await requireAdminUser(request)
+  if (adminAuth.response) return adminAuth.response
+
   try {
     const result = await getAdminSupportIssues()
     return NextResponse.json(result, { status: result.success ? 200 : 400 })
@@ -15,6 +19,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: NextRequest) {
+  const adminAuth = await requireAdminUser(request)
+  if (adminAuth.response) return adminAuth.response
+
   try {
     const body = await request.json()
     const issueId = String(body?.issueId || '')
