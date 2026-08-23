@@ -15,11 +15,11 @@ export function PalmpayAdminDashboard({ bypassAccessCheck = false, embedded = fa
   const [authorized, setAuthorized] = useState(false)
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({
-    totalTransactions: 0,
-    totalRevenue: 0,
-    totalEscrow: 0,
-    pendingPayments: 0,
-    completedPayments: 0,
+    totalTransactions: null as number | null,
+    totalRevenue: null as number | null,
+    totalEscrow: null as number | null,
+    pendingPayments: null as number | null,
+    completedPayments: null as number | null,
   })
 
   useEffect(() => {
@@ -44,11 +44,11 @@ export function PalmpayAdminDashboard({ bypassAccessCheck = false, embedded = fa
         const result = await response.json()
         if (result?.success && result?.stats) {
           setStats({
-            totalTransactions: Number(result.stats.totalTransactions || 0),
-            totalRevenue: Number(result.stats.totalRevenue || 0),
-            totalEscrow: Number(result.stats.totalEscrow || 0),
-            pendingPayments: Number(result.stats.pendingPayments || 0),
-            completedPayments: Number(result.stats.completedPayments || 0),
+            totalTransactions: result.stats.totalTransactions == null ? null : Number(result.stats.totalTransactions),
+            totalRevenue: result.stats.totalRevenue == null ? null : Number(result.stats.totalRevenue),
+            totalEscrow: result.stats.totalEscrow == null ? null : Number(result.stats.totalEscrow),
+            pendingPayments: result.stats.pendingPayments == null ? null : Number(result.stats.pendingPayments),
+            completedPayments: result.stats.completedPayments == null ? null : Number(result.stats.completedPayments),
           })
         }
       } finally {
@@ -61,10 +61,10 @@ export function PalmpayAdminDashboard({ bypassAccessCheck = false, embedded = fa
 
   const cards = useMemo(
     () => [
-      { icon: CreditCard, label: "Transactions", value: String(stats.totalTransactions) },
-      { icon: CircleDollarSign, label: "Revenue", value: formatCurrency(stats.totalRevenue, "USD") },
-      { icon: Wallet, label: "Trade Protection Pool", value: formatCurrency(stats.totalEscrow, "USD") },
-      { icon: Clock4, label: "Pending Payments", value: String(stats.pendingPayments) },
+      { icon: CreditCard, label: "Transactions", value: stats.totalTransactions == null ? "Unavailable" : String(stats.totalTransactions) },
+      { icon: CircleDollarSign, label: "Recognized Revenue", value: stats.totalRevenue == null ? "Unavailable" : formatCurrency(stats.totalRevenue, "USD") },
+      { icon: Wallet, label: "Trade Protection Pool", value: stats.totalEscrow == null ? "Unavailable" : formatCurrency(stats.totalEscrow, "USD") },
+      { icon: Clock4, label: "Pending Payments", value: stats.pendingPayments == null ? "Unavailable" : String(stats.pendingPayments) },
     ],
     [stats],
   )
