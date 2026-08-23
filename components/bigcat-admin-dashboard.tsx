@@ -22,10 +22,10 @@ export function BigcatAdminDashboard({ bypassAccessCheck = false }: BigcatAdminD
   const [authorized, setAuthorized] = useState(false)
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<PlatformStats>({
-    totalUsers: 0,
-    totalMerchants: 0,
-    totalOrders: 0,
-    totalRevenue: 0,
+    totalUsers: null,
+    totalMerchants: null,
+    totalOrders: null,
+    totalRevenue: null,
   })
 
   useEffect(() => {
@@ -43,12 +43,12 @@ export function BigcatAdminDashboard({ bypassAccessCheck = false }: BigcatAdminD
       try {
         const response = await fetch("/api/admin/stats", { cache: "no-store" })
         const result = await response.json()
-        if (result?.success) {
+        if (result?.success && result?.platform?.available) {
           setStats({
-            totalUsers: Number(result?.platform?.totalUsers || 0),
-            totalMerchants: Number(result?.platform?.totalMerchants || 0),
-            totalOrders: Number(result?.platform?.totalOrders || 0),
-            totalRevenue: Number(result?.platform?.totalRevenue || 0),
+            totalUsers: Number(result.platform.totalUsers ?? 0),
+            totalMerchants: Number(result.platform.totalMerchants ?? 0),
+            totalOrders: Number(result.platform.totalOrders ?? 0),
+            totalRevenue: result.platform.totalRevenue == null ? null : Number(result.platform.totalRevenue),
           })
         }
       } finally {
@@ -61,10 +61,10 @@ export function BigcatAdminDashboard({ bypassAccessCheck = false }: BigcatAdminD
 
   const cards = useMemo(
     () => [
-      { label: "Users", value: String(stats.totalUsers), icon: Users },
-      { label: "Merchants", value: String(stats.totalMerchants), icon: Store },
-      { label: "Orders", value: String(stats.totalOrders), icon: Ship },
-      { label: "Revenue", value: formatCurrency(stats.totalRevenue, "USD"), icon: Landmark },
+      { label: "Users", value: stats.totalUsers == null ? "Unavailable" : String(stats.totalUsers), icon: Users },
+      { label: "Merchants", value: stats.totalMerchants == null ? "Unavailable" : String(stats.totalMerchants), icon: Store },
+      { label: "Orders", value: stats.totalOrders == null ? "Unavailable" : String(stats.totalOrders), icon: Ship },
+      { label: "Recognized Revenue", value: stats.totalRevenue == null ? "Unavailable" : formatCurrency(stats.totalRevenue, "USD"), icon: Landmark },
     ],
     [stats],
   )
