@@ -2,7 +2,8 @@
 -- Apply after the canonical order/product migrations.
 
 ALTER TABLE public.orders
-  ADD COLUMN IF NOT EXISTS idempotency_key TEXT;
+  ADD COLUMN IF NOT EXISTS idempotency_key TEXT,
+  ADD COLUMN IF NOT EXISTS pickup_token TEXT;
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_orders_idempotency_key
   ON public.orders (idempotency_key)
@@ -21,6 +22,7 @@ CREATE OR REPLACE FUNCTION public.create_marketplace_order_atomic(
   p_coupon_id UUID,
   p_coupon_code TEXT,
   p_coupon_discount NUMERIC,
+  p_pickup_token TEXT,
   p_idempotency_key TEXT,
   p_items JSONB
 )
@@ -154,13 +156,13 @@ BEGIN
     id, buyer_id, merchant_id, status, payment_status,
     grand_total, product_total, delivery_fee, delivery_type,
     delivery_address, payment_method, applied_coupon_code,
-    coupon_discount, final_total, total_amount, idempotency_key
+    coupon_discount, final_total, total_amount, pickup_token, idempotency_key
   )
   VALUES (
     p_order_id, p_buyer_id, p_merchant_id, 'paid', 'completed',
     grand_total, product_total, safe_delivery_fee, p_delivery_type,
     p_delivery_address, p_payment_method, p_coupon_code,
-    safe_coupon_discount, grand_total, grand_total, p_idempotency_key
+    safe_coupon_discount, grand_total, grand_total, p_pickup_token, p_idempotency_key
   );
 
   FOR item IN SELECT value FROM jsonb_array_elements(p_items)
@@ -202,10 +204,10 @@ $$;
 
 REVOKE ALL ON FUNCTION public.create_marketplace_order_atomic(
   UUID, UUID, UUID, TEXT, TEXT, TEXT, NUMERIC, UUID, NUMERIC,
-  UUID, TEXT, NUMERIC, TEXT, JSONB
+  UUID, TEXT, NUMERIC, TEXT, TEXT, JSONB
 ) FROM PUBLIC;
 
 GRANT EXECUTE ON FUNCTION public.create_marketplace_order_atomic(
   UUID, UUID, UUID, TEXT, TEXT, TEXT, NUMERIC, UUID, NUMERIC,
-  UUID, TEXT, NUMERIC, TEXT, JSONB
+  UUID, TEXT, NUMERIC, TEXT, TEXT, JSONB
 ) TO service_role;
