@@ -274,8 +274,9 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
+      // INITIAL_SESSION may fire before initializeSession has loaded the profile.
+      // Keep loading owned by initializeSession to avoid flashing onboarding.
       if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-        setIsLoading(false)
         return
       }
 
