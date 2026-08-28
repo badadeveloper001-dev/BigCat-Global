@@ -84,7 +84,7 @@ export function Onboarding({ onGuestBrowse }: { onGuestBrowse?: () => void } = {
           {roles.map((role) => (
             <button
               key={role.id}
-              onClick={() => role.id === "buyer" && onGuestBrowse ? onGuestBrowse() : setSelectedAuth(role.id)}
+              onClick={() => setSelectedAuth(role.id)}
               className="group flex items-center gap-4 p-4 bg-card border border-border rounded-2xl hover:border-primary/40 hover:shadow-sm transition-all duration-200 shadow-sm"
             >
               <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-secondary text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
@@ -98,6 +98,16 @@ export function Onboarding({ onGuestBrowse }: { onGuestBrowse?: () => void } = {
             </button>
           ))}
         </div>
+
+        {onGuestBrowse && (
+          <button
+            type="button"
+            onClick={onGuestBrowse}
+            className="mt-4 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+          >
+            Browse as guest
+          </button>
+        )}
 
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground mt-6">
