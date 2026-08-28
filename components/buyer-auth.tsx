@@ -310,16 +310,27 @@ export function BuyerAuth({
       // Store role before redirect so RoleContext can read it back after OAuth
       localStorage.setItem('pendingOAuthRole', 'buyer')
       const supabase = createClient()
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?next=%2Fmarketplace`,
         },
       })
       if (error) {
         localStorage.removeItem('pendingOAuthRole')
         setError(error.message || 'Google sign-in failed')
+        return
       }
+
+      if (!data?.url) {
+        localStorage.removeItem('pendingOAuthRole')
+        setError('Google sign-in is not available in this deployment. Please check the Supabase Google provider and redirect URL configuration.')
+        return
+      }
+
+      // Navigate explicitly so embedded browsers and strict navigation policies
+      // do not swallow the OAuth redirect returned by Supabase.
+      window.location.assign(data.url)
     } catch (err: any) {
       localStorage.removeItem('pendingOAuthRole')
       setError(err?.message || 'Google sign-in failed')
