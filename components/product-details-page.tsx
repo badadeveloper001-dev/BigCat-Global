@@ -87,6 +87,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
 
   const loadProduct = async () => {
     setLoading(true)
+    setError('')
     try {
       const response = await fetch(`/api/products/${productId}`, { cache: 'no-store' })
       const result = await response.json()
@@ -160,9 +161,19 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
   if (error || !product) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center px-4">
           <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
-          <p className="text-destructive">{error || 'Product not found'}</p>
+          <p role="alert" className="text-destructive">{error || 'Product not found'}</p>
+          <div className="mt-4 flex items-center justify-center gap-3">
+            {onBack ? (
+              <button onClick={onBack} className="rounded-lg border border-border px-4 py-2 text-sm font-medium">
+                Go back
+              </button>
+            ) : null}
+            <button onClick={loadProduct} className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+              Try again
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -174,7 +185,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
   const savedToWishlist = isInWishlist(String(product.id))
   const availableStock = Math.max(0, Number(product.stock || 0))
   const isOutOfStock = availableStock <= 0
-  const promotionPercentOff = Math.max(0, Number(product.promotion_percent_off || 0))
+  const promotionPercentOff = Math.max(0, Math.min(100, Number(product.promotion_percent_off || 0)))
   const currentPrice = Math.max(0, Number(product.price || 0))
   const discountedPrice = promotionPercentOff > 0
     ? currentPrice * (1 - promotionPercentOff / 100)
@@ -249,12 +260,14 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
                 className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/80 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
               >
                 <ChevronLeft className="w-5 h-5" />
+                <span className="sr-only">Previous product image</span>
               </button>
               <button
                 onClick={() => setCurrentImageIndex((i) => (i === product.images.length - 1 ? 0 : i + 1))}
                 className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/80 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
               >
                 <ChevronRight className="w-5 h-5" />
+                <span className="sr-only">Next product image</span>
               </button>
               
               {/* Image Dots */}
@@ -263,6 +276,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
                   <button
                     key={i}
                     onClick={() => setCurrentImageIndex(i)}
+                    aria-label={`View product image ${i + 1}`}
                     className={`w-2 h-2 rounded-full transition-colors ${
                       i === currentImageIndex ? 'bg-primary' : 'bg-background/60'
                     }`}
@@ -555,8 +569,9 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
                 id: product.id,
                 productId: product.id,
                 name: product.name,
-                price: parseFloat(product.price),
-                quantity: quantity,
+                price: currentPrice,
+                quantity,
+                maxStock: availableStock,
                 merchantId: product.merchant_id,
                 merchantName: product.merchant_profiles?.business_name || 'Unknown',
               })
@@ -632,7 +647,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
                 </div>
                 <p className="text-sm font-medium text-foreground line-clamp-2">{product.name}</p>
                 <p className="text-xs text-muted-foreground mt-1">Quantity: {quantity}</p>
-                <p className="text-sm font-bold text-primary mt-2">{formatNaira(Number(product.price) * quantity)}</p>
+                <p className="text-sm font-bold text-primary mt-2">{formatNaira(currentPrice * quantity)}</p>
               </div>
             </div>
             <div className="mt-4 space-y-2">

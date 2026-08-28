@@ -85,7 +85,7 @@ export function ProductCard({
   const verificationLevel = merchant.verification_level || (merchant.logo_url && merchant.location ? 'verified' : 'basic')
   const verificationLabel = verificationLevel === 'trusted' ? 'Trusted Seller' : verificationLevel === 'verified' ? 'Verified Seller' : 'New Seller'
   const displayCurrency = preferences.currency || 'NGN'
-  const displayPrice = displayCurrency === 'NGN' ? discountedPrice : Math.max(0, Number(price || 0))
+  const displayPrice = discountedPrice
   const displayPriceLabel = displayCurrency === 'NGN' ? formatNaira(displayPrice) : formatCurrency(displayPrice, displayCurrency)
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -98,6 +98,7 @@ export function ProductCard({
       name,
       price,
       quantity: 1,
+      maxStock: availableStock,
       merchantId: merchant.id,
       merchantName: merchant.business_name,
     })

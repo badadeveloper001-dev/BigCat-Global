@@ -22,6 +22,8 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
   const [submitting, setSubmitting] = useState(false)
   const [newRating, setNewRating] = useState(5)
   const [newComment, setNewComment] = useState("")
+  const [reviewError, setReviewError] = useState("")
+  const [eligibilityReason, setEligibilityReason] = useState("")
 
   useEffect(() => {
     loadReviews()
@@ -45,17 +47,19 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
 
   const checkCanReview = async () => {
     if (!user?.userId) return
-    const result = await canUserReview(productId, user.userId)
+    const result = await canUserReview(productId)
     setCanReview(Boolean(result.success && result.canReview))
-    setHasReviewed(Boolean(result.success && !result.canReview))
+    setHasReviewed(Boolean(result.success && result.hasReviewed))
+    setEligibilityReason(result.success ? String(result.reason || "") : "")
   }
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user?.userId || !newComment.trim()) return
+    setReviewError("")
 
     setSubmitting(true)
-    const result = await createReview(productId, user.userId, newRating, newComment.trim())
+    const result = await createReview(productId, newRating, newComment.trim())
 
     if (result.success) {
       setShowReviewForm(false)
@@ -64,6 +68,12 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
       loadReviews()
       setCanReview(false)
       setHasReviewed(true)
+    } else {
+      setReviewError(String(result.error || "Unable to submit review."))
+      if (result.hasReviewed) {
+        setCanReview(false)
+        setHasReviewed(true)
+      }
     }
     setSubmitting(false)
   }
@@ -145,6 +155,9 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
             </span>
           )}
         </div>
+        {!canReview && !hasReviewed && eligibilityReason ? (
+          <p className="text-xs text-muted-foreground mt-3">{eligibilityReason}</p>
+        ) : null}
       </div>
 
       {/* Review Form */}
@@ -165,8 +178,14 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
               placeholder="Share your experience with this product..."
               className="w-full px-4 py-3 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 min-h-[100px] resize-none"
               required
+              minLength={10}
+              maxLength={1000}
             />
           </div>
+
+          {reviewError ? (
+            <p role="alert" className="text-sm text-destructive bg-destructive/10 rounded-lg p-3">{reviewError}</p>
+          ) : null}
 
           <div className="flex gap-3">
             <button
@@ -178,7 +197,7 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
             </button>
             <button
               type="submit"
-              disabled={submitting || !newComment.trim()}
+              disabled={submitting || newComment.trim().length < 10}
               className="flex-1 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {submitting ? (
@@ -212,6 +231,12 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
                     <span className="font-medium text-foreground">
                       {review.user_name || "Anonymous"}
                     </span>
+                    {review.verified_purchase ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-[11px] font-medium text-green-700 dark:text-green-400">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Verified purchase
+                      </span>
+                    ) : null}
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     {renderStars(review.rating)}
