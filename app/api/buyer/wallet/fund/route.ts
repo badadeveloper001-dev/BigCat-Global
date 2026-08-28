@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getRequestAuthUser } from '@/lib/supabase/request-auth'
 import { createClient } from '@supabase/supabase-js'
 
 function getSupabaseClient() {
@@ -15,13 +16,11 @@ function getSupabaseClient() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const buyerId = String(body?.buyerId || '').trim()
+    const { user, error: authError } = await getRequestAuthUser(request)
+    if (authError || !user) return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 })
+    const buyerId = user.id
     const amount = Number(body?.amount || 0)
     const reason = String(body?.reason || 'Wallet top-up').trim()
-
-    if (!buyerId) {
-      return NextResponse.json({ success: false, error: 'buyerId is required' }, { status: 400 })
-    }
 
     if (!Number.isFinite(amount) || amount <= 0) {
       return NextResponse.json({ success: false, error: 'Invalid amount' }, { status: 400 })
