@@ -274,8 +274,10 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
+      // INITIAL_SESSION can fire before initializeSession has finished loading
+      // the profile. Keep the loading gate owned by initializeSession so the
+      // marketplace never flashes onboarding for an already authenticated user.
       if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-        setIsLoading(false)
         return
       }
 
