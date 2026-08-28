@@ -152,7 +152,9 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
 
       // If session exists but no role in localStorage, fetch profile from DB
       const storedRole = localStorage.getItem('userRole')
-      if (session && !storedRole) {
+      let storedUserId = ''
+      try { storedUserId = JSON.parse(localStorage.getItem('userData') || '{}')?.userId || '' } catch {}
+      if (session && (!storedRole || storedUserId !== session.user.id)) {
         try {
           const response = await fetch(`/api/user/profile?userId=${session.user.id}`, {
             headers: { Authorization: `Bearer ${session.access_token}` },
@@ -182,27 +184,34 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
             }))
           } else {
             // Profile not in auth_users yet — fall back to user_metadata
-            const metaRole = session.user.user_metadata?.role as string | undefined
-            if (metaRole && isActive) {
+            if (isActive) {
               const fallbackUser = {
-                userId: session.user.id,
-                email: session.user.email || '',
-                phone: '',
-                name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || '',
-                role: metaRole as 'buyer' | 'merchant',
-              }
-              setRoleState(metaRole)
-              setUserState(fallbackUser)
-              localStorage.setItem('userRole', metaRole)
-              localStorage.setItem('userData', JSON.stringify(fallbackUser))
+              userId: session.user.id,
+              email: session.user.email || '',
+              phone: '',
+              name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split('@')[0] || '',
+              role: 'buyer' as const,
+            }
+            setRoleState('buyer')
+            setUserState(fallbackUser)
+            localStorage.setItem('userRole', 'buyer')
+            localStorage.setItem('userData', JSON.stringify(fallbackUser))
             }
           }
         } catch {
           // Fall back to user_metadata
-          const metaRole = session.user.user_metadata?.role as string | undefined
-          if (metaRole && isActive) {
-            setRoleState(metaRole)
-            localStorage.setItem('userRole', metaRole)
+          if (isActive) {
+            const fallbackUser = {
+              userId: session.user.id,
+              email: session.user.email || '',
+              phone: '',
+              name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split('@')[0] || '',
+              role: 'buyer' as const,
+            }
+            setRoleState('buyer')
+            setUserState(fallbackUser)
+            localStorage.setItem('userRole', 'buyer')
+            localStorage.setItem('userData', JSON.stringify(fallbackUser))
           }
         }
       }
