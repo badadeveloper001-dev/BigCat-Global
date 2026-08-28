@@ -17,7 +17,6 @@ export async function POST(request: NextRequest) {
 
   try {
     const {
-      userId,
       payCurrency,       // currency user chooses to pay with
       payAmount,         // amount in payCurrency
       targetCurrency,    // the currency the merchant receives (usually NGN)
@@ -27,6 +26,7 @@ export async function POST(request: NextRequest) {
       rates,             // live rates from client { USD: 1, NGN: ..., CNY: ... }
     } = await request.json()
 
+    const userId = auth.user?.id
     if (!userId || !payCurrency || !payAmount || !orderId) {
       return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 })
     }
