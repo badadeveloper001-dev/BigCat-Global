@@ -166,7 +166,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
             setRoleState(profile.role)
             setUserState({
               userId: profile.id,
-              email: profile.email,
+              email: profile.email || session.user.email || '',
               phone: profile.phone || '',
               name: profile.name || profile.full_name || profile.business_name,
               city: profile.city || '',
@@ -274,8 +274,20 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         } catch {
           const role = pendingRole || 'buyer'
           if (isActive) {
+            const fallback = {
+              userId: session.user.id,
+              email: session.user.email || '',
+              phone: '',
+              name: session.user.user_metadata?.full_name
+                || session.user.user_metadata?.name
+                || session.user.email?.split('@')[0]
+                || '',
+              role: role as any,
+            }
             setRoleState(role)
+            setUserState(fallback)
             localStorage.setItem('userRole', role)
+            localStorage.setItem('userData', JSON.stringify(fallback))
             if (pendingRole) localStorage.removeItem('pendingOAuthRole')
           }
         }
