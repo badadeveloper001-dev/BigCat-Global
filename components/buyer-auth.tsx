@@ -313,7 +313,7 @@ export function BuyerAuth({
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=%2Fmarketplace`,
+          redirectTo: `${window.location.origin}/auth/complete?next=%2Fmarketplace`,
         },
       })
       if (error) {
