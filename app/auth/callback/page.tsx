@@ -20,15 +20,28 @@ export default function OAuthCallbackPage() {
 
     const completeSignIn = async () => {
       const params = new URLSearchParams(window.location.search)
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''))
       const code = params.get('code')
       const next = safeNextPath(params.get('next'))
       const supabase = createClient()
 
       try {
-        // createBrowserClient may already exchange the PKCE code while it starts.
-        // Reuse that session first, then exchange explicitly when necessary.
+        // Depending on the Supabase Auth flow configured for the project, the
+        // provider can return either a PKCE code or tokens in the URL hash.
         let { data: sessionData } = await supabase.auth.getSession()
         let session = sessionData.session
+
+        if (!session && hashParams.get('access_token') && hashParams.get('refresh_token')) {
+          const tokenSession = await supabase.auth.setSession({
+            access_token: hashParams.get('access_token')!,
+            refresh_token: hashParams.get('refresh_token')!,
+          })
+          session = tokenSession.data.session
+
+          if (tokenSession.error && !session) {
+            throw tokenSession.error
+          }
+        }
 
         if (!session && code) {
           const exchange = await supabase.auth.exchangeCodeForSession(code)
@@ -47,8 +60,20 @@ export default function OAuthCallbackPage() {
           }
         }
 
+        if (!session && (code || hashParams.get('access_token'))) {
+          // Give createBrowserClient's URL detector one final opportunity to
+          // persist the session before displaying an error.
+          await new Promise((resolve) => window.setTimeout(resolve, 500))
+          const retry = await supabase.auth.getSession()
+          session = retry.data.session
+        }
+
         if (!session?.user) {
-          throw new Error(code ? 'Google sign-in did not create a session.' : 'Google did not return an authorization code.')
+          const providerError = params.get('error_description')
+            || params.get('error')
+            || hashParams.get('error_description')
+            || hashParams.get('error')
+          throw new Error(providerError || 'Google did not return a usable authorization response.')
         }
 
         const authUser = session.user
