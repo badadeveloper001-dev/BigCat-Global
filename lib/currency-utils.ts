@@ -1,10 +1,13 @@
-import { TEST_FX_RATES } from '@/lib/pilot-config'
 import type { SupportedCurrency } from '@/lib/global-market-config'
 
 type ExchangeRates = Record<SupportedCurrency, number>
 
 // Base: USD. Replace with Orchid exchange-rate API when available.
-const USD_BASE_RATES: ExchangeRates = TEST_FX_RATES
+const USD_BASE_RATES: ExchangeRates = {
+  USD: 1,
+  NGN: 1600,
+  CNY: 7.2,
+}
 
 const CURRENCY_LOCALE: Record<SupportedCurrency, string> = {
   NGN: 'en-NG',

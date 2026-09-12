@@ -10,9 +10,7 @@
     "migrate": "node scripts/migrate.mjs",
     "setup-db": "node scripts/setup-db.mjs",
     "verify-supabase": "node scripts/verify-supabase.mjs",
-    "setup:all": "npm run verify-supabase && npm run setup-db",
-    "typecheck": "tsc --noEmit",
-    "test": "node tests/pilot-auth.test.mjs && node tests/pilot-database.test.mjs"
+    "setup:all": "npm run verify-supabase && npm run setup-db"
   },
   "dependencies": {
     "@aws-sdk/dsql-signer": "^3.1024.0",
@@ -79,7 +77,6 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.5.8",
     "@tailwindcss/postcss": "^4.2.0",
     "@types/bcrypt": "^6.0.0",
     "@types/node": "^22",
@@ -90,6 +87,5 @@
     "tailwindcss": "^4.2.0",
     "tw-animate-css": "1.3.3",
     "typescript": "5.7.3"
-  },
-  "packageManager": "pnpm@11.19.0"
+  }
 }

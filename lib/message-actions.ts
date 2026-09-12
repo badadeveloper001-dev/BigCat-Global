@@ -1,7 +1,5 @@
 'use server'
 
-import { requireActor, requireOrderActor } from '@/lib/supabase/authorize'
-
 import { randomUUID } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { dispatchNotification } from '@/lib/notifications'
@@ -13,7 +11,6 @@ function generateId(prefix: string) {
 
 export async function getOrCreateConversation(buyerId: string, merchantId: string, productId?: string) {
   try {
-    const actor = await requireActor(); if (actor.id !== buyerId && actor.id !== merchantId) throw new Error('Access denied')
     const supabase = await createClient()
 
     let query = supabase.from('conversations').select('*').eq('buyer_id', buyerId).eq('merchant_id', merchantId)
@@ -64,7 +61,6 @@ export async function getConversationMessages(
   viewerLanguage: 'en' | 'zh' = 'en',
 ) {
   try {
-    const actor = await requireActor(); viewerId = actor.id
     const supabase = await createClient()
 
     if (viewerId) {
@@ -85,11 +81,11 @@ export async function getConversationMessages(
       .from('messages')
       .select('*, sender:auth_users!sender_id(name, business_name, role)')
       .eq('conversation_id', conversationId)
-      .order('created_at', { ascending: false }).limit(50)
+      .order('created_at', { ascending: true })
     if (error) throw error
 
     const translatedMessages = await Promise.all(
-      (data || []).reverse().map(async (message: any) => {
+      (data || []).map(async (message: any) => {
         const sourceLanguage = detectMessageLanguage(String(message?.content || ''))
         const translation = await translateMessageForUser({
           text: String(message?.content || ''),
@@ -114,7 +110,6 @@ export async function getConversationMessages(
 
 export async function markConversationAsRead(conversationId: string, userId: string) {
   try {
-    await requireActor(userId)
     const supabase = await createClient()
     const { data: conversation, error: conversationError } = await supabase
       .from('conversations')
@@ -147,7 +142,6 @@ export async function sendMessage(
   senderLanguage: 'en' | 'zh' = 'en',
 ) {
   try {
-    await requireActor(senderId)
     const supabase = await createClient()
     const { data: conversation, error: conversationError } = await supabase
       .from('conversations')
@@ -227,7 +221,6 @@ export async function sendMessage(
 
 export async function getUserConversations(userId: string) {
   try {
-    await requireActor(userId)
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('conversations')

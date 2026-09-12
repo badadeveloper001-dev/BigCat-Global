@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getProductReviews, createReview } from "@/lib/review-actions"
+import { getProductReviews, createReview, canUserReview } from "@/lib/review-actions"
+import { requireAuthenticatedUser } from "@/lib/supabase/request-auth"
 
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: productId } = await params
     if (!productId) {
@@ -17,12 +18,15 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     const totalReviews = reviews.length
     const averageRating =
       totalReviews > 0
-        ? reviews.reduce((sum: number, review: any) => sum + Number(review.rating || 0), 0) / totalReviews
+        ? reviews.reduce((sum: number, r: any) => sum + Number(r.rating || 0), 0) / totalReviews
         : 0
 
     return NextResponse.json({
       success: true,
-      data: reviews,
+      data: reviews.map((r: any) => ({
+        ...r,
+        user_name: r.auth_users?.name || r.user_name || null,
+      })),
       averageRating: Math.round(averageRating * 10) / 10,
       totalReviews,
     })
@@ -35,23 +39,21 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: productId } = await params
-    const body = await request.json()
-    const rating = Number(body?.rating)
-    const comment = String(body?.comment || "")
+    const { userId, rating, comment } = await request.json()
 
-    if (!productId || !Number.isInteger(rating) || !comment.trim()) {
-      return NextResponse.json({ success: false, error: "Product, rating, and review are required." }, { status: 400 })
+    if (!productId || !userId || !rating || !comment) {
+      return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 })
     }
 
-    // createReview resolves the signed-in user from the request cookies and never
-    // accepts a browser-supplied user id.
-    const result = await createReview(productId, rating, comment)
+    const auth = await requireAuthenticatedUser(userId, request)
+    if (auth.response) return auth.response
+
+    const result = await createReview(productId, userId, Number(rating), String(comment))
     if (!result.success) {
-      const status = result.code === "AUTH_REQUIRED" ? 401 : result.hasReviewed ? 409 : 400
-      return NextResponse.json({ success: false, error: result.error, hasReviewed: result.hasReviewed }, { status })
+      return NextResponse.json({ success: false, error: result.error }, { status: 400 })
     }
 
-    return NextResponse.json({ success: true, data: result.data }, { status: 201 })
+    return NextResponse.json({ success: true, data: result.data })
   } catch (error) {
     console.error("Reviews POST error:", error)
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })

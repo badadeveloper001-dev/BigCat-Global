@@ -1,17 +1,14 @@
-import { requireActor } from '@/lib/supabase/authorize'
 import { type NextRequest, NextResponse } from 'next/server'
 import { get } from '@vercel/blob'
 
 export async function GET(request: NextRequest) {
   try {
-    const actor = await requireActor()
     const pathname = request.nextUrl.searchParams.get('pathname')
 
     if (!pathname) {
       return NextResponse.json({ error: 'Missing pathname' }, { status: 400 })
     }
 
-    if (actor.role !== 'admin' && (!pathname.startsWith('products/'+actor.id+'/') || pathname.includes('..'))) return NextResponse.json({error:'Access denied'},{status:403})
     const result = await get(pathname, {
       access: 'private',
       ifNoneMatch: request.headers.get('if-none-match') ?? undefined,

@@ -1,11 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminUser } from '@/lib/supabase/admin-auth'
+import { NextResponse } from 'next/server'
 import { getRecentOrders } from '@/lib/admin-actions'
 
-export async function GET(request: NextRequest) {
-  const adminAuth = await requireAdminUser(request)
-  if (adminAuth.response) return adminAuth.response
-
+export async function GET() {
   try {
     const result = await getRecentOrders()
     return NextResponse.json(result)

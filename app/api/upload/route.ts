@@ -1,10 +1,8 @@
-import { requireActor } from '@/lib/supabase/authorize'
 import { put, del } from '@vercel/blob'
 import { type NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const actor = await requireActor()
     const formData = await request.formData() as unknown as { get(key: string): File | null }
     const file = formData.get('file') as File
 
@@ -33,7 +31,7 @@ export async function POST(request: NextRequest) {
     // Generate unique filename
     const timestamp = Date.now()
     const extension = file.name.split('.').pop() || 'jpg'
-    const filename = `products/${actor.id}/${timestamp}-${Math.random().toString(36).substring(7)}.${extension}`
+    const filename = `products/${timestamp}-${Math.random().toString(36).substring(7)}.${extension}`
 
     // Upload to Vercel Blob with public access so images are served directly from CDN
     const blob = await put(filename, file, {
@@ -54,15 +52,12 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const actor = await requireActor()
     const { url } = await request.json()
 
     if (!url) {
       return NextResponse.json({ error: 'No URL provided' }, { status: 400 })
     }
 
-    const parsed = new URL(url)
-    if (parsed.protocol !== 'https:' || !parsed.hostname.endsWith('.public.blob.vercel-storage.com') || !parsed.pathname.startsWith('/products/' + actor.id + '/')) return NextResponse.json({error: 'Access denied'}, {status: 403})
     await del(url)
 
     return NextResponse.json({ success: true })

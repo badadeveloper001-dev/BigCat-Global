@@ -11,7 +11,6 @@ export interface CartItem {
   quantity: number
   merchantId: string
   merchantName: string
-  maxStock?: number
 }
 
 interface CartContextType {
@@ -34,25 +33,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems((prevItems) => {
       const existingItem = prevItems.find((i) => i.productId === newItem.productId)
 
-      const requestedStock = Number(newItem.maxStock)
-      const hasStockLimit = Number.isFinite(requestedStock) && requestedStock >= 0
-      const maxStock = hasStockLimit ? Math.floor(requestedStock) : Number.POSITIVE_INFINITY
-
       if (existingItem) {
         return prevItems.map((i) =>
           i.productId === newItem.productId
-            ? {
-                ...i,
-                price: newItem.price,
-                maxStock: newItem.maxStock ?? i.maxStock,
-                quantity: Math.min(maxStock, i.quantity + newItem.quantity),
-              }
+            ? { ...i, quantity: i.quantity + newItem.quantity }
             : i
         )
       }
 
-      const quantity = Math.min(maxStock, Math.max(1, Math.floor(newItem.quantity)))
-      return quantity > 0 ? [...prevItems, { ...newItem, quantity }] : prevItems
+      return [...prevItems, newItem]
     })
   }, [])
 
@@ -67,14 +56,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
 
     setItems((prevItems) =>
-      prevItems.map((i) => {
-        if (i.productId !== productId) return i
-        const stock = Number(i.maxStock)
-        const boundedQuantity = Number.isFinite(stock)
-          ? Math.min(Math.max(0, Math.floor(quantity)), Math.max(0, Math.floor(stock)))
-          : Math.max(0, Math.floor(quantity))
-        return { ...i, quantity: boundedQuantity }
-      }).filter((i) => i.quantity > 0)
+      prevItems.map((i) =>
+        i.productId === productId ? { ...i, quantity } : i
+      )
     )
   }, [removeItem])
 

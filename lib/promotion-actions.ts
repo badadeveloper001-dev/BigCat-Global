@@ -1,4 +1,3 @@
-import { requireActor } from '@/lib/supabase/authorize'
 import { createClient } from '@/lib/supabase/server'
 
 function formatPromotionError(error: any) {
@@ -316,7 +315,6 @@ async function enforceCouponMarginGuard(
 
 export async function createPromotion(merchantId: string, input: PromotionInput) {
   try {
-    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     await syncPromotionAndCouponStatuses(supabase, merchantId)
 
@@ -397,7 +395,6 @@ export async function updatePromotion(
   updates: Partial<PromotionInput>,
 ) {
   try {
-    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     await syncPromotionAndCouponStatuses(supabase, merchantId)
 
@@ -496,7 +493,6 @@ export async function updatePromotion(
 
 export async function deletePromotion(merchantId: string, promotionId: string) {
   try {
-    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
 
     const { data: promo, error: fetchError } = await supabase
@@ -523,7 +519,6 @@ export async function deletePromotion(merchantId: string, promotionId: string) {
 
 export async function getMerchantPromotions(merchantId: string) {
   try {
-    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     await syncPromotionAndCouponStatuses(supabase, merchantId)
 
@@ -542,7 +537,6 @@ export async function getMerchantPromotions(merchantId: string) {
 
 export async function createCoupon(merchantId: string, input: CouponInput) {
   try {
-    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     await syncPromotionAndCouponStatuses(supabase, merchantId)
 
@@ -574,7 +568,6 @@ export async function createCoupon(merchantId: string, input: CouponInput) {
 
 export async function getMerchantCoupons(merchantId: string) {
   try {
-    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     await syncPromotionAndCouponStatuses(supabase, merchantId)
 
@@ -593,7 +586,6 @@ export async function getMerchantCoupons(merchantId: string) {
 
 export async function validateCoupon(couponCode: string, buyerId: string, cartTotal: number) {
   try {
-    await requireActor(buyerId, ['buyer'])
     const supabase = await createClient()
     await syncPromotionAndCouponStatuses(supabase)
 
@@ -667,12 +659,56 @@ export async function validateCoupon(couponCode: string, buyerId: string, cartTo
 }
 
 export async function applyCoupon(couponCode: string, buyerId: string) {
- return { success: false, error: 'Coupons are redeemed only during atomic checkout' }
+  try {
+    const supabase = await createClient()
+    await syncPromotionAndCouponStatuses(supabase)
+
+    const { data: coupon } = await supabase
+      .from('coupons')
+      .select('*')
+      .eq('code', String(couponCode).toUpperCase())
+      .single()
+
+    if (!coupon) {
+      return { success: false, error: 'Coupon not found' }
+    }
+
+    // Increment coupon usage
+    await supabase
+      .from('coupons')
+      .update({ current_uses: coupon.current_uses + 1 })
+      .eq('id', coupon.id)
+
+    // Upsert buyer usage
+    const { data: usage } = await supabase
+      .from('coupon_usage')
+      .select('used_count')
+      .eq('coupon_id', coupon.id)
+      .eq('buyer_id', buyerId)
+      .single()
+
+    if (usage) {
+      await supabase
+        .from('coupon_usage')
+        .update({ used_count: usage.used_count + 1, last_used_at: new Date().toISOString() })
+        .eq('coupon_id', coupon.id)
+        .eq('buyer_id', buyerId)
+    } else {
+      await supabase.from('coupon_usage').insert({
+        coupon_id: coupon.id,
+        buyer_id: buyerId,
+        used_count: 1,
+      })
+    }
+
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: formatPromotionError(error) }
+  }
 }
 
 export async function getPromotionAnalytics(merchantId: string, promotionId: string) {
   try {
-    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     await syncPromotionAndCouponStatuses(supabase, merchantId)
 
@@ -812,7 +848,6 @@ export async function getPromotionPercentOffForProduct(merchantId: string, produ
 
 export async function getMerchantPromotionAnalyticsOverview(merchantId: string) {
   try {
-    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     await syncPromotionAndCouponStatuses(supabase, merchantId)
 
@@ -864,5 +899,29 @@ export async function getMerchantPromotionAnalyticsOverview(merchantId: string) 
 }
 
 export async function incrementPromotionUsage(promotionId: string) {
- return { success: false, error: 'Promotion usage is recorded only during atomic checkout' }
+  try {
+    if (!promotionId) return { success: false }
+    const supabase = await createClient()
+
+    const { data: promo } = await supabase
+      .from('promotions')
+      .select('id,current_uses')
+      .eq('id', promotionId)
+      .single()
+
+    if (!promo) return { success: false }
+
+    const { error } = await supabase
+      .from('promotions')
+      .update({
+        current_uses: Number(promo.current_uses || 0) + 1,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', promotionId)
+
+    if (error) return { success: false, error: formatPromotionError(error) }
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: formatPromotionError(error) }
+  }
 }

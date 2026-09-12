@@ -1,9 +1,6 @@
 'use server'
 
-import { requireActor, requireOrderActor } from '@/lib/supabase/authorize'
-
 import { createClient } from '@/lib/supabase/server'
-import { getRequestAuthUser, toPublicProfile } from '@/lib/supabase/request-auth'
 import { isWebsiteBannerTemplate, normalizeWebsiteBannerConfig, type WebsiteBannerConfig } from '@/lib/merchant-website'
 import { createHash } from 'crypto'
 
@@ -107,9 +104,6 @@ export async function getUserProfile(userId: string) {
     const { data, error } = await supabase.from('auth_users').select('*').eq('id', userId).single()
     if (error) throw error
 
-    const viewer = await getRequestAuthUser()
-    if (viewer.user?.id !== userId) return { success: true, data: toPublicProfile(data) }
-    delete data.password_hash
     const metadataPrefs = await getWebsitePreferencesFromAuthMetadata(userId)
 
     return {
@@ -136,8 +130,6 @@ export async function updateUserProfile(
     business_name?: string
     business_description?: string
     business_category?: string
-    country?: 'NG' | 'CN'
-    language?: 'en' | 'zh'
     city?: string
     state?: string
     location?: string
@@ -148,7 +140,6 @@ export async function updateUserProfile(
   }
 ) {
   try {
-    await requireActor(userId)
     const supabase = await createClient()
 
     // website_theme and website_layout columns do not exist in auth_users.
@@ -156,8 +147,7 @@ export async function updateUserProfile(
     const websiteTheme = updates.website_theme
     const websiteLayout = updates.website_layout
     const websiteBanner = updates.website_banner ? normalizeWebsiteBannerConfig(updates.website_banner) : undefined
-    const fields = ['name', 'full_name', 'phone', 'address', 'business_name', 'business_description', 'business_category', 'city', 'state', 'location', 'country', 'language']
-    const dbUpdates = Object.fromEntries(Object.entries(updates).filter(([key, value]) => fields.includes(key) && typeof value === 'string'))
+    const { website_theme: _t, website_layout: _l, website_banner: _b, ...dbUpdates } = updates
 
     const { data, error } = await supabase
       .from('auth_users')
@@ -186,7 +176,6 @@ export async function updateUserProfile(
 
 export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
   try {
-    await requireActor(userId)
     const supabase = await createClient()
     const { data: user } = await supabase
       .from('auth_users')
@@ -257,15 +246,18 @@ export async function changePassword(userId: string, currentPassword: string, ne
 }
 
 export async function updateEmail(userId: string, newEmail: string) {
- try {
-  await requireActor(userId)
-  return {success:false,error:'Email changes are paused during the test pilot. Contact the pilot administrator.'}
- } catch(error: any) {return {success:false,error:error.message}}
+  try {
+    const supabase = await createClient()
+    const { error } = await supabase.from('auth_users').update({ email: newEmail }).eq('id', userId)
+    if (error) throw error
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
 }
 
 export async function updateNotificationPreferences(userId: string, preferences: any) {
   try {
-    await requireActor(userId)
     const supabase = await createClient()
     const payload = {
       email_notifications: Boolean(preferences?.email_notifications),
@@ -290,7 +282,6 @@ export async function updateNotificationPreferences(userId: string, preferences:
 
 export async function deleteAccount(userId: string) {
   try {
-    await requireActor(userId)
     const supabase = await createClient()
     const { error } = await supabase.from('auth_users').delete().eq('id', userId)
     if (error) throw error
@@ -302,7 +293,6 @@ export async function deleteAccount(userId: string) {
 
 export async function getPaymentMethods(userId: string) {
   try {
-    await requireActor(userId)
     const supabase = await createClient()
     const { data, error } = await supabase.from('payment_methods').select('*').eq('user_id', userId)
     if (error) throw error
@@ -314,7 +304,6 @@ export async function getPaymentMethods(userId: string) {
 
 export async function addPaymentMethod(userId: string, method: { type: string; details: any }) {
   try {
-    await requireActor(userId)
     const supabase = await createClient()
     const { data, error } = await supabase.from('payment_methods').insert({ user_id: userId, ...method }).select().single()
     if (error) throw error
@@ -326,7 +315,6 @@ export async function addPaymentMethod(userId: string, method: { type: string; d
 
 export async function removePaymentMethod(userId: string, methodId: string) {
   try {
-    await requireActor(userId)
     const supabase = await createClient()
     const { error } = await supabase.from('payment_methods').delete().eq('id', methodId).eq('user_id', userId)
     if (error) throw error
@@ -338,7 +326,6 @@ export async function removePaymentMethod(userId: string, methodId: string) {
 
 export async function setDefaultPaymentMethod(userId: string, methodId: string) {
   try {
-    await requireActor(userId)
     const supabase = await createClient()
     await supabase.from('payment_methods').update({ is_default: false }).eq('user_id', userId)
     const { error } = await supabase.from('payment_methods').update({ is_default: true }).eq('id', methodId).eq('user_id', userId)

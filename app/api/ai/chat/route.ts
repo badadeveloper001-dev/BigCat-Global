@@ -1,4 +1,3 @@
-import { requireActor } from '@/lib/supabase/authorize'
 import { NextRequest, NextResponse } from 'next/server'
 import {
   buildAiSearchReply,
@@ -194,7 +193,6 @@ function buildProfessionalPromoReply(message: string, language = 'en') {
 
 export async function POST(request: NextRequest) {
   try {
-    await requireActor()
     const body = await request.json()
     const message = String(body?.message || '').trim()
     const language = String(body?.language || 'auto')

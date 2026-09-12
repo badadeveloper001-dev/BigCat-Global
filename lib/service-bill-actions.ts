@@ -1,9 +1,5 @@
 'use server'
 
-import { requirePilotMode } from '@/lib/pilot-config'
-
-import { requireActor } from '@/lib/supabase/authorize'
-
 import { createClient } from '@/lib/supabase/server'
 import { dispatchNotification } from '@/lib/notifications'
 
@@ -61,7 +57,6 @@ export async function createServiceBill(
   const total = Math.max(0, subtotal - discount)
 
   try {
-    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     const { data, error } = await (supabase.from('service_bills') as any)
       .insert({
@@ -107,7 +102,6 @@ export async function updateServiceBill(
   }>,
 ) {
   try {
-    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
 
     const patch: Record<string, any> = { updated_at: new Date().toISOString() }
@@ -143,7 +137,6 @@ export async function updateServiceBill(
 
 export async function sendServiceBill(merchantId: string, billId: string) {
   try {
-    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
 
     const { data, error } = await (supabase.from('service_bills') as any)
@@ -176,7 +169,6 @@ export async function sendServiceBill(merchantId: string, billId: string) {
 
 export async function getMerchantServiceBills(merchantId: string) {
   try {
-    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     const { data, error } = await (supabase.from('service_bills') as any)
       .select('*')
@@ -216,7 +208,6 @@ export async function getMerchantServiceBills(merchantId: string) {
 
 export async function getBuyerServiceBills(buyerId: string) {
   try {
-    await requireActor(buyerId, ['buyer'])
     const supabase = await createClient()
     const { data, error } = await (supabase.from('service_bills') as any)
       .select('*')
@@ -254,19 +245,137 @@ export async function getBuyerServiceBills(buyerId: string) {
   }
 }
 
-export async function payServiceBill(buyerId: string, billId: string, options?: {paymentMethod?: 'palmpay' | 'bank' | 'card'; paymentAddress?: string}) {
- try {
-  requirePilotMode()
-  await requireActor(buyerId, ['buyer'])
-  const {data,error} = await createClient().rpc('pilot_service_checkout',{p_buyer:buyerId,p_key:'service-bill:'+billId,p_payload:{billId,address:options?.paymentAddress,outcome:'success'}})
-  if (error) throw error
-  return data
- } catch(e: any) {return {success:false,error:e.message}}
+export async function payServiceBill(
+  buyerId: string,
+  billId: string,
+  options?: {
+    paymentMethod?: 'palmpay' | 'bank' | 'card'
+    paymentAddress?: string
+  },
+) {
+  try {
+    const supabase = await createClient()
+    const paymentMethod = options?.paymentMethod === 'bank' || options?.paymentMethod === 'card' ? options.paymentMethod : 'palmpay'
+    const paymentAddress = String(options?.paymentAddress || '').trim() || null
+
+    // 1. Load bill
+    const { data: bill, error: billError } = await (supabase.from('service_bills') as any)
+      .select('*')
+      .eq('id', billId)
+      .eq('buyer_id', buyerId)
+      .eq('status', 'sent')
+      .maybeSingle()
+
+    if (billError) throw billError
+    if (!bill) return { success: false, error: 'Bill not found or already paid' }
+
+    const amount = Number(bill.total_amount)
+    if (!amount || amount <= 0) return { success: false, error: 'Invalid bill amount' }
+
+    if (paymentMethod === 'palmpay') {
+      // 2. Check wallet balance for wallet payments
+      const { data: txRows, error: txError } = await supabase
+        .from('transactions')
+        .select('type, amount')
+        .eq('buyer_id', buyerId)
+
+      if (txError) throw txError
+
+      const creditTypes = new Set(['wallet_credit', 'refund', 'payment', 'escrow_release'])
+      const debitTypes = new Set(['wallet_debit', 'withdrawal'])
+      const balance = (txRows || []).reduce((sum: number, tx: any) => {
+        const type = String(tx?.type || '').toLowerCase()
+        const amt = Math.max(0, Number(tx?.amount || 0))
+        if (creditTypes.has(type)) return sum + amt
+        if (debitTypes.has(type)) return sum - amt
+        return sum
+      }, 0)
+
+      if (balance < amount) {
+        return {
+          success: false,
+          error: `Insufficient wallet balance. You need ₦${amount.toLocaleString('en-NG')} but have ₦${balance.toLocaleString('en-NG')}. Please top up your wallet first.`,
+          code: 'INSUFFICIENT_BALANCE',
+          currentBalance: balance,
+          required: amount,
+        }
+      }
+
+      // 3. Debit buyer wallet
+      const { error: debitError } = await supabase
+        .from('transactions')
+        .insert({
+          buyer_id: buyerId,
+          type: 'wallet_debit',
+          amount,
+          reason: `Service bill payment: ${bill.scope_summary || billId}`,
+          status: 'completed',
+        })
+
+      if (debitError) throw debitError
+    } else {
+      // Non-wallet methods are treated as externally settled and recorded.
+      const { error: paymentError } = await supabase
+        .from('transactions')
+        .insert({
+          buyer_id: buyerId,
+          type: 'payment',
+          amount,
+          reason: `Service bill payment via ${paymentMethod}: ${bill.scope_summary || billId}`,
+          status: 'completed',
+        })
+
+      if (paymentError) throw paymentError
+    }
+
+    // 4. Create service booking with quoted price = total_amount
+    let bookingId: string | null = null
+    if (bill.service_listing_id) {
+      const { data: booking } = await (supabase.from('service_bookings') as any)
+        .insert({
+          service_id: bill.service_listing_id,
+          buyer_id: buyerId,
+          merchant_id: bill.merchant_id,
+          status: 'accepted',
+          quoted_price: amount,
+          payment_status: 'paid',
+          escrow_status: 'held',
+          service_address: paymentAddress,
+          buyer_note: bill.scope_summary || null,
+        })
+        .select('id')
+        .single()
+      bookingId = booking?.id || null
+    }
+
+    // 5. Mark bill as paid
+    await (supabase.from('service_bills') as any)
+      .update({
+        status: 'paid',
+        booking_id: bookingId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', billId)
+
+    // 6. Notify merchant
+    const buyerName = await getBuyerName(buyerId)
+    await dispatchNotification({
+      userId: bill.merchant_id,
+      type: 'order',
+      title: 'Service bill paid',
+      message: `${buyerName} paid ₦${amount.toLocaleString('en-NG')} for: ${bill.scope_summary || 'Service bill'}.`,
+      eventKey: `service-bill-paid:${billId}`,
+      metadata: { billId, buyerId, amount },
+    }).catch(() => null)
+
+    return { success: true, bookingId }
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to process payment' }
+  }
 }
 
 export async function cancelServiceBill(actorId: string, billId: string, actorType: 'merchant' | 'buyer') {
   try {
-    await requireActor(actorId, [actorType])
     const supabase = await createClient()
     const filter = actorType === 'merchant' ? 'merchant_id' : 'buyer_id'
 

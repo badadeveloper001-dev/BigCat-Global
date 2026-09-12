@@ -16,7 +16,6 @@ async function translateWithOpenAI(text: string, source: SupportedLanguage, targ
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
-    signal: AbortSignal.timeout(2500),
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
@@ -79,9 +78,8 @@ export async function translateMessageForUser(params: {
     }
   }
 
-  const translated = await translateWithOpenAI(text, sourceLanguage, targetLanguage).catch(() => null)
+  const translated = await translateWithOpenAI(text, sourceLanguage, targetLanguage)
   if (translated) {
-    if (translationCache.size >= 500) translationCache.clear()
     translationCache.set(cacheKey, translated)
     return {
       sourceLanguage,

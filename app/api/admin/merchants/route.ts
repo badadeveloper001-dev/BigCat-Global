@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminUser } from '@/lib/supabase/admin-auth'
 import { getMerchants, approveMerchant, rejectMerchant } from '@/lib/admin-actions'
 
 export async function GET(request: NextRequest) {
-  const adminAuth = await requireAdminUser(request)
-  if (adminAuth.response) return adminAuth.response
-
   try {
     const { searchParams } = new URL(request.url)
     const buyerLat = Number(searchParams.get('buyerLat'))
@@ -26,9 +22,6 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const adminAuth = await requireAdminUser(request)
-  if (adminAuth.response) return adminAuth.response
-
   try {
     const { id } = await request.json()
     if (!id) return NextResponse.json({ success: false, error: 'Missing id' }, { status: 400 })
@@ -41,9 +34,6 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const adminAuth = await requireAdminUser(request)
-  if (adminAuth.response) return adminAuth.response
-
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')

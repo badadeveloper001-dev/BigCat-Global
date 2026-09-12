@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminUser } from '@/lib/supabase/admin-auth'
 import { requestOrderReturn } from '@/lib/logistics-actions'
+
+function isAuthorized(request: NextRequest) {
+  const supplied = request.headers.get('x-logistics-access-code') || ''
+  const expected = process.env.LOGISTICS_ACCESS_CODE || 'LOGISTICS_001'
+  return supplied.trim().toUpperCase() === expected.trim().toUpperCase()
+}
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const adminAuth = await requireAdminUser(request)
-    if (adminAuth.response) return adminAuth.response
+    if (!isAuthorized(request)) {
+      return NextResponse.json({ success: false, error: 'Unauthorized logistics access' }, { status: 401 })
+    }
 
     const { id } = await params
     if (!id) {

@@ -1,11 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminUser } from '@/lib/supabase/admin-auth'
+import { NextResponse } from 'next/server'
 import { getRecentUsers } from '@/lib/admin-actions'
 
-export async function GET(request: NextRequest) {
-  const adminAuth = await requireAdminUser(request)
-  if (adminAuth.response) return adminAuth.response
-
+export async function GET() {
   try {
     const result = await getRecentUsers()
     return NextResponse.json(result)

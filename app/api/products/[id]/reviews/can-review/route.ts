@@ -1,24 +1,23 @@
 import { NextRequest, NextResponse } from "next/server"
 import { canUserReview } from "@/lib/review-actions"
 
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: productId } = await params
-    if (!productId) {
-      return NextResponse.json({ canReview: false, hasReviewed: false, reason: "Product ID required." }, { status: 400 })
+    const { searchParams } = new URL(request.url)
+    const userId = searchParams.get("userId") || ""
+
+    if (!productId || !userId) {
+      return NextResponse.json({ canReview: false, hasReviewed: false })
     }
 
-    // Eligibility is derived from the authenticated session, never a query-string user id.
-    const result = await canUserReview(productId)
+    const result = await canUserReview(productId, userId)
+    const hasReviewed = result.success && !result.canReview
     return NextResponse.json({
       canReview: result.success ? Boolean(result.canReview) : false,
-      hasReviewed: result.success ? Boolean(result.hasReviewed) : false,
-      reason: result.success ? result.reason || null : result.error || "Unable to check review eligibility.",
+      hasReviewed,
     })
-  } catch {
-    return NextResponse.json(
-      { canReview: false, hasReviewed: false, reason: "Unable to check review eligibility." },
-      { status: 500 },
-    )
+  } catch (error) {
+    return NextResponse.json({ canReview: false, hasReviewed: false })
   }
 }

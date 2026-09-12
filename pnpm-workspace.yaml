@@ -1,4 +1,0 @@
-allowBuilds:
-  '@sentry/cli': true
-  bcrypt: true
-  sharp: true

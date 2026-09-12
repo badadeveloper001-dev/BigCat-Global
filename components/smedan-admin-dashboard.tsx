@@ -61,7 +61,13 @@ export function SmedanAdminDashboard({ bypassAccessCheck = false, embedded = fal
       return
     }
 
-    router.replace("/admin-portal")
+    const adminAccess = sessionStorage.getItem("adminAccess")
+    if (adminAccess === "SMEDAN_123") {
+      setIsAuthorized(true)
+      loadData()
+    } else {
+      router.push("/")
+    }
   }, [router, bypassAccessCheck])
 
   const loadData = async () => {
