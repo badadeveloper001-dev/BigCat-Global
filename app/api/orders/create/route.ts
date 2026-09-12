@@ -41,9 +41,11 @@ export async function POST(request: NextRequest) {
       deliveryType,
       deliveryAddress,
       paymentMethod,
+      testOutcome: body.testOutcome,
+      payCurrency: body.payCurrency,
       deliveryFee: Number(deliveryFee || 0),
       appliedCoupon: appliedCoupon || null,
-      idempotencyKey: String(idempotencyKey || request.headers.get('idempotency-key') || crypto.randomUUID()),
+      idempotencyKey: String(idempotencyKey || request.headers.get('idempotency-key')),
     })
 
     return NextResponse.json(result, {

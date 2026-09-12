@@ -1,3 +1,4 @@
+import { checkOtpRateLimit } from '@/lib/rate-limit'
 import { NextRequest, NextResponse } from 'next/server'
 import { signupEnhanced } from '@/lib/auth-actions'
 import { dispatchNotification } from '@/lib/notifications'
@@ -23,16 +24,21 @@ export async function POST(request: NextRequest) {
       cacId,
       merchantType,
       country,
+      language,
       governmentIdNumber,
       bankVerificationRef,
       verificationModule,
     } = body || {}
 
+    const pilot = process.env.PAYMENT_MODE === 'test'
     const normalizedEmail = String(email || '').trim().toLowerCase()
     const normalizedRole = role === 'merchant' ? 'merchant' : 'buyer'
     const normalizedCountry = country === 'CN' ? 'CN' : 'NG'
     const pendingOtp = decodePendingSignupOtp(request.cookies.get(SIGNUP_OTP_COOKIE)?.value)
 
+    if (!['buyer','merchant'].includes(role) || !String(city||'').trim() || !String(state||'').trim()) return NextResponse.json({success:false,error:'Role, city and province/state are required'},{status:400})
+    const limit = await checkOtpRateLimit('verify:'+normalizedEmail,'verify:'+(request.headers.get('x-forwarded-for')?.split(',')[0]||'unknown'))
+    if (!limit.allowed) return NextResponse.json({success:false,error:limit.reason},{status:429})
     if (!otp || String(otp).trim().length !== 6) {
       return NextResponse.json({ success: false, error: 'A valid 6-digit OTP is required' }, { status: 400 })
     }
@@ -45,15 +51,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Invalid or expired OTP. Please request a new code.' }, { status: 400 })
     }
 
-    if (normalizedRole === 'merchant' && normalizedCountry === 'NG' && !governmentIdNumber) {
+    if (!pilot && normalizedRole === 'merchant' && normalizedCountry === 'NG' && !governmentIdNumber) {
       return NextResponse.json({ success: false, error: 'Government-issued ID is required for Nigerian merchant verification' }, { status: 400 })
     }
 
-    if (normalizedRole === 'merchant' && normalizedCountry === 'NG' && !bankVerificationRef) {
+    if (!pilot && normalizedRole === 'merchant' && normalizedCountry === 'NG' && !bankVerificationRef) {
       return NextResponse.json({ success: false, error: 'Bank verification reference is required for Nigerian merchant verification' }, { status: 400 })
     }
 
-    if (normalizedRole === 'merchant' && normalizedCountry === 'CN' && verificationModule !== 'Chinese Business Verification') {
+    if (!pilot && normalizedRole === 'merchant' && normalizedCountry === 'CN' && verificationModule !== 'Chinese Business Verification') {
       return NextResponse.json({ success: false, error: 'Chinese merchants must use the Chinese Business Verification module placeholder' }, { status: 400 })
     }
 
@@ -69,6 +75,7 @@ export async function POST(request: NextRequest) {
       cacId,
       merchantType,
       country: normalizedCountry,
+      language: language === 'zh' ? 'zh' : normalizedCountry === 'CN' ? 'zh' : 'en',
       governmentIdNumber,
       bankVerificationRef,
       verificationModule: normalizedRole === 'merchant' && normalizedCountry === 'CN' ? 'Chinese Business Verification' : 'Nigerian Merchant Verification',

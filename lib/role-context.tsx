@@ -152,7 +152,9 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
 
       // If session exists but no role in localStorage, fetch profile from DB
       const storedRole = localStorage.getItem('userRole')
-      if (session && !storedRole) {
+      let storedUserId = ''
+      try { storedUserId = JSON.parse(localStorage.getItem('userData') || '{}')?.userId || '' } catch {}
+      if (session && (!storedRole || storedUserId !== session.user.id)) {
         try {
           const response = await fetch(`/api/user/profile?userId=${session.user.id}`, {
             headers: { Authorization: `Bearer ${session.access_token}` },
@@ -161,10 +163,15 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
           const result = await response.json()
           if (result.success && result.data && isActive) {
             const profile = result.data
+            if (!localStorage.getItem('globalPreferences') && ['NG','CN'].includes(profile.country)) {
+              const restored = {...buildDefaultPreferences(profile.country), language: profile.language === 'zh' ? 'zh' as const : 'en' as const}
+              setPreferencesState(restored)
+              localStorage.setItem('globalPreferences',JSON.stringify(restored))
+            }
             setRoleState(profile.role)
             setUserState({
               userId: profile.id,
-              email: profile.email,
+              email: profile.email || session.user.email || '',
               phone: profile.phone || '',
               name: profile.name || profile.full_name || profile.business_name,
               city: profile.city || '',
@@ -182,27 +189,34 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
             }))
           } else {
             // Profile not in auth_users yet — fall back to user_metadata
-            const metaRole = session.user.user_metadata?.role as string | undefined
-            if (metaRole && isActive) {
+            if (isActive) {
               const fallbackUser = {
-                userId: session.user.id,
-                email: session.user.email || '',
-                phone: '',
-                name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || '',
-                role: metaRole as 'buyer' | 'merchant',
-              }
-              setRoleState(metaRole)
-              setUserState(fallbackUser)
-              localStorage.setItem('userRole', metaRole)
-              localStorage.setItem('userData', JSON.stringify(fallbackUser))
+              userId: session.user.id,
+              email: session.user.email || '',
+              phone: '',
+              name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split('@')[0] || '',
+              role: 'buyer' as const,
+            }
+            setRoleState('buyer')
+            setUserState(fallbackUser)
+            localStorage.setItem('userRole', 'buyer')
+            localStorage.setItem('userData', JSON.stringify(fallbackUser))
             }
           }
         } catch {
           // Fall back to user_metadata
-          const metaRole = session.user.user_metadata?.role as string | undefined
-          if (metaRole && isActive) {
-            setRoleState(metaRole)
-            localStorage.setItem('userRole', metaRole)
+          if (isActive) {
+            const fallbackUser = {
+              userId: session.user.id,
+              email: session.user.email || '',
+              phone: '',
+              name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split('@')[0] || '',
+              role: 'buyer' as const,
+            }
+            setRoleState('buyer')
+            setUserState(fallbackUser)
+            localStorage.setItem('userRole', 'buyer')
+            localStorage.setItem('userData', JSON.stringify(fallbackUser))
           }
         }
       }
@@ -227,7 +241,12 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
           const result = await response.json()
           if (result.success && result.data && isActive) {
             const profile = result.data
-            const role = (pendingRole || profile.role || 'buyer') as string
+            if (!localStorage.getItem('globalPreferences') && ['NG','CN'].includes(profile.country)) {
+              const restored = {...buildDefaultPreferences(profile.country), language: profile.language === 'zh' ? 'zh' as const : 'en' as const}
+              setPreferencesState(restored)
+              localStorage.setItem('globalPreferences',JSON.stringify(restored))
+            }
+            const role = (profile.role || 'buyer') as string
             setRoleState(role)
             setUserState({
               userId: profile.id,
@@ -243,13 +262,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem('userData', JSON.stringify({ userId: profile.id, email: profile.email, name: profile.name || profile.full_name, role }))
             if (pendingRole) {
               localStorage.removeItem('pendingOAuthRole')
-              if (profile.role !== pendingRole) {
-                fetch('/api/user/profile', {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-                  body: JSON.stringify({ userId: session.user.id, updates: { role: pendingRole } }),
-                }).catch(() => {})
-              }
+
             }
           } else {
             const role = pendingRole || 'buyer'
@@ -265,8 +278,20 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         } catch {
           const role = pendingRole || 'buyer'
           if (isActive) {
+            const fallback = {
+              userId: session.user.id,
+              email: session.user.email || '',
+              phone: '',
+              name: session.user.user_metadata?.full_name
+                || session.user.user_metadata?.name
+                || session.user.email?.split('@')[0]
+                || '',
+              role: role as any,
+            }
             setRoleState(role)
+            setUserState(fallback)
             localStorage.setItem('userRole', role)
+            localStorage.setItem('userData', JSON.stringify(fallback))
             if (pendingRole) localStorage.removeItem('pendingOAuthRole')
           }
         }
@@ -274,9 +299,8 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      // INITIAL_SESSION can fire before initializeSession has finished loading
-      // the profile. Keep the loading gate owned by initializeSession so the
-      // marketplace never flashes onboarding for an already authenticated user.
+      // INITIAL_SESSION may fire before initializeSession has loaded the profile.
+      // Keep loading owned by initializeSession to avoid flashing onboarding.
       if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
         return
       }
@@ -318,7 +342,10 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   const setPreferences = (nextPreferences: GlobalPreferences) => {
     setPreferencesState(nextPreferences)
     localStorage.setItem('globalPreferences', JSON.stringify(nextPreferences))
+    if(user?.userId) void fetch('/api/user/profile',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:user.userId,updates:{country:nextPreferences.country,language:nextPreferences.language}})}).catch(()=>{})
   }
+
+  useEffect(() => { document.documentElement.lang = preferences.language === 'zh' ? 'zh-CN' : 'en' }, [preferences.language])
 
   const setCountry = (country: SupportedCountry) => {
     setPreferences(applyCountryPreset(preferences, country))

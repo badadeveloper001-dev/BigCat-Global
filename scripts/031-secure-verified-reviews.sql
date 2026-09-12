@@ -3,7 +3,7 @@
 -- duplicate buyer/product reviews already exist so they can be reviewed rather
 -- than silently deleting customer content.
 
-DO $
+DO $$
 DECLARE
   invalid_rows integer;
   duplicate_groups integer;
@@ -31,7 +31,7 @@ BEGIN
       duplicate_groups;
   END IF;
 END;
-$;
+$$;
 
 ALTER TABLE reviews
   ALTER COLUMN comment SET NOT NULL,

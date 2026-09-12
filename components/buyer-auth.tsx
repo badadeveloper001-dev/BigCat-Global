@@ -76,6 +76,7 @@ export function BuyerAuth({
 
   const [verifiedBuyer, setVerifiedBuyer] = useState<any>(null)
   const [formData, setFormData] = useState({
+    country: "NG",
     email: "",
     phone: "",
     city: "",
@@ -122,6 +123,7 @@ export function BuyerAuth({
         phone: formData.phone,
         city: formData.city,
         state: formData.state,
+          country: formData.country,
         role: 'buyer',
       }),
     })
@@ -188,40 +190,9 @@ export function BuyerAuth({
       }
 
       if (isSignUp) {
-        const result = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-            name: formData.name,
-            phone: formData.phone,
-            city: formData.city,
-            state: formData.state,
-            role: 'buyer',
-          }),
-        }).then(r => r.json())
-
-        if (!result.success) {
-          setError(result.error || 'Failed to create account')
-          return
-        }
-
-        const supabase = createClient()
-        const { error: sessionError } = await supabase.auth.signInWithPassword({
-          email: formData.email,
-          password: formData.password,
-        })
-
-        if (sessionError) {
-          setError(sessionError.message || 'Account created but failed to sign in. Please try logging in.')
-          return
-        }
-
-        setUser(normalizeBuyerUser(result.data))
-        setRole('buyer')
-        setSuccessMessage('Account created successfully!')
-        onSuccess?.()
+        const result = await requestBuyerOtp()
+        if (!result.success) {setError(result.error || 'Unable to send verification code');return}
+        setShowOtpVerification(true)
         return
       }
 
@@ -310,16 +281,27 @@ export function BuyerAuth({
       // Store role before redirect so RoleContext can read it back after OAuth
       localStorage.setItem('pendingOAuthRole', 'buyer')
       const supabase = createClient()
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?next=%2Fmarketplace`,
         },
       })
       if (error) {
         localStorage.removeItem('pendingOAuthRole')
         setError(error.message || 'Google sign-in failed')
+        return
       }
+
+      if (!data?.url) {
+        localStorage.removeItem('pendingOAuthRole')
+        setError('Google sign-in is not available in this deployment. Please check the Supabase Google provider and redirect URL configuration.')
+        return
+      }
+
+      // Navigate explicitly so embedded browsers and strict navigation policies
+      // do not swallow the OAuth redirect returned by Supabase.
+      window.location.assign(data.url)
     } catch (err: any) {
       localStorage.removeItem('pendingOAuthRole')
       setError(err?.message || 'Google sign-in failed')
@@ -329,6 +311,8 @@ export function BuyerAuth({
   }
 
   const isModal = mode === "modal"
+
+  if (showOtpVerification) return <OTPVerification email={formData.email} deliveryMethod={otpDeliveryMethod} onBack={()=>setShowOtpVerification(false)} onResend={requestBuyerOtp} onVerify={verifyBuyerOtp} onVerifySuccess={()=>{if(verifiedBuyer){setUser(normalizeBuyerUser(verifiedBuyer));setRole('buyer');onSuccess?.()}}} />
 
   return (
     <div className={isModal ? "w-full max-w-sm max-h-[calc(100vh-3rem)] overflow-y-auto" : "min-h-screen bg-gradient-to-br from-background via-background to-secondary/30 flex flex-col font-sans"}>
@@ -397,7 +381,7 @@ export function BuyerAuth({
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Email Address</label>
+                <label className="text-sm font-medium text-foreground">Email Address / 邮箱</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
@@ -415,7 +399,7 @@ export function BuyerAuth({
               {isSignUp && (
                 <>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Full Name</label>
+                    <label className="text-sm font-medium text-foreground">Full Name / 姓名</label>
                     <div className="relative">
                       <input
                         type="text"
@@ -430,13 +414,15 @@ export function BuyerAuth({
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Phone Number</label>
+                    <label className="text-sm font-medium text-foreground">Country / 国家</label>
+<select aria-label="Country / 国家" value={formData.country} onChange={e => setFormData(p => ({...p, country: e.target.value, state: ''}))} className="w-full p-3 bg-secondary rounded-xl"><option value="NG">Nigeria / 尼日利亚</option><option value="CN">China / 中国</option></select>
+<label className="text-sm font-medium text-foreground">Phone Number / 电话号码</label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                       <input
                         type="tel"
                         name="phone"
-                        placeholder="Enter your phone number"
+                        placeholder={formData.country === 'CN' ? '+86' : '+234'}
                         value={formData.phone}
                         onChange={handleChange}
                         className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
@@ -455,7 +441,7 @@ export function BuyerAuth({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">State</label>
+                        <label className="text-sm font-medium text-foreground">State / 省／州</label>
                         <div className="relative">
                           <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
                           <select
@@ -466,7 +452,7 @@ export function BuyerAuth({
                             required
                           >
                             <option value="">Select your state</option>
-                            {NIGERIAN_STATES.map((stateName) => (
+                            {(formData.country === 'CN' ? ['Beijing','Shanghai','Tianjin','Chongqing','Hebei','Shanxi','Liaoning','Jilin','Heilongjiang','Jiangsu','Zhejiang','Anhui','Fujian','Jiangxi','Shandong','Henan','Hubei','Hunan','Guangdong','Hainan','Sichuan','Guizhou','Yunnan','Shaanxi','Gansu','Qinghai','Inner Mongolia','Guangxi','Tibet','Ningxia','Xinjiang'] : NIGERIAN_STATES).map((stateName) => (
                               <option key={stateName} value={stateName}>
                                 {stateName}
                               </option>
@@ -476,7 +462,7 @@ export function BuyerAuth({
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">City</label>
+                        <label className="text-sm font-medium text-foreground">City / 城市</label>
                         <div className="relative">
                           <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                           <input
@@ -496,7 +482,7 @@ export function BuyerAuth({
               )}
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Password</label>
+                <label className="text-sm font-medium text-foreground">Password / 密码</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
@@ -555,7 +541,7 @@ export function BuyerAuth({
                   setError("")
                   setWarningMessage("")
                   setSuccessMessage("")
-                  setFormData({ email: "", phone: "", city: "", state: "", password: "", name: "" })
+                  setFormData({ country: "NG", email: "", phone: "", city: "", state: "", password: "", name: "" })
                 }}
                 className="text-primary hover:text-primary/80 font-medium transition-colors"
               >

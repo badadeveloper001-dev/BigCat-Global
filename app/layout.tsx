@@ -1,11 +1,8 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
 import { Providers } from '@/components/providers'
 import { PoweredByMarquee } from '@/components/brand-wordmark'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -50,6 +47,7 @@ export default function RootLayout({
           <div className="border-b border-border bg-card px-4 py-2">
             <PoweredByMarquee />
           </div>
+          {process.env.PAYMENT_MODE === 'test' && <div role="status" className="bg-amber-100 text-amber-950 text-center px-4 py-2 text-sm">Test pilot: no real money or shipments. / 测试试点：不涉及真实资金或发货。</div>}
           <Providers>
             {children}
           </Providers>

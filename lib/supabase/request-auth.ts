@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
@@ -11,7 +11,7 @@ export async function getRequestAuthUser(request?: Request) {
   }
 
   // Path 1: bearer token in Authorization header (sent by browser fetch calls)
-  const authHeader = request?.headers.get('authorization') || ''
+  const authHeader = (request?.headers || await headers()).get('authorization') || ''
   const tokenMatch = authHeader.match(/^Bearer\s+(.+)$/i)
   const accessToken = tokenMatch?.[1]
 

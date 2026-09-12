@@ -108,6 +108,7 @@ function getAnonClient() {
 
 export async function signup(email: string, password: string, name: string, phone: string, role: 'buyer' | 'merchant') {
   try {
+    if (!['buyer', 'merchant'].includes(role)) throw new Error('Invalid account role')
     const admin = createClient()
 
     // Create user in Supabase Auth (handles hashing, no bcrypt needed)
@@ -155,6 +156,7 @@ export async function signupEnhanced(params: {
   cacId?: string
   merchantType?: 'products' | 'services'
   country?: 'NG' | 'CN'
+  language?: 'en' | 'zh'
   governmentIdNumber?: string
   bankVerificationRef?: string
   verificationModule?: string
@@ -179,6 +181,7 @@ export async function signupEnhanced(params: {
       verificationModule,
       verificationStatus,
     } = params
+    if (!['buyer', 'merchant'].includes(role)) throw new Error('Invalid account role')
     const normalizedCity = city?.trim() || null
     const normalizedState = state?.trim() || null
 
@@ -210,11 +213,12 @@ export async function signupEnhanced(params: {
           location: buildMerchantLocation(normalizedCity, normalizedState),
           smedan_id: smedanId || null,
           cac_id: cacId || null,
-          country: country || 'NG',
-          government_id_number: governmentIdNumber || null,
-          bank_verification_ref: bankVerificationRef || null,
+          country: country === 'CN' ? 'CN' : 'NG',
+          language: params.language === 'zh' ? 'zh' : 'en',
+          government_id_number: process.env.PAYMENT_MODE === 'test' ? null : governmentIdNumber || null,
+          bank_verification_ref: process.env.PAYMENT_MODE === 'test' ? null : bankVerificationRef || null,
           verification_module: verificationModule || null,
-          verification_status: verificationStatus || null,
+          verification_status: process.env.PAYMENT_MODE === 'test' ? 'test_only' : 'pending_review',
           merchant_type: merchantType || 'products',
           token_balance: INITIAL_MERCHANT_TOKENS,
         }
@@ -228,6 +232,8 @@ export async function signupEnhanced(params: {
           city: normalizedCity,
           state: normalizedState,
           location: buildMerchantLocation(normalizedCity, normalizedState),
+          country: country === 'CN' ? 'CN' : 'NG',
+          language: params.language === 'zh' ? 'zh' : 'en',
           token_balance: 0,
         }
 

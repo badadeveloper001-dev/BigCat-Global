@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRole } from "@/lib/role-context"
 import { createClient } from "@/lib/supabase/client"
 import { BrandWordmark } from "./brand-wordmark"
@@ -122,6 +122,8 @@ export function MerchantAuth({
   const [successMessage, setSuccessMessage] = useState<string>("")
 
   const [verifiedMerchantProfile, setVerifiedMerchantProfile] = useState<any>(null)
+  const [pilot,setPilot]=useState(false)
+  useEffect(()=>{fetch('/api/pilot').then(r=>r.json()).then(d=>setPilot(d.isTest===true)).catch(()=>{})},[])
   const [formData, setFormData] = useState({
     businessName: "",
     email: "",
@@ -260,46 +262,9 @@ export function MerchantAuth({
       const supabase = createClient()
 
       if (isSignUp) {
-        const result = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-            name: formData.businessName,
-            phone: formData.phone,
-            city: formData.city,
-            state: formData.state,
-            role: 'merchant',
-            smedanId: formData.smedanId,
-            cacId: formData.cacId,
-            merchantType,
-            country: formData.country,
-            governmentIdNumber: formData.governmentIdNumber,
-            bankVerificationRef: formData.bankVerificationRef,
-            verificationModule: formData.country === 'CN' ? 'Chinese Business Verification' : 'Nigerian Merchant Verification',
-          }),
-        }).then(r => r.json())
-
-        if (!result.success) {
-          setError(result.error || 'Failed to create account')
-          return
-        }
-
-        const { data: sessionData, error: sessionError } = await supabase.auth.signInWithPassword({
-          email: formData.email,
-          password: formData.password,
-        })
-
-        if (sessionError || !sessionData.session || !sessionData.user) {
-          setError(sessionError?.message || 'Account created but failed to sign in. Please try logging in.')
-          return
-        }
-
-        const profile = await loadMerchantProfile(sessionData.user.id, sessionData.session.access_token)
-        setUser(normalizeMerchantUser(profile))
-        setRole('merchant')
-        setSuccessMessage('Account created successfully!')
+        const result = await requestMerchantOtp()
+        if (!result.success) {setError(result.error || 'Unable to send verification code');return}
+        setShowOtpVerification(true)
         return
       }
 
@@ -386,6 +351,8 @@ export function MerchantAuth({
     }
   }
 
+  if (showOtpVerification) return <OTPVerification email={formData.email} deliveryMethod={otpDeliveryMethod} onBack={()=>setShowOtpVerification(false)} onResend={requestMerchantOtp} onVerify={verifyMerchantOtp} onVerifySuccess={()=>{if(verifiedMerchantProfile){setUser(normalizeMerchantUser(verifiedMerchantProfile));setRole('merchant');}}} />
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/30 flex flex-col font-sans">
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border px-4 py-3">
@@ -438,7 +405,7 @@ export function MerchantAuth({
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Email Address</label>
+                <label className="text-sm font-medium text-foreground">Email Address / 邮箱</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
@@ -456,7 +423,7 @@ export function MerchantAuth({
               {isSignUp && (
                 <>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Business Name</label>
+                    <label className="text-sm font-medium text-foreground">Business Name / 商家名称</label>
                     <div className="relative">
                       <Store className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                       <input
@@ -472,7 +439,7 @@ export function MerchantAuth({
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Phone Number</label>
+                    <label className="text-sm font-medium text-foreground">Phone Number / 电话号码</label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                       <input
@@ -534,7 +501,7 @@ export function MerchantAuth({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">State</label>
+                        <label className="text-sm font-medium text-foreground">State / 省／州</label>
                         <div className="relative">
                           <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
                           <select
@@ -555,7 +522,7 @@ export function MerchantAuth({
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">City</label>
+                        <label className="text-sm font-medium text-foreground">City / 城市</label>
                         <div className="relative">
                           <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                           <input
@@ -622,7 +589,7 @@ export function MerchantAuth({
                     </div>
                   </div>
 
-                  {formData.country === 'NG' ? (
+                  {pilot ? <p className="rounded border p-3 text-sm">Test account: do not submit government or bank IDs. / 测试账号：请勿提交身份证或银行资料。</p> : formData.country === 'NG' ? (
                     <>
                       <div className="space-y-2">
                         <div className="relative">
@@ -701,7 +668,7 @@ export function MerchantAuth({
               )}
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Password</label>
+                <label className="text-sm font-medium text-foreground">Password / 密码</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input

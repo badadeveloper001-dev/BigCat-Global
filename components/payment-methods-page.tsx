@@ -135,14 +135,14 @@ function BuyerWalletSection({ userId }: { userId: string }) {
       const res = await fetch('/api/buyer/wallet/fund', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ buyerId: userId, amount, reason: `Wallet top-up – ${formatNaira(amount)}` }),
+        body: JSON.stringify({ idempotencyKey: crypto.randomUUID(), buyerId: userId, amount, reason: `Wallet top-up – ${formatNaira(amount)}` }),
       })
       const result = await res.json()
       if (!result?.success) {
         setFundError(result?.error || 'Failed to fund wallet')
         return
       }
-      setFundSuccess(`₦${amount.toLocaleString('en-NG')} added to your wallet!`)
+      setFundSuccess(`₦${amount.toLocaleString('en-NG')} test funds added. No money moved.`)
       setFundAmount("5000")
       setShowFundWallet(false)
       await loadData()
@@ -811,6 +811,7 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          idempotencyKey: crypto.randomUUID(),
           authUserId,
           merchantId,
           amount,

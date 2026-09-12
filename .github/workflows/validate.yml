@@ -17,10 +17,11 @@ concurrency:
 
 jobs:
   web:
-    name: Lint and build
+    name: Typecheck, database tests and build
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
+      PAYMENT_MODE: "test"
       NEXT_TELEMETRY_DISABLED: "1"
       NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co"
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "ci-placeholder"
@@ -29,17 +30,24 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.19.0
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 22
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: npm run lint
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Database lifecycle tests
+        run: pnpm test
 
       - name: Build
-        run: npm run build
+        run: pnpm build

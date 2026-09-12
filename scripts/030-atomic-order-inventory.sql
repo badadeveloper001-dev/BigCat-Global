@@ -57,9 +57,9 @@ BEGIN
     RAISE EXCEPTION 'A valid idempotency key is required';
   END IF;
 
-  SELECT id, grand_total, product_total
+  SELECT o.id, o.grand_total, o.product_total
     INTO existing_order
-    FROM public.orders
+    FROM public.orders o
    WHERE idempotency_key = p_idempotency_key
    LIMIT 1;
 
@@ -76,6 +76,8 @@ BEGIN
     RAISE EXCEPTION 'At least one order item is required';
   END IF;
 
+  IF (SELECT count(DISTINCT value->>'productId') FROM jsonb_array_elements(p_items)) <> jsonb_array_length(p_items) THEN RAISE EXCEPTION 'Duplicate product lines must be combined'; END IF;
+  IF NOT EXISTS(SELECT 1 FROM auth_users WHERE id=p_merchant_id AND role='merchant' AND NOT is_suspended) THEN RAISE EXCEPTION 'Merchant unavailable'; END IF;
   -- Lock every product before validating or calculating totals.
   PERFORM id
     FROM public.products
