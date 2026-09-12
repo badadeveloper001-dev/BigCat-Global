@@ -17,7 +17,7 @@ Vercel Blob stores uploaded product images under the uploader's ID. Email and op
 5. Create buyer and merchant accounts through signup. Provision the pilot operator's admin role directly in the isolated database after verifying that account. Never expose an admin code or role selector in signup.
 6. Require a successful deployment and hosted smoke test before inviting testers. No live database or hosting credentials were used during local implementation.
 
-Use BIGCAT_BUILD_WORKER_THREADS=1 when building in an environment that supports Node worker threads but cannot spawn subprocesses. This does not skip type checking.
+Build validation must run in an environment that permits Next.js subprocess workers. The restricted Windows workspace passed compilation and TypeScript, but could not complete static generation; its worker-thread fallback also failed. A successful production build remains a release requirement.
 
 ## Tester scenarios / 测试场景
 
