@@ -239,20 +239,20 @@ ADMIN: → Admin login → Admin Dashboard
 
 **Three Admin Levels**:
 
-1. **SMEDAN Admin** (Code: SMEDAN_123)
+1. **SMEDAN Admin** (Code: [removed — sign in with an authorized admin account])
    - Dashboard: `smedan-admin-dashboard.tsx`
    - Merchant verification and approval
    - SMEDAN ID validation
    - Merchant statistics
 
-2. **PalmPay Admin** (Code: PALMPAY_012)
+2. **PalmPay Admin** (Code: [removed — sign in with an authorized admin account])
    - Dashboard: `palmpay-admin-dashboard.tsx`
    - Payment processing oversight
    - Transaction verification
    - Escrow management
    - Revenue tracking
 
-3. **BigCat Super Admin** (Code: BIGCAT_00)
+3. **BigCat Super Admin** (Code: [removed — sign in with an authorized admin account])
    - Dashboard: `bigcat-admin-dashboard.tsx`
    - Full platform overview
    - User analytics

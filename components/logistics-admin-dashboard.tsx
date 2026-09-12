@@ -41,11 +41,6 @@ export function LogisticsAdminDashboard({ bypassAccessCheck = false, embedded = 
       setAuthorized(true)
       return
     }
-    const access = typeof window !== "undefined" ? sessionStorage.getItem("adminAccess") : null
-    if (access === "TRADELOG_001") {
-      setAuthorized(true)
-      return
-    }
     router.replace("/admin-portal")
   }, [bypassAccessCheck, router])
 
@@ -56,7 +51,6 @@ export function LogisticsAdminDashboard({ bypassAccessCheck = false, embedded = 
       try {
         const response = await fetch("/api/logistics/orders", {
           cache: "no-store",
-          headers: { "x-logistics-access-code": "LOGISTICS_001" },
         })
         const result = await response.json()
         const nextOrders = Array.isArray(result?.data?.orders) ? result.data.orders : []

@@ -41,9 +41,9 @@
 
 ### ✅ 7. Admin Multi-Level Access
 - **3 Admin Levels**:
-  - SMEDAN_123 - Merchant verification
-  - PALMPAY_012 - Payment oversight
-  - BIGCAT_00 - Super admin
+  - [removed — sign in with an authorized admin account] - Merchant verification
+  - [removed — sign in with an authorized admin account] - Payment oversight
+  - [removed — sign in with an authorized admin account] - Super admin
 
 ---
 
@@ -206,9 +206,9 @@ Confirmation with Payment Details
 
 | Code | Level | Access |
 |------|-------|--------|
-| SMEDAN_123 | SMEDAN Admin | Merchant verification, SMEDAN IDs |
-| PALMPAY_012 | PalmPay Admin | Payment processing, transactions |
-| BIGCAT_00 | Super Admin | All platform data and settings |
+| [removed — sign in with an authorized admin account] | SMEDAN Admin | Merchant verification, SMEDAN IDs |
+| [removed — sign in with an authorized admin account] | PalmPay Admin | Payment processing, transactions |
+| [removed — sign in with an authorized admin account] | Super Admin | All platform data and settings |
 
 ---
 

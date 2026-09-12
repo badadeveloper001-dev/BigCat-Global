@@ -1,4 +1,4 @@
-"use server"
+import 'server-only'
 
 import { sendEmail } from "@/lib/mailer"
 import { createClient } from "@/lib/supabase/server"

@@ -1,5 +1,7 @@
 'use server'
 
+import { requireActor, requireOrderActor } from '@/lib/supabase/authorize'
+
 import { createClient } from '@/lib/supabase/server'
 import { updateOrderStatus } from '@/lib/order-actions'
 import { dispatchNotification } from '@/lib/notifications'
@@ -241,6 +243,7 @@ async function ensureRiderTableExists(supabase: any) {
 
 export async function registerOrderForLogistics(payload: LogisticsOrderPayload) {
   try {
+    await requireOrderActor(payload.order_id)
     const supabase = await createClient()
 
     const orderId = String(payload?.order_id || '').trim()
@@ -271,6 +274,7 @@ export async function registerOrderForLogistics(payload: LogisticsOrderPayload) 
 
 export async function getLogisticsOrders() {
   try {
+    await requireActor(undefined, ['admin'])
     const supabase = await createClient()
 
     const ordersResult = await selectOrdersWithCompatibility(supabase, 'list')
@@ -374,6 +378,7 @@ export async function getLogisticsOrders() {
 
 export async function createLogisticsRider(payload: { name: string; email?: string; phone?: string; region?: string }) {
   try {
+    await requireActor(undefined, ['admin'])
     const supabase = await createClient()
     const tableExists = await ensureRiderTableExists(supabase)
 
@@ -406,6 +411,7 @@ export async function createLogisticsRider(payload: { name: string; email?: stri
 
 export async function deactivateLogisticsRider(riderId: string) {
   try {
+    await requireActor(undefined, ['admin'])
     const supabase = await createClient()
     const result = await (supabase.from('logistics_riders') as any)
       .update({ is_active: false, updated_at: new Date().toISOString() })
@@ -432,6 +438,7 @@ export async function deactivateLogisticsRider(riderId: string) {
 
 export async function assignRiderToOrder(orderId: string, riderId: string, notes?: string) {
   try {
+    await requireActor(undefined, ['admin'])
     const supabase = await createClient()
 
     const order = await readOrderForDeliveryContext(supabase, orderId)
@@ -522,6 +529,7 @@ export async function assignRiderToOrder(orderId: string, riderId: string, notes
 
 export async function markLogisticsOrderInTransit(orderId: string) {
   try {
+    await requireActor(undefined, ['admin'])
     const supabase = await createClient()
 
     const order = await readOrderForDeliveryContext(supabase, orderId)
@@ -551,6 +559,7 @@ export async function markLogisticsOrderInTransit(orderId: string) {
 
 export async function completeLogisticsOrder(orderId: string, proofOfDeliveryUrl?: string | null) {
   try {
+    await requireActor(undefined, ['admin'])
     const supabase = await createClient()
 
     const order = await readOrderForDeliveryContext(supabase, orderId)
@@ -587,6 +596,7 @@ export async function completeLogisticsOrder(orderId: string, proofOfDeliveryUrl
 
 export async function autoAssignRiderToOrder(orderId: string) {
   try {
+    await requireActor(undefined, ['admin'])
     const supabase = await createClient()
     const order = await readOrderForDeliveryContext(supabase, orderId)
     if (!order) return { success: false, error: 'Order not found.' }
@@ -634,6 +644,7 @@ export async function autoAssignRiderToOrder(orderId: string) {
 
 export async function requestOrderReturn(orderId: string, reason: string, requestedBy: 'admin' | 'buyer' = 'admin') {
   try {
+    await requireActor(undefined, ['admin'])
     const supabase = await createClient()
     const order = await readOrderForDeliveryContext(supabase, orderId)
     if (!order) return { success: false, error: 'Order not found.' }
@@ -673,6 +684,7 @@ export async function requestOrderReturn(orderId: string, reason: string, reques
 
 export async function reportRiderIncident(orderId: string, riderId: string, incidentType: string, note?: string) {
   try {
+    await requireActor(undefined, ['admin'])
     const supabase = await createClient()
 
     const assignmentResult = await (supabase.from('logistics_order_assignments') as any)
@@ -722,6 +734,7 @@ export async function reportRiderIncident(orderId: string, riderId: string, inci
 
 export async function getRiderEarnings(riderId: string) {
   try {
+    await requireActor(undefined, ['admin'])
     const supabase = await createClient()
 
     const completedAssignmentsResult = await (supabase.from('logistics_order_assignments') as any)
@@ -782,6 +795,7 @@ export async function getRiderEarnings(riderId: string) {
 
 export async function requestRiderPayout(riderId: string, amount: number) {
   try {
+    await requireActor(undefined, ['admin'])
     const supabase = await createClient()
     const earnings = await getRiderEarnings(riderId)
     if (!earnings.success) return earnings

@@ -1,4 +1,4 @@
-import { createHash, randomInt } from 'crypto'
+import { createHash, createHmac, timingSafeEqual, randomInt } from 'crypto'
 import { sendEmail } from '@/lib/mailer'
 import { sendWhatsAppOtp } from '@/lib/whatsapp'
 
@@ -15,7 +15,9 @@ export type PendingSignupOtp = {
 export type OtpDeliveryMethod = 'email' | 'whatsapp'
 
 function getOtpSecret() {
-  return process.env.AUTH_OTP_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || 'bigcat-dev-otp-secret'
+  const secret = process.env.AUTH_OTP_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!secret) throw new Error('OTP signing secret is not configured')
+  return secret
 }
 
 export function generateOtp() {
@@ -29,14 +31,20 @@ export function hashOtp(email: string, role: 'buyer' | 'merchant', otp: string) 
 }
 
 export function encodePendingSignupOtp(payload: PendingSignupOtp) {
-  return Buffer.from(JSON.stringify(payload), 'utf8').toString('base64url')
+  const encoded = Buffer.from(JSON.stringify(payload), 'utf8').toString('base64url')
+  return encoded + '.' + createHmac('sha256',getOtpSecret()).update(encoded).digest('base64url')
 }
 
 export function decodePendingSignupOtp(value?: string | null): PendingSignupOtp | null {
   if (!value) return null
 
   try {
-    const parsed = JSON.parse(Buffer.from(value, 'base64url').toString('utf8'))
+    const [encoded,signature] = value.split('.')
+    if (!encoded || !signature) return null
+    const expected = createHmac('sha256',getOtpSecret()).update(encoded).digest()
+    const actual = Buffer.from(signature,'base64url')
+    if (actual.length !== expected.length || !timingSafeEqual(actual,expected)) return null
+    const parsed = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8'))
     if (!parsed?.email || !parsed?.role || !parsed?.otpHash || !parsed?.expiresAt) return null
     return parsed as PendingSignupOtp
   } catch {

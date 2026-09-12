@@ -1,48 +1,50 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminUser } from '@/lib/supabase/admin-auth'
 import { getTransactions, getTransactionStats } from '@/lib/admin-actions'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const adminAuth = await requireAdminUser(request)
+  if (adminAuth.response) return adminAuth.response
+
   try {
     const [txnResult, statsResult] = await Promise.all([
       getTransactions(),
       getTransactionStats(),
     ])
 
-    const transactions = txnResult.success ? txnResult.data.map((t: any) => ({
-      id: t.id,
-      orderId: t.order_id || t.id,
-      user: t.buyer_id || 'Unknown',
-      buyerId: t.buyer_id || 'Unknown',
-      amount: t.grand_total || t.total_amount || 0,
-      status:
-        String(t.status || '').toLowerCase() === 'delivered'
-          ? 'completed'
-          : String(t.payment_status || '').toLowerCase() === 'completed'
-            ? 'paid'
-            : t.status || t.payment_status || 'pending',
-      orderStatus: t.status || 'pending',
-      paymentStatus: t.payment_status || 'pending',
-      date: new Date(t.created_at).toLocaleDateString(),
-      createdAt: t.created_at,
-      type: 'payment',
+    const transactions = txnResult.success ? txnResult.data.map((transaction: any) => ({
+      id: transaction.id,
+      orderId: transaction.order_id || null,
+      user: transaction.buyer_id || 'Unknown',
+      buyerId: transaction.buyer_id || null,
+      amount: Number(transaction.amount || 0),
+      status: transaction.status || 'pending',
+      date: transaction.created_at ? new Date(transaction.created_at).toLocaleDateString() : '',
+      createdAt: transaction.created_at,
+      type: transaction.type || 'unknown',
+      reason: transaction.reason || null,
     })) : []
 
     const raw = statsResult.success ? statsResult.data : null
 
     const stats = {
-      totalTransactions: transactions.length,
-      totalRevenue: raw?.totalRevenue || 0,
-      productEscrow: raw?.productEscrow || 0,
-      deliveryEscrow: raw?.deliveryEscrow || 0,
-      totalEscrow: raw?.totalEscrow || 0,
-      completedPayments: raw?.successful || 0,
-      pendingPayments: raw?.pending || 0,
-      pendingOrders: raw?.pendingOrders || 0,
-      completedOrders: raw?.completedOrders || 0,
-      disbursedAmount: raw?.disbursedAmount || 0,
+      totalTransactions: raw?.totalTransactions ?? null,
+      totalRevenue: raw?.totalRevenue ?? null,
+      productEscrow: raw?.productEscrow ?? null,
+      deliveryEscrow: raw?.deliveryEscrow ?? null,
+      totalEscrow: raw?.totalEscrow ?? null,
+      completedPayments: raw?.successful ?? null,
+      pendingPayments: raw?.pending ?? null,
+      pendingOrders: raw?.pendingOrders ?? null,
+      completedOrders: raw?.completedOrders ?? null,
+      disbursedAmount: raw?.disbursedAmount ?? null,
+      transactionLedgerAvailable: raw?.transactionLedgerAvailable ?? false,
+      escrowAvailable: raw?.escrowAvailable ?? false,
+      revenueBasis: raw?.revenueBasis || null,
+      testingMode: true,
     }
 
-    return NextResponse.json({ success: true, transactions, stats })
+    return NextResponse.json({ success: true, transactions, stats, ledgerAvailable: txnResult.success, ledgerError: txnResult.success ? null : txnResult.error })
   } catch (error) {
     console.error('Admin transactions API error:', error)
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })

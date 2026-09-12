@@ -352,10 +352,10 @@ BigCat International is a comprehensive e-commerce platform built with Next.js, 
 ```
 1. Click "Admin Access" on onboarding
    ↓
-2. Enter admin code:
-   - SMEDAN_123 → SMEDAN admin dashboard
-   - PALMPAY_012 → PalmPay admin dashboard
-   - BIGCAT_00 → BigCat super admin dashboard
+2. Enter administrator credentials:
+   - [removed — sign in with an authorized admin account] → SMEDAN admin dashboard
+   - [removed — sign in with an authorized admin account] → PalmPay admin dashboard
+   - [removed — sign in with an authorized admin account] → BigCat super admin dashboard
    ↓
 3. View role-specific admin panel
    ↓
@@ -421,11 +421,11 @@ All prices use Naira. To change:
 2. Search-replace all ₦ symbols if needed
 3. Update delivery fee calculations in `lib/delivery-utils.ts`
 
-### Admin Codes
+### Administrator Access
 Located in `components/admin-access-modal.tsx`:
-- SMEDAN_123 → SMEDAN admin
-- PALMPAY_012 → PalmPay admin
-- BIGCAT_00 → Super admin
+- [removed — sign in with an authorized admin account] → SMEDAN admin
+- [removed — sign in with an authorized admin account] → PalmPay admin
+- [removed — sign in with an authorized admin account] → Super admin
 
 ---
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useRef, useState, useEffect, useCallback } from "react"
 import { Wallet, ArrowLeftRight, Plus, RefreshCw, TrendingUp, Clock, ChevronDown, X, Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
 
 type Currency = "NGN" | "USD" | "CNY"
@@ -33,7 +33,7 @@ const CURRENCY_META: Record<Currency, { symbol: string; name: string; flag: stri
   CNY: { symbol: "¥", name: "Chinese Yuan", flag: "🇨🇳", color: "#ef4444" },
 }
 
-const DEFAULT_RATES: ExchangeRates = { USD: 1, NGN: 1620, CNY: 7.26 }
+const DEFAULT_RATES: ExchangeRates = { USD: 1, NGN: 1600, CNY: 7.2 }
 
 function fmt(amount: number, currency: Currency): string {
   const meta = CURRENCY_META[currency]
@@ -59,6 +59,7 @@ export function MultiCurrencyWallet({
   orderAmountNGN,
   compact = false,
 }: MultiCurrencyWalletProps) {
+  const fundKey = useRef(''), convertKey = useRef('')
   const [wallets, setWallets] = useState<WalletBalance[]>([])
   const [transactions, setTransactions] = useState<WalletTx[]>([])
   const [rates, setRates] = useState<ExchangeRates>(DEFAULT_RATES)
@@ -168,6 +169,7 @@ export function MultiCurrencyWallet({
   }
 
   const handleFund = async () => {
+    if (fundLoading) return
     const amount = Number(fundAmount)
     if (!amount || amount <= 0) { setFundMsg("Enter a valid amount"); return }
     setFundLoading(true)
@@ -176,11 +178,12 @@ export function MultiCurrencyWallet({
       const res = await fetch("/api/wallet/fund", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, currency: fundCurrency, amount, description: "Manual top-up" }),
+        body: JSON.stringify({ idempotencyKey: (fundKey.current ||= crypto.randomUUID()), userId, currency: fundCurrency, amount, description: "Manual top-up" }),
       })
       const data = await res.json()
       if (data.success) {
-        setFundMsg("✅ Wallet funded successfully!")
+        fundKey.current = ''
+        setFundMsg('✅ Test funds added. No money moved. / 测试资金已添加。')
         setFundAmount("")
         await fetchWallet()
         setTimeout(() => { setShowFund(false); setFundMsg("") }, 1500)
@@ -195,6 +198,7 @@ export function MultiCurrencyWallet({
   }
 
   const handleConvert = async () => {
+    if (convertLoading) return
     const amount = Number(convertAmount)
     if (!amount || amount <= 0) { setConvertMsg("Enter a valid amount"); return }
     if (fromCurrency === toCurrency) { setConvertMsg("Choose different currencies"); return }
@@ -205,11 +209,12 @@ export function MultiCurrencyWallet({
       const res = await fetch("/api/wallet/convert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, fromCurrency, toCurrency, amount, rates: latestRates }),
+        body: JSON.stringify({ idempotencyKey: (convertKey.current ||= crypto.randomUUID()), userId, fromCurrency, toCurrency, amount, rates: latestRates }),
       })
       const data = await res.json()
       if (data.success) {
-        const received = data.toAmount.toFixed(2)
+        convertKey.current = ''
+        const received = Number(data.toAmount).toFixed(2)
         setConvertMsg(`✅ Converted! Received ${CURRENCY_META[toCurrency].symbol}${received} ${toCurrency}`)
         setConvertAmount("")
         await fetchWallet()
@@ -465,7 +470,7 @@ export function MultiCurrencyWallet({
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 px-4">
           <div className="bg-card border border-border rounded-2xl w-full max-w-sm p-6">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="font-bold text-foreground">Fund Wallet</h3>
+              <h3 className="font-bold text-foreground">Add test funds / 添加测试资金</h3>
               <button onClick={() => { setShowFund(false); setFundMsg("") }}>
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
@@ -477,7 +482,7 @@ export function MultiCurrencyWallet({
                 <div className="grid grid-cols-3 gap-2">
                   {(["NGN", "USD", "CNY"] as Currency[]).map((c) => (
                     <button key={c}
-                      onClick={() => setFundCurrency(c)}
+                      onClick={() => (setFundCurrency(c), fundKey.current = '')}
                       className={`py-2.5 rounded-xl text-sm font-semibold border transition-all ${
                         fundCurrency === c ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"
                       }`}
@@ -495,7 +500,7 @@ export function MultiCurrencyWallet({
                 <input
                   type="number"
                   value={fundAmount}
-                  onChange={(e) => setFundAmount(e.target.value)}
+                  onChange={(e) => (setFundAmount(e.target.value), fundKey.current = '')}
                   placeholder={`Enter ${CURRENCY_META[fundCurrency].symbol} amount`}
                   className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:border-primary"
                 />
@@ -535,7 +540,7 @@ export function MultiCurrencyWallet({
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">From</label>
                   <select
                     value={fromCurrency}
-                    onChange={(e) => setFromCurrency(e.target.value as Currency)}
+                    onChange={(e) => (setFromCurrency(e.target.value as Currency), convertKey.current = '')}
                     className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:border-primary"
                   >
                     {(["NGN", "USD", "CNY"] as Currency[]).map((c) => (
@@ -547,7 +552,7 @@ export function MultiCurrencyWallet({
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">To</label>
                   <select
                     value={toCurrency}
-                    onChange={(e) => setToCurrency(e.target.value as Currency)}
+                    onChange={(e) => (setToCurrency(e.target.value as Currency), convertKey.current = '')}
                     className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:border-primary"
                   >
                     {(["NGN", "USD", "CNY"] as Currency[]).map((c) => (
@@ -564,7 +569,7 @@ export function MultiCurrencyWallet({
                 <input
                   type="number"
                   value={convertAmount}
-                  onChange={(e) => setConvertAmount(e.target.value)}
+                  onChange={(e) => (setConvertAmount(e.target.value), convertKey.current = '')}
                   placeholder={`Enter ${CURRENCY_META[fromCurrency].symbol} amount`}
                   className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:border-primary"
                 />

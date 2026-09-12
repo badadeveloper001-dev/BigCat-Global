@@ -1,5 +1,7 @@
 'use server'
 
+import { requireActor, requireOrderActor } from '@/lib/supabase/authorize'
+
 import { createClient } from '@/lib/supabase/server'
 
 interface MerchantSetupData {
@@ -13,6 +15,7 @@ interface MerchantSetupData {
 
 export async function saveMerchantSetup(userId: string, setup: MerchantSetupData) {
   try {
+    await requireActor(userId, ['merchant'])
     const supabase = await createClient()
     const updateData = {
       business_name: setup.businessName,
@@ -46,6 +49,7 @@ export async function saveMerchantSetup(userId: string, setup: MerchantSetupData
 
 export async function getMerchantSetup(userId: string) {
   try {
+    await requireActor(userId)
     const supabase = await createClient()
     const { data, error } = await supabase.from('auth_users').select('*').eq('id', userId).single()
     if (error) throw error

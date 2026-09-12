@@ -16,7 +16,7 @@ const nextConfig = {
   },
 }
 
-export default withSentryConfig(nextConfig, {
+const sentryOptions = {
   // Suppresses the Sentry CLI update nag
   silent: true,
   // Only upload source maps when SENTRY_AUTH_TOKEN is set
@@ -29,4 +29,7 @@ export default withSentryConfig(nextConfig, {
   },
   // Disable telemetry (not needed)
   telemetry: false,
-})
+}
+
+// Keep unconfigured local builds free of Sentry webpack hooks.
+export default (process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_AUTH_TOKEN) ? withSentryConfig(nextConfig, sentryOptions) : nextConfig

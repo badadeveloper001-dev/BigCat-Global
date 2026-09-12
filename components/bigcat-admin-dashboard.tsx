@@ -4,33 +4,37 @@ import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Globe2, Landmark, Shield, Ship, Store, Users } from "lucide-react"
 import { formatCurrency } from "@/lib/currency-utils"
+import { createClient } from "@/lib/supabase/client"
 
 type PlatformStats = {
-  totalUsers: number
-  totalMerchants: number
-  totalOrders: number
-  totalRevenue: number
+  totalUsers: number | null
+  totalMerchants: number | null
+  totalOrders: number | null
+  totalRevenue: number | null
 }
 
-export function BigcatAdminDashboard() {
+interface BigcatAdminDashboardProps {
+  bypassAccessCheck?: boolean
+}
+
+export function BigcatAdminDashboard({ bypassAccessCheck = false }: BigcatAdminDashboardProps = {}) {
   const router = useRouter()
   const [authorized, setAuthorized] = useState(false)
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<PlatformStats>({
-    totalUsers: 0,
-    totalMerchants: 0,
-    totalOrders: 0,
-    totalRevenue: 0,
+    totalUsers: null,
+    totalMerchants: null,
+    totalOrders: null,
+    totalRevenue: null,
   })
 
   useEffect(() => {
-    const access = typeof window !== "undefined" ? sessionStorage.getItem("adminAccess") : null
-    if (access === "BIGCAT_00") {
+    if (bypassAccessCheck) {
       setAuthorized(true)
       return
     }
     router.replace("/admin-portal")
-  }, [router])
+  }, [bypassAccessCheck, router])
 
   useEffect(() => {
     if (!authorized) return
@@ -39,12 +43,12 @@ export function BigcatAdminDashboard() {
       try {
         const response = await fetch("/api/admin/stats", { cache: "no-store" })
         const result = await response.json()
-        if (result?.success) {
+        if (result?.success && result?.platform?.available) {
           setStats({
-            totalUsers: Number(result?.platform?.totalUsers || 0),
-            totalMerchants: Number(result?.platform?.totalMerchants || 0),
-            totalOrders: Number(result?.platform?.totalOrders || 0),
-            totalRevenue: Number(result?.platform?.totalRevenue || 0),
+            totalUsers: Number(result.platform.totalUsers ?? 0),
+            totalMerchants: Number(result.platform.totalMerchants ?? 0),
+            totalOrders: Number(result.platform.totalOrders ?? 0),
+            totalRevenue: result.platform.totalRevenue == null ? null : Number(result.platform.totalRevenue),
           })
         }
       } finally {
@@ -57,10 +61,10 @@ export function BigcatAdminDashboard() {
 
   const cards = useMemo(
     () => [
-      { label: "Users", value: String(stats.totalUsers), icon: Users },
-      { label: "Merchants", value: String(stats.totalMerchants), icon: Store },
-      { label: "Orders", value: String(stats.totalOrders), icon: Ship },
-      { label: "Revenue", value: formatCurrency(stats.totalRevenue, "USD"), icon: Landmark },
+      { label: "Users", value: stats.totalUsers == null ? "Unavailable" : String(stats.totalUsers), icon: Users },
+      { label: "Merchants", value: stats.totalMerchants == null ? "Unavailable" : String(stats.totalMerchants), icon: Store },
+      { label: "Orders", value: stats.totalOrders == null ? "Unavailable" : String(stats.totalOrders), icon: Ship },
+      { label: "Recognized Revenue", value: stats.totalRevenue == null ? "Unavailable" : formatCurrency(stats.totalRevenue, "USD"), icon: Landmark },
     ],
     [stats],
   )
@@ -124,11 +128,14 @@ export function BigcatAdminDashboard() {
             <p className="text-sm text-muted-foreground mt-1">Freight, customs status, milestones, and international shipment visibility.</p>
           </button>
           <button
-            onClick={() => router.push("/admin-portal")}
+            onClick={async () => {
+              await createClient().auth.signOut()
+              router.replace("/admin-portal")
+            }}
             className="rounded-xl border border-border bg-card p-4 text-left hover:border-primary/40 transition-colors"
           >
-            <h3 className="font-semibold">Security Access</h3>
-            <p className="text-sm text-muted-foreground mt-1">Manage privileged access for BigCat, Orchid, and Trade & Logistics admins.</p>
+            <h3 className="font-semibold">Sign out</h3>
+            <p className="text-sm text-muted-foreground mt-1">End this administrator session securely.</p>
           </button>
         </section>
 

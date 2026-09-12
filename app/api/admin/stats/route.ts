@@ -1,7 +1,11 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminUser } from '@/lib/supabase/admin-auth'
 import { getPlatformStats, getLogisticsStats, getMerchantStats, getTransactionStats } from '@/lib/admin-actions'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const adminAuth = await requireAdminUser(request)
+  if (adminAuth.response) return adminAuth.response
+
   try {
     const [platformResult, logisticsResult, merchantResult, transactionResult] = await Promise.all([
       getPlatformStats(),
@@ -12,10 +16,10 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      platform: platformResult.success ? platformResult.stats : { totalUsers: 0, totalMerchants: 0, totalRevenue: 0, activeNow: 0 },
-      logistics: logisticsResult.success ? logisticsResult.data : { total: 0, pending: 0, completed: 0 },
-      merchants: merchantResult.success ? merchantResult.data : { total: 0, approved: 0, pending: 0 },
-      transactions: transactionResult.success ? transactionResult.data : { totalTransactions: 0, totalRevenue: 0, productEscrow: 0, deliveryEscrow: 0, totalEscrow: 0, completedPayments: 0, pendingPayments: 0, pendingOrders: 0, completedOrders: 0, disbursedAmount: 0 },
+      platform: platformResult.success ? { available: true, ...platformResult.stats } : { available: false, error: platformResult.error },
+      logistics: logisticsResult.success ? { available: true, ...logisticsResult.data } : { available: false, error: logisticsResult.error },
+      merchants: merchantResult.success ? { available: true, ...merchantResult.data } : { available: false, error: merchantResult.error },
+      transactions: transactionResult.success ? { available: true, ...transactionResult.data } : { available: false, error: transactionResult.error },
     })
   } catch (error) {
     console.error('Admin stats API error:', error)

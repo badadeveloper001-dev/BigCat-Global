@@ -8,13 +8,11 @@ import { BuyerDashboard } from "./buyer-dashboard"
 import { MerchantDashboard } from "./merchant-dashboard"
 import { MerchantSetup } from "./merchant-setup"
 import { MerchantStoreSettings } from "./merchant-store-settings"
-import { AdminLogin } from "./admin-login"
 import { AdminDashboard } from "./admin-dashboard"
 
 export function MarketplaceApp() {
   const router = useRouter()
   const { role, user, setUser, isLoading } = useRole()
-  const [adminAuthenticated, setAdminAuthenticated] = useState(false)
   const [setupComplete, setSetupComplete] = useState(false)
   const [storeSettingsComplete, setStoreSettingsComplete] = useState(false)
   const [guestBrowsing, setGuestBrowsing] = useState(false)
@@ -109,9 +107,6 @@ export function MarketplaceApp() {
     case "orchid_admin":
     case "trade_logistics_admin":
     case "admin":
-      if (!adminAuthenticated) {
-        return <AdminLogin onSuccess={() => setAdminAuthenticated(true)} />
-      }
       return <AdminDashboard />
     default:
       return <Onboarding />

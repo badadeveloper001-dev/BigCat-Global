@@ -1,0 +1,11 @@
+[
+  "SUPABASE_FULL_SETUP.sql",
+  "023-add-coupon-tracking-to-orders.sql",
+  "027-agent-wallet-onboarding-fee.sql",
+  "028-fix-onboarding-request-id-types.sql",
+  "029-add-admin-role.sql",
+  "030-atomic-order-inventory.sql",
+  "031-secure-verified-reviews.sql",
+  "032-pilot-transactions.sql",
+  "033-pilot-services.sql"
+]

@@ -163,6 +163,11 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
           const result = await response.json()
           if (result.success && result.data && isActive) {
             const profile = result.data
+            if (!localStorage.getItem('globalPreferences') && ['NG','CN'].includes(profile.country)) {
+              const restored = {...buildDefaultPreferences(profile.country), language: profile.language === 'zh' ? 'zh' as const : 'en' as const}
+              setPreferencesState(restored)
+              localStorage.setItem('globalPreferences',JSON.stringify(restored))
+            }
             setRoleState(profile.role)
             setUserState({
               userId: profile.id,
@@ -236,7 +241,12 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
           const result = await response.json()
           if (result.success && result.data && isActive) {
             const profile = result.data
-            const role = (pendingRole || profile.role || 'buyer') as string
+            if (!localStorage.getItem('globalPreferences') && ['NG','CN'].includes(profile.country)) {
+              const restored = {...buildDefaultPreferences(profile.country), language: profile.language === 'zh' ? 'zh' as const : 'en' as const}
+              setPreferencesState(restored)
+              localStorage.setItem('globalPreferences',JSON.stringify(restored))
+            }
+            const role = (profile.role || 'buyer') as string
             setRoleState(role)
             setUserState({
               userId: profile.id,
@@ -252,13 +262,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem('userData', JSON.stringify({ userId: profile.id, email: profile.email, name: profile.name || profile.full_name, role }))
             if (pendingRole) {
               localStorage.removeItem('pendingOAuthRole')
-              if (profile.role !== pendingRole) {
-                fetch('/api/user/profile', {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-                  body: JSON.stringify({ userId: session.user.id, updates: { role: pendingRole } }),
-                }).catch(() => {})
-              }
+
             }
           } else {
             const role = pendingRole || 'buyer'
@@ -338,7 +342,10 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   const setPreferences = (nextPreferences: GlobalPreferences) => {
     setPreferencesState(nextPreferences)
     localStorage.setItem('globalPreferences', JSON.stringify(nextPreferences))
+    if(user?.userId) void fetch('/api/user/profile',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:user.userId,updates:{country:nextPreferences.country,language:nextPreferences.language}})}).catch(()=>{})
   }
+
+  useEffect(() => { document.documentElement.lang = preferences.language === 'zh' ? 'zh-CN' : 'en' }, [preferences.language])
 
   const setCountry = (country: SupportedCountry) => {
     setPreferences(applyCountryPreset(preferences, country))

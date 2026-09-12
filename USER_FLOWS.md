@@ -344,7 +344,7 @@
                 │
                 ▼
       ┌────────────────────────┐
-      │ Enter Admin Code:       │
+      │ Enter administrator credentials:       │
       │ [________________]      │
       │ [Verify]               │
       └────────┬───────────────┘
@@ -352,7 +352,7 @@
        ┌───────┴─────────┬──────────────────┐
        │                 │                  │
        ▼                 ▼                  ▼
-   SMEDAN_123      PALMPAY_012         BIGCAT_00
+   [removed — sign in with an authorized admin account]      [removed — sign in with an authorized admin account]         [removed — sign in with an authorized admin account]
        │                 │                  │
        ▼                 ▼                  ▼
 ┌──────────────┐ ┌──────────────┐ ┌──────────────┐

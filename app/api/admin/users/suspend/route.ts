@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminUser } from '@/lib/supabase/admin-auth'
 import { createClient } from '@/lib/supabase/server'
 
 // POST /api/admin/users/suspend
 // Body: { userId, suspended: boolean, reason?: string }
 
 export async function POST(request: NextRequest) {
+  const adminAuth = await requireAdminUser(request)
+  if (adminAuth.response) return adminAuth.response
+
   try {
     const { userId, suspended, reason } = await request.json()
 

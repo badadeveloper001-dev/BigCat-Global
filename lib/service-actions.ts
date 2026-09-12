@@ -1,5 +1,9 @@
 'use server'
 
+import { requirePilotMode } from '@/lib/pilot-config'
+
+import { requireActor } from '@/lib/supabase/authorize'
+
 import { createClient } from '@/lib/supabase/server'
 import { dispatchNotification } from '@/lib/notifications'
 
@@ -82,6 +86,7 @@ export async function getMarketplaceServices(filters?: {
 
 export async function getMerchantServices(merchantId: string) {
   try {
+    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('service_listings')
@@ -108,6 +113,7 @@ export async function createServiceListing(input: {
   serviceState?: string
 }) {
   try {
+    await requireActor(input.merchantId, ['merchant'])
     const title = String(input.title || '').trim()
     if (!title) return { success: false, error: 'Title is required' }
 
@@ -158,6 +164,8 @@ export async function createServiceBooking(input: {
   buyerNote?: string
 }) {
   try {
+    requirePilotMode()
+    await requireActor(input.buyerId, ['buyer'])
     const supabase = await createClient()
     const { data: service, error: serviceError } = await supabase
       .from('service_listings')
@@ -183,8 +191,9 @@ export async function createServiceBooking(input: {
         service_address: String(input.serviceAddress || '').trim() || null,
         buyer_note: String(input.buyerNote || '').trim() || null,
         quoted_price: Number(service.base_price || 0),
-        payment_status: 'held',
-        escrow_status: 'held',
+        payment_status: 'unpaid',
+        escrow_status: 'none',
+        is_test: true,
       })
       .select('*')
       .single()
@@ -219,6 +228,7 @@ export async function createServiceBooking(input: {
 
 export async function getBuyerServiceBookings(buyerId: string) {
   try {
+    await requireActor(buyerId, ['buyer'])
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('service_bookings')
@@ -248,6 +258,7 @@ export async function getBuyerServiceBookings(buyerId: string) {
 
 export async function getMerchantServiceBookings(merchantId: string) {
   try {
+    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('service_bookings')
@@ -293,6 +304,7 @@ export async function updateServiceBookingStatus(input: {
   note?: string
 }) {
   try {
+    await requireActor(input.actorId, [input.actorType])
     const nextStatus = toLower(input.nextStatus)
     if (!VALID_BOOKING_STATUSES.has(nextStatus)) {
       return { success: false, error: 'Invalid status' }
@@ -317,7 +329,12 @@ export async function updateServiceBookingStatus(input: {
       return { success: false, error: 'Not allowed to update this booking' }
     }
 
+    requirePilotMode()
+    if (!booking.is_test) return {success:false,error:'Only test bookings can change during the pilot'}
     const currentStatus = toLower(booking.status)
+    const transitions: Record<string,string[]> = {requested:['accepted','cancelled'],accepted:['scheduled','cancelled'],scheduled:['in_progress','cancelled'],in_progress:['completed','disputed'],completed:['released','disputed'],disputed:[],released:[],cancelled:[]}
+    if (currentStatus === nextStatus) return {success:true,data:booking}
+    if (!transitions[currentStatus]?.includes(nextStatus)) return {success:false,error:'Invalid booking transition'}
 
     const merchantAllowed = ['accepted', 'scheduled', 'in_progress', 'completed', 'cancelled']
     const buyerAllowed = ['released', 'disputed', 'cancelled']
@@ -344,6 +361,7 @@ export async function updateServiceBookingStatus(input: {
 
     const { data, error } = await (supabase.from('service_bookings') as any)
       .update(updatePayload)
+      .eq('status', currentStatus)
       .eq('id', input.bookingId)
       .select('*')
       .single()
@@ -401,6 +419,7 @@ export async function updateServiceListing(
   },
 ) {
   try {
+    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     const payload: any = {}
     if (updates.title !== undefined) payload.title = String(updates.title).trim()
@@ -428,6 +447,7 @@ export async function updateServiceListing(
 
 export async function toggleServiceActive(merchantId: string, serviceId: string, isActive: boolean) {
   try {
+    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     const { data, error } = await (supabase.from('service_listings') as any)
       .update({ is_active: isActive })
@@ -445,6 +465,7 @@ export async function toggleServiceActive(merchantId: string, serviceId: string,
 
 export async function deleteServiceListing(merchantId: string, serviceId: string) {
   try {
+    await requireActor(merchantId, ['merchant'])
     const supabase = await createClient()
     const { error } = await (supabase.from('service_listings') as any)
       .delete()
