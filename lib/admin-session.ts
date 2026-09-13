@@ -13,7 +13,7 @@ function configuredCode(scope: AdminScope) { return process.env[names[scope]] ||
 function codeVersion(scope: AdminScope) { return createHmac('sha256', secret()).update(configuredCode(scope)).digest('base64url') }
 export function scopeForAccessCode(code: string): AdminScope | undefined {
  secret()
- const configured = scopes.filter(scope => configuredCode(scope).length >= 16)
+ const configured = scopes.filter(scope => configuredCode(scope).length > 0)
  if (!configured.length) throw new AdminAccessError('CONFIGURATION_REQUIRED', 'Admin access codes are not configured.', 503)
  if (new Set(configured.map(configuredCode)).size !== configured.length) throw new AdminAccessError('CONFIGURATION_REQUIRED', 'Each admin dashboard must have a distinct access code.', 503)
  let match: AdminScope | undefined
@@ -30,7 +30,7 @@ export function verifyAdminSession(token: string, scope?: AdminScope) {
  const session = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'))
  if (!scopes.includes(session.scope) || !Number.isFinite(session.expires) || session.expires <= Date.now()) throw new Error('Admin access denied.')
  const sessionScope = session.scope as AdminScope
- if (configuredCode(sessionScope).length < 16 || session.version !== codeVersion(sessionScope) || (scope && sessionScope !== 'bigcat' && scope !== sessionScope)) throw new Error('Admin access denied.')
+ if (configuredCode(sessionScope).length === 0 || session.version !== codeVersion(sessionScope) || (scope && sessionScope !== 'bigcat' && scope !== sessionScope)) throw new Error('Admin access denied.')
  return { id: 'admin-code:' + sessionScope, role: roles[sessionScope], scope: sessionScope }
 }
 export async function requireAdminSession(scope?: AdminScope) {

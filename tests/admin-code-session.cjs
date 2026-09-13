@@ -1,5 +1,5 @@
 const fs=require('fs'),vm=require('vm'),ts=require('typescript'),assert=require('node:assert/strict')
-const env={ADMIN_SESSION_SECRET:'s'.repeat(32),ADMIN_BIGCAT_ACCESS_CODE:'b'.repeat(24),ADMIN_ORCHID_ACCESS_CODE:'o'.repeat(24),ADMIN_LOGISTICS_ACCESS_CODE:'l'.repeat(24)}
+const env={ADMIN_SESSION_SECRET:'s'.repeat(32),ADMIN_BIGCAT_ACCESS_CODE:'b',ADMIN_ORCHID_ACCESS_CODE:'1234',ADMIN_LOGISTICS_ACCESS_CODE:'logistics'}
 const exportsObject={}
 vm.runInNewContext(ts.transpileModule(fs.readFileSync('lib/admin-session.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{exports:exportsObject,require:name=>name==='server-only'?{}:name==='next/headers'?{}:require(name),process:{env},Buffer,Date})
 const {scopeForAccessCode,signAdminSession,verifyAdminSession}=exportsObject
@@ -8,6 +8,7 @@ for(const [scope,key] of [['bigcat','ADMIN_BIGCAT_ACCESS_CODE'],['orchid','ADMIN
  assert.equal(verifyAdminSession(signAdminSession(scope),scope).scope,scope)
 }
 assert.equal(scopeForAccessCode('wrong'),undefined)
+assert.equal(scopeForAccessCode(''),undefined)
 assert.throws(()=>verifyAdminSession(signAdminSession('orchid'),'bigcat'))
 assert.throws(()=>verifyAdminSession(signAdminSession('trade-logistics'),'orchid'))
 assert.equal(verifyAdminSession(signAdminSession('bigcat'),'orchid').scope,'bigcat')
