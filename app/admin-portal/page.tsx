@@ -2,20 +2,14 @@
 import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
 
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { createClient } from '@/lib/supabase/client'
 import Image from "next/image"
 import { Lock, Loader2, AlertCircle, ArrowLeft } from "lucide-react"
 
 
 export default function AdminPortalPage() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [accountEmail, setAccountEmail] = useState('')
-  const [checkingAccount, setCheckingAccount] = useState(true)
-  useEffect(() => { createClient().auth.getUser().then(({ data }: { data: { user: { email?: string } | null } }) => setAccountEmail(data.user?.email || '')).catch(() => setAccountEmail('')).finally(() => setCheckingAccount(false)) }, [])
   const [accessCode, setAccessCode] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -26,12 +20,6 @@ export default function AdminPortalPage() {
     setIsLoading(true)
 
     try {
-      if (!accountEmail) {
-        const result = await createClient().auth.signInWithPassword({ email: email.trim(), password })
-        if (result.error || !result.data.session) throw new Error(result.error?.message || 'Sign-in failed.')
-        setAccountEmail(result.data.user.email || email)
-        setPassword('')
-      }
       const response = await fetch('/api/admin/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: accessCode }) })
       const result = await response.json()
       if (!response.ok) throw new Error(result.error || 'Access denied.')
@@ -73,10 +61,6 @@ export default function AdminPortalPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {accountEmail ? <div className="text-sm"><p><UiText text={"Signed in as"} />{" "}{accountEmail}</p><button type="button" className="underline" onClick={async () => { await createClient().auth.signOut(); setAccountEmail(''); setError('') }}><UiText text={"Use another account"} /></button></div> : <>
-          <label className="text-sm"><UiText text={"Admin email"} /><input type="email" autoComplete="username" required value={email} onChange={e => setEmail(e.target.value)} className="w-full px-4 py-3 border border-border rounded-xl bg-background" /></label>
-          <label className="text-sm"><UiText text={"Password"} /><input type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full px-4 py-3 border border-border rounded-xl bg-background" /></label>
-          </>}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
               <UiText text={"Access Code"} />{" "}</label>
@@ -103,7 +87,7 @@ export default function AdminPortalPage() {
 
           <button
             type="submit"
-            disabled={checkingAccount || isLoading || !accessCode.trim()}
+            disabled={isLoading || !accessCode.trim()}
             className="w-full py-3 bg-destructive text-destructive-foreground rounded-xl font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity flex items-center justify-center gap-2"
           >
             {isLoading ? (

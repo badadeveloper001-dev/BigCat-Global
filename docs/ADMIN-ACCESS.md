@@ -1,11 +1,9 @@
 # Admin access setup
 
-Sign in with a Supabase account whose auth_users role is admin (BigCat), orchid_admin (payment operations), or trade_logistics_admin (logistics). Roles must be assigned by a trusted database operator, never public signup. Suspended accounts are denied.
+Admins enter only their designated access code at /admin-portal. No email signup, Supabase account, or database role assignment is needed. The server maps ADMIN_BIGCAT_ACCESS_CODE to BigCat, ADMIN_ORCHID_ACCESS_CODE to Orchid, and ADMIN_LOGISTICS_ACCESS_CODE to Trade & Logistics.
 
-Set server-only Vercel environment variables ADMIN_BIGCAT_ACCESS_CODE, ADMIN_ORCHID_ACCESS_CODE, ADMIN_LOGISTICS_ACCESS_CODE to distinct randomly generated values of at least 16 characters. Set ADMIN_SESSION_SECRET to a random value of at least 32 characters. Do not use NEXT_PUBLIC prefixes or the former public demo codes. Configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN; code verification fails closed without distributed rate limiting.
+Set these server-only Vercel variables to distinct random values of at least 16 characters. Keep ADMIN_SESSION_SECRET at least 32 random characters. Keep UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN configured; login fails closed without distributed IP rate limiting (5 attempts per 10 minutes). Never prefix these variables with NEXT_PUBLIC.
 
-The access code is a second step after account login, not a replacement for identity. Sessions expire after one hour and are bound to the account, role and dashboard. DELETE /api/admin/session signs out the admin session. Rotating ADMIN_SESSION_SECRET invalidates all admin sessions.
+The server issues a signed, HttpOnly, one-hour session cookie. Changing a dashboard code invalidates its existing sessions; changing ADMIN_SESSION_SECRET invalidates all sessions. DELETE /api/admin/session signs out. Codes identify dashboard access, not individual people; people sharing a code share that identity.
 
-BigCat has platform oversight. Orchid can read transaction operations, not manage users or merchant approvals. Trade & Logistics can operate logistics, not payments or user administration. Payments remain simulated. No provider custody or automatic refund capability is implied.
-
-SMEDAN dashboard removed; existing merchant registration identifiers are retained. These changes require deployment and server environment configuration before use.
+BigCat retains platform oversight. Orchid is restricted to payment operations and Trade & Logistics to logistics. Backend actions and dashboard layouts verify the signed session and scope. Payments remain simulated. The previous 033-assign-admin-account.sql is not required for code-only access.
