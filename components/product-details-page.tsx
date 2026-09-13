@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { formatCurrency, formatNaira } from '@/lib/currency-utils'
+import { convertCurrency, formatCurrency, formatNaira } from '@/lib/currency-utils'
 import { useCart } from '@/lib/cart-context'
 import { useWishlist } from '@/lib/wishlist-context'
 import { useRole } from '@/lib/role-context'
@@ -42,7 +42,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
     if (!product) return
 
     const stockCount = Math.max(0, Number(product.stock || 0))
-    setQuantity((current) => (stockCount > 0 ? Math.min(Math.max(1, current), stockCount) : 1))
+    setQuantity(Number(product.minimum_order_quantity ?? 1))
   }, [product])
 
   useEffect(() => {
@@ -172,15 +172,20 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
   const cartCount = getItemCount()
   const cartTotal = getTotal()
   const savedToWishlist = isInWishlist(String(product.id))
+  const minimumOrder = Number(product.minimum_order_quantity ?? 1)
   const availableStock = Math.max(0, Number(product.stock || 0))
-  const isOutOfStock = availableStock <= 0
+  const isOutOfStock = availableStock < minimumOrder
   const promotionPercentOff = Math.max(0, Number(product.promotion_percent_off || 0))
   const currentPrice = Math.max(0, Number(product.price || 0))
   const discountedPrice = promotionPercentOff > 0
     ? currentPrice * (1 - promotionPercentOff / 100)
     : currentPrice
   const displayCurrency = preferences.currency || 'NGN'
-  const displayPriceLabel = displayCurrency === 'NGN' ? formatNaira(discountedPrice) : formatCurrency(discountedPrice, displayCurrency)
+  const listingCurrency = product.listing_currency || 'NGN'
+  const originalPrice = Number(product.listing_price ?? product.price)
+  const originalDiscounted = originalPrice * (1 - promotionPercentOff / 100)
+  const displayPriceLabel = formatCurrency(originalDiscounted, listingCurrency)
+  const equivalentPrice = formatCurrency(convertCurrency(originalDiscounted, listingCurrency, displayCurrency), displayCurrency)
 
   const wishlistItem = {
     id: String(product.id),
@@ -298,9 +303,10 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <p className="text-2xl font-bold text-foreground">{displayPriceLabel}</p>
+              {displayCurrency !== listingCurrency && <p className="text-sm text-muted-foreground">≈ {equivalentPrice} · Demo rate / 演示汇率</p>}
               {promotionPercentOff > 0 && (
                 <>
-                  <p className="text-sm text-muted-foreground line-through">{formatNaira(currentPrice)}</p>
+                  <p className="text-sm text-muted-foreground line-through">{formatCurrency(originalPrice, listingCurrency)}</p>
                   <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                     {promotionPercentOff}% OFF
                   </span>
@@ -377,7 +383,8 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
           <div className={`flex items-center gap-3 text-sm ${isOutOfStock ? 'text-destructive' : availableStock <= 5 ? 'text-chart-4' : 'text-primary'}`}>
             <div className={`w-2 h-2 rounded-full ${isOutOfStock ? 'bg-destructive' : availableStock <= 5 ? 'bg-chart-4' : 'bg-primary'}`} />
             <span>
-              {isOutOfStock ? 'Out of stock' : `${availableStock} item${availableStock !== 1 ? 's' : ''} available`}
+              <span className="block">Price per unit · Minimum {minimumOrder} units · Minimum purchase {formatCurrency(originalPrice * minimumOrder, product.listing_currency || 'NGN')} ≈ {formatCurrency(convertCurrency(originalPrice * minimumOrder, product.listing_currency || 'NGN', preferences.currency), preferences.currency)} (demo)</span>
+              {isOutOfStock ? 'Insufficient stock for minimum order' : `${availableStock} item${availableStock !== 1 ? 's' : ''} available`}
             </span>
           </div>
 
@@ -505,8 +512,8 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
           </div>
           <div className="flex items-center gap-3 bg-secondary rounded-lg p-3 w-fit">
             <button
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              disabled={isOutOfStock}
+              onClick={() => setQuantity(Math.max(minimumOrder, quantity - 1))}
+              disabled={isOutOfStock || quantity <= minimumOrder}
               className="w-8 h-8 flex items-center justify-center bg-card rounded hover:bg-border transition-colors disabled:opacity-50"
             >
               −
@@ -557,6 +564,8 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
                 name: product.name,
                 price: parseFloat(product.price),
                 quantity: quantity,
+                minimum_order_quantity: minimumOrder,
+                stock: availableStock,
                 merchantId: product.merchant_id,
                 merchantName: product.merchant_profiles?.business_name || 'Unknown',
               })

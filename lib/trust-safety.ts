@@ -10,6 +10,8 @@ const suspensionMinutes = Number.isFinite(parsedMinutes) && parsedMinutes > 0
 const SUSPENSION_DURATION_MS = suspensionMinutes * 60 * 1000
 
 const CONTACT_PATTERNS: RegExp[] = [
+  /加(?:我|一下)?(?:的)?微信|微信(?:号|联系)|私下(?:交易|付款|转账)|站外(?:交易|付款)|平台外(?:交易|付款)|加我QQ/i,
+  /\bwechat\b/i,
   /phone\s*number/i,
   /whats\s*app|whatsapp/i,
   /call\s+me/i,
@@ -27,6 +29,7 @@ const CONTACT_PATTERNS: RegExp[] = [
 ]
 
 const CONTACT_VALUE_PATTERNS: RegExp[] = [
+  /(?:^|[^\d])(?:\+?86[ -]?)?1[3-9]\d{9}(?!\d)/,
   /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i,
   /\b(?:\+?234|0)[789][01]\d{8}\b/,
   /(?:telegram|t\.me|instagram|ig|facebook|fb|snapchat|twitter|x)\s*[:@]?\s*[a-z0-9._-]{3,}/i,

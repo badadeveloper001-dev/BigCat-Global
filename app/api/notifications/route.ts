@@ -41,7 +41,9 @@ export async function PATCH(request: NextRequest) {
 
     const body = await request.json().catch(() => ({}))
     const notificationId = String(body?.notificationId || "").trim()
-    const markAll = Boolean(body?.markAll)
+    const markAll = body?.markAll === true
+
+    if (!markAll && !notificationId) return NextResponse.json({ success: false, error: "notificationId is required" }, { status: 400 })
 
     const result = markAll
       ? await markAllNotificationsRead(auth.user.id)

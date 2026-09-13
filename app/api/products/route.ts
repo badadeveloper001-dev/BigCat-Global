@@ -1,3 +1,4 @@
+import { optionalCoordinate } from '@/lib/discovery-utils'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllProducts } from '@/lib/product-actions'
 import { createClient } from '@/lib/supabase/server'
@@ -5,8 +6,8 @@ import { createClient } from '@/lib/supabase/server'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const buyerLat = Number(searchParams.get('buyerLat'))
-    const buyerLng = Number(searchParams.get('buyerLng'))
+    const buyerLat = optionalCoordinate(searchParams.get('buyerLat'), 90)
+    const buyerLng = optionalCoordinate(searchParams.get('buyerLng'), 180)
     const category = searchParams.get('category') || null
     const search = searchParams.get('search') || null
     const page = Number(searchParams.get('page') || '1')

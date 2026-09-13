@@ -84,6 +84,7 @@ export function CartView({ onCheckout, onBack }: CartViewProps) {
                       {/* Quantity Controls */}
                       <div className="flex items-center gap-2 mt-3">
                         <button
+                          disabled={item.quantity <= (item.minimum_order_quantity || 1)}
                           onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                           className="p-1 hover:bg-secondary rounded transition-colors"
                         >
@@ -93,6 +94,7 @@ export function CartView({ onCheckout, onBack }: CartViewProps) {
                           {item.quantity}
                         </span>
                         <button
+                          disabled={item.stock !== undefined && item.quantity >= item.stock}
                           onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                           className="p-1 hover:bg-secondary rounded transition-colors"
                         >
@@ -113,6 +115,7 @@ export function CartView({ onCheckout, onBack }: CartViewProps) {
                         <p className="text-xs text-muted-foreground">Subtotal</p>
                         <p className="text-sm font-bold text-foreground">
                           {formatNaira(item.price * item.quantity)}
+                          <small className="block text-muted-foreground">Minimum {item.minimum_order_quantity || 1} units</small>
                         </p>
                       </div>
                     </div>

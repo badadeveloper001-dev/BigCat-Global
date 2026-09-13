@@ -1,5 +1,7 @@
 'use server'
 
+import { requireAdmin } from '@/lib/supabase/require-admin'
+import { getRequestAuthUser } from '@/lib/supabase/request-auth'
 import { createClient } from '@/lib/supabase/server'
 import { updateOrderStatus } from '@/lib/order-actions'
 import { dispatchNotification } from '@/lib/notifications'
@@ -16,6 +18,8 @@ export interface LogisticsOrderPayload {
   delivery_fee: number
   status?: 'pending'
 }
+
+async function requireLogisticsOperator() { await requireAdmin('trade-logistics') }
 
 function includesMissingTable(errorMessage: string, tableName: string) {
   const normalized = String(errorMessage || '').toLowerCase()
@@ -271,6 +275,7 @@ export async function registerOrderForLogistics(payload: LogisticsOrderPayload) 
 
 export async function getLogisticsOrders() {
   try {
+    await requireLogisticsOperator()
     const supabase = await createClient()
 
     const ordersResult = await selectOrdersWithCompatibility(supabase, 'list')
@@ -374,6 +379,7 @@ export async function getLogisticsOrders() {
 
 export async function createLogisticsRider(payload: { name: string; email?: string; phone?: string; region?: string }) {
   try {
+    await requireLogisticsOperator()
     const supabase = await createClient()
     const tableExists = await ensureRiderTableExists(supabase)
 
@@ -406,6 +412,7 @@ export async function createLogisticsRider(payload: { name: string; email?: stri
 
 export async function deactivateLogisticsRider(riderId: string) {
   try {
+    await requireLogisticsOperator()
     const supabase = await createClient()
     const result = await (supabase.from('logistics_riders') as any)
       .update({ is_active: false, updated_at: new Date().toISOString() })
@@ -432,6 +439,7 @@ export async function deactivateLogisticsRider(riderId: string) {
 
 export async function assignRiderToOrder(orderId: string, riderId: string, notes?: string) {
   try {
+    await requireLogisticsOperator()
     const supabase = await createClient()
 
     const order = await readOrderForDeliveryContext(supabase, orderId)
@@ -479,7 +487,7 @@ export async function assignRiderToOrder(orderId: string, riderId: string, notes
     }
 
     const currentStatus = String(order.status || '').toLowerCase().trim()
-    if (!['order_packed', 'order_taken_for_delivery', 'in_transit', 'completed', 'delivered'].includes(currentStatus)) {
+    if (!['order_packed', 'order_taken_for_delivery', 'in_transit'].includes(currentStatus)) {
       return { success: false, error: 'Order is not ready for logistics assignment yet.' }
     }
 
@@ -522,6 +530,7 @@ export async function assignRiderToOrder(orderId: string, riderId: string, notes
 
 export async function markLogisticsOrderInTransit(orderId: string) {
   try {
+    await requireLogisticsOperator()
     const supabase = await createClient()
 
     const order = await readOrderForDeliveryContext(supabase, orderId)
@@ -551,6 +560,7 @@ export async function markLogisticsOrderInTransit(orderId: string) {
 
 export async function completeLogisticsOrder(orderId: string, proofOfDeliveryUrl?: string | null) {
   try {
+    await requireLogisticsOperator()
     const supabase = await createClient()
 
     const order = await readOrderForDeliveryContext(supabase, orderId)
@@ -587,6 +597,7 @@ export async function completeLogisticsOrder(orderId: string, proofOfDeliveryUrl
 
 export async function autoAssignRiderToOrder(orderId: string) {
   try {
+    await requireLogisticsOperator()
     const supabase = await createClient()
     const order = await readOrderForDeliveryContext(supabase, orderId)
     if (!order) return { success: false, error: 'Order not found.' }

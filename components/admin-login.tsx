@@ -15,16 +15,13 @@ export function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
     setError("")
     setIsLoading(true)
 
-    // Simulate verification
-    await new Promise((resolve) => setTimeout(resolve, 800))
-
-    // Demo access code: "admin123"
-    if (code === "admin123") {
-      onSuccess()
-    } else {
-      setError("Invalid access code. Please try again.")
-    }
-    setIsLoading(false)
+    try {
+      const response = await fetch('/api/admin/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: code }) })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Access denied.')
+      window.location.assign(result.redirect)
+    } catch (err) { setError(err instanceof Error ? err.message : 'Access unavailable.') }
+    finally { setIsLoading(false) }
   }
 
   return (
@@ -108,12 +105,6 @@ export function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
             </button>
           </p>
 
-          {/* Demo hint */}
-          <div className="mt-8 p-3 bg-secondary/50 border border-border rounded-xl">
-            <p className="text-xs text-muted-foreground text-center">
-              Demo access code: <span className="font-mono text-foreground">admin123</span>
-            </p>
-          </div>
         </div>
       </main>
     </div>

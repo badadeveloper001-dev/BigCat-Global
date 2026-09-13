@@ -107,6 +107,7 @@ function getAnonClient() {
 }
 
 export async function signup(email: string, password: string, name: string, phone: string, role: 'buyer' | 'merchant') {
+  if (role !== 'buyer' && role !== 'merchant') return { success: false, error: 'Choose buyer or merchant.' }
   try {
     const admin = createClient()
 
@@ -179,6 +180,7 @@ export async function signupEnhanced(params: {
       verificationModule,
       verificationStatus,
     } = params
+    if (role !== 'buyer' && role !== 'merchant') return { success: false, error: 'Choose buyer or merchant.' }
     const normalizedCity = city?.trim() || null
     const normalizedState = state?.trim() || null
 
@@ -228,6 +230,7 @@ export async function signupEnhanced(params: {
           city: normalizedCity,
           state: normalizedState,
           location: buildMerchantLocation(normalizedCity, normalizedState),
+          country: country || 'NG',
           token_balance: 0,
         }
 

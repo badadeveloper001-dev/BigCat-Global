@@ -24,12 +24,10 @@ export function BigcatAdminDashboard() {
   })
 
   useEffect(() => {
-    const access = typeof window !== "undefined" ? sessionStorage.getItem("adminAccess") : null
-    if (access === "BIGCAT_00") {
-      setAuthorized(true)
-      return
-    }
-    router.replace("/admin-portal")
+    fetch('/api/admin/session', { cache: 'no-store' }).then(r => r.json()).then(result => {
+      if (result.scope === 'bigcat' || result.scope === 'bigcat') setAuthorized(true)
+      else router.replace('/admin-portal')
+    }).catch(() => router.replace('/admin-portal'))
   }, [router])
 
   useEffect(() => {
@@ -60,7 +58,7 @@ export function BigcatAdminDashboard() {
       { label: "Users", value: String(stats.totalUsers), icon: Users },
       { label: "Merchants", value: String(stats.totalMerchants), icon: Store },
       { label: "Orders", value: String(stats.totalOrders), icon: Ship },
-      { label: "Revenue", value: formatCurrency(stats.totalRevenue, "USD"), icon: Landmark },
+      { label: "Revenue", value: formatCurrency(stats.totalRevenue, "NGN"), icon: Landmark },
     ],
     [stats],
   )
@@ -84,6 +82,7 @@ export function BigcatAdminDashboard() {
         </div>
       </header>
 
+      <div className="px-4 pt-3 text-right"><button className="text-sm text-muted-foreground" onClick={async () => { const response = await fetch('/api/admin/session', { method: 'DELETE' }); if (response.ok) window.location.assign('/admin-portal') }}>End admin session</button></div>
       <main className="mx-auto max-w-6xl px-4 py-6 space-y-6">
         <section className="rounded-2xl border border-border bg-card p-5">
           <div className="flex items-center gap-3 mb-2">
@@ -109,6 +108,10 @@ export function BigcatAdminDashboard() {
         </section>
 
         <section className="grid md:grid-cols-3 gap-4">
+          <button onClick={() => router.push('/admin/bigcat/manage')} className="rounded-xl border border-border bg-card p-4 text-left hover:border-primary/40 transition-colors">
+            <h3 className="font-semibold">Users & Merchants</h3>
+            <p className="text-sm text-muted-foreground mt-1">Manage accounts and merchant approvals.</p>
+          </button>
           <button
             onClick={() => router.push("/admin/orchid")}
             className="rounded-xl border border-border bg-card p-4 text-left hover:border-primary/40 transition-colors"
@@ -128,7 +131,7 @@ export function BigcatAdminDashboard() {
             className="rounded-xl border border-border bg-card p-4 text-left hover:border-primary/40 transition-colors"
           >
             <h3 className="font-semibold">Security Access</h3>
-            <p className="text-sm text-muted-foreground mt-1">Manage privileged access for BigCat, Orchid, and Trade & Logistics admins.</p>
+            <p className="text-sm text-muted-foreground mt-1">Enter an access code for another authorized dashboard.</p>
           </button>
         </section>
 

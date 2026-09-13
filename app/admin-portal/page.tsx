@@ -5,11 +5,6 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Lock, Loader2, AlertCircle, ArrowLeft } from "lucide-react"
 
-const ACCESS_CODES: Record<string, string> = {
-  ORCHID_012: "/admin/orchid",
-  BIGCAT_00: "/admin/bigcat",
-  TRADELOG_001: "/admin/trade-logistics",
-}
 
 export default function AdminPortalPage() {
   const router = useRouter()
@@ -22,16 +17,13 @@ export default function AdminPortalPage() {
     setError("")
     setIsLoading(true)
 
-    const trimmed = accessCode.trim().toUpperCase()
-    const redirectUrl = ACCESS_CODES[trimmed]
-
-    if (redirectUrl) {
-      sessionStorage.setItem("adminAccess", trimmed)
-      router.push(redirectUrl)
-    } else {
-      setError("Invalid access code")
-      setIsLoading(false)
-    }
+    try {
+      const response = await fetch('/api/admin/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: accessCode }) })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Access denied.')
+      window.location.assign(result.redirect)
+    } catch (err) { setError(err instanceof Error ? err.message : 'Access unavailable.') }
+    finally { setIsLoading(false) }
   }
 
   return (

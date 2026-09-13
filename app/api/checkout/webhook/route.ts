@@ -28,9 +28,11 @@ export async function POST(request: NextRequest) {
   try {
     const rawBody = await request.text()
 
-    // Verify webhook signature when secret is configured.
-    // Safe to skip now — will auto-enforce once KORA_WEBHOOK_SECRET is added to env.
+    // Reject unconfigured callbacks; an unsigned callback must never settle an order.
     const webhookSecret = process.env.KORA_WEBHOOK_SECRET
+    if (!webhookSecret) {
+      return NextResponse.json({ error: 'Payment callbacks are not configured for this test pilot.' }, { status: 503 })
+    }
     if (webhookSecret) {
       const signature = request.headers.get("x-korapay-signature") || request.headers.get("x-webhook-signature") || ""
       const expected = createHmac("sha256", webhookSecret).update(rawBody).digest("hex")

@@ -62,23 +62,9 @@ export function ImageUpload({ images, onImagesChange, maxImages = 4 }: ImageUplo
     }
   }
 
-  const handleRemoveImage = async (index: number) => {
-    const imageUrl = images[index]
-    
-    // Remove from UI immediately
-    const newImages = images.filter((_, i) => i !== index)
-    onImagesChange(newImages)
-
-    // Try to delete from blob storage (don't block on failure)
-    try {
-      await fetch('/api/upload', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: imageUrl }),
-      })
-    } catch (err) {
-      console.error('Failed to delete image from storage:', err)
-    }
+  const handleRemoveImage = (index: number) => {
+    // Only change the draft. Deleting the blob here breaks saved products if editing is cancelled.
+    onImagesChange(images.filter((_, i) => i !== index))
   }
 
   return (

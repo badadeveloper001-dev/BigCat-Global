@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ShoppingCart, Heart, MapPin, Package, Check } from 'lucide-react'
-import { formatCurrency, formatNaira } from '@/lib/currency-utils'
+import { convertCurrency, formatCurrency, formatNaira } from '@/lib/currency-utils'
 import { useCart } from '@/lib/cart-context'
 import { useWishlist } from '@/lib/wishlist-context'
 import { useRole } from '@/lib/role-context'
@@ -12,8 +12,11 @@ interface ProductCardProps {
   id: string
   name: string
   price: number
+  listing_currency?: 'NGN' | 'CNY' | 'USD'
+  listing_price?: number | null
   category: string
   image?: string | null
+  minimum_order_quantity?: number
   stock?: number
   promotionPercentOff?: number
   merchant: {
@@ -31,7 +34,8 @@ interface ProductCardProps {
     price: number
     category: string
     image?: string | null
-    stock?: number
+    minimum_order_quantity?: number
+  stock?: number
     merchant: {
       id: string
       business_name: string
@@ -47,9 +51,12 @@ export function ProductCard({
   id,
   name,
   price,
+  listing_currency = 'NGN',
+  listing_price,
   category,
   image,
   stock = 0,
+  minimum_order_quantity = 1,
   promotionPercentOff = 0,
   merchant,
   onClick,
@@ -60,6 +67,7 @@ export function ProductCard({
   const { toggleItem, isInWishlist } = useWishlist()
   const { preferences } = useRole()
 
+  const originalPrice = Number(listing_price ?? price)
   const wishlistItem = {
     id,
     productId: id,
@@ -68,13 +76,16 @@ export function ProductCard({
     category,
     image,
     stock,
+    minimum_order_quantity,
     promotionPercentOff,
+    listing_currency,
+    listing_price,
     merchant,
   }
 
   const savedToWishlist = isInWishlist(id)
   const availableStock = Math.max(0, Number(stock || 0))
-  const isOutOfStock = availableStock <= 0
+  const isOutOfStock = availableStock < minimum_order_quantity
   const normalizedPromotionPercent = Math.max(0, Math.min(100, Number(promotionPercentOff || 0)))
   const discountedPrice = normalizedPromotionPercent > 0
     ? Math.max(0, Number(price || 0) * (1 - normalizedPromotionPercent / 100))
@@ -85,7 +96,8 @@ export function ProductCard({
   const verificationLevel = merchant.verification_level || (merchant.logo_url && merchant.location ? 'verified' : 'basic')
   const verificationLabel = verificationLevel === 'trusted' ? 'Trusted Seller' : verificationLevel === 'verified' ? 'Verified Seller' : 'New Seller'
   const displayCurrency = preferences.currency || 'NGN'
-  const displayPrice = displayCurrency === 'NGN' ? discountedPrice : Math.max(0, Number(price || 0))
+  const originalDiscountedPrice = originalPrice * (1 - normalizedPromotionPercent / 100)
+  const displayPrice = convertCurrency(originalDiscountedPrice, listing_currency, displayCurrency)
   const displayPriceLabel = displayCurrency === 'NGN' ? formatNaira(displayPrice) : formatCurrency(displayPrice, displayCurrency)
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -97,7 +109,9 @@ export function ProductCard({
       productId: id,
       name,
       price,
-      quantity: 1,
+      quantity: minimum_order_quantity,
+      minimum_order_quantity,
+      stock: availableStock,
       merchantId: merchant.id,
       merchantName: merchant.business_name,
     })
@@ -166,11 +180,12 @@ export function ProductCard({
             {name}
           </h3>
           <div className="mt-1.5 flex items-center gap-2 flex-wrap">
-            <p className="text-lg font-bold text-foreground">{displayPriceLabel}</p>
+            <p className="text-lg font-bold text-foreground">{formatCurrency(originalDiscountedPrice, listing_currency)}</p>
+            {displayCurrency !== listing_currency && <span className="text-xs text-muted-foreground">≈ {displayPriceLabel} · {preferences.language === 'zh' ? '演示汇率' : 'Demo rate'}</span>}
             {normalizedPromotionPercent > 0 && (
               <>
                 <p className="text-xs font-medium text-muted-foreground line-through decoration-2">
-                  {displayCurrency === 'NGN' ? formatNaira(price) : formatCurrency(price, displayCurrency)}
+                  {formatCurrency(originalPrice, listing_currency)}
                 </p>
                 <span className="rounded-full bg-red-600 px-2 py-0.5 text-[11px] font-bold text-white">
                   {normalizedPromotionPercent}% OFF
@@ -178,7 +193,8 @@ export function ProductCard({
               </>
             )}
             <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${isOutOfStock ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'}`}>
-              {isOutOfStock ? 'Out of stock' : `${availableStock} in stock`}
+              <span className="block">Minimum {minimum_order_quantity} units · {formatCurrency(originalDiscountedPrice * minimum_order_quantity, listing_currency)}{listing_currency !== displayCurrency && <> ≈ {formatCurrency(displayPrice * minimum_order_quantity, displayCurrency)} (demo)</>}</span>
+              {isOutOfStock ? 'Insufficient stock for minimum order' : `${availableStock} in stock`}
             </span>
           </div>
         </div>
@@ -255,7 +271,8 @@ interface ProductGridProps {
     price: number
     category: string
     image?: string | null
-    stock?: number
+    minimum_order_quantity?: number
+  stock?: number
     merchant: {
       id: string
       business_name: string

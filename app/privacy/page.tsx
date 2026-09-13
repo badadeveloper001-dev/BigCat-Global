@@ -28,6 +28,7 @@ export default function PrivacyPage() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="bg-card border border-border rounded-2xl p-6 space-y-8 text-sm text-foreground leading-relaxed">
 
+          <aside className="rounded-xl border border-border bg-secondary/30 p-4">Test-only pilot: no real payment processing or funds custody. <Link href="/pilot" className="underline">Read the pilot rules / 阅读试点规则</Link>.</aside>
           <section>
             <p className="text-muted-foreground">
               {COMPANY} (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;) is committed to protecting your personal information. This Privacy Policy explains how we collect, use, share, and protect your data when you use our platform. We comply with the Nigeria Data Protection Regulation (NDPR) 2019 issued by the National Information Technology Development Agency (NITDA).
@@ -93,7 +94,7 @@ export default function PrivacyPage() {
             <ul className="text-muted-foreground space-y-2 list-disc list-inside">
               <li><strong className="text-foreground">With merchants</strong> — your delivery address and contact name are shared with the merchant fulfilling your order.</li>
               <li><strong className="text-foreground">With buyers</strong> — your store name, description, and listing information are publicly visible on your merchant profile.</li>
-              <li><strong className="text-foreground">Payment processors</strong> — Orchid processes payments and receives necessary transaction data for wallet funding, conversion, and settlement.</li>
+              <li><strong className="text-foreground">Payment processors</strong> — No real payment processor is enabled for the test pilot.</li>
               <li><strong className="text-foreground">Exchange-rate providers</strong> — we query third-party market data providers for current currency rates; no full card or password data is shared for rate lookup.</li>
               <li><strong className="text-foreground">Regulatory bodies</strong> — relevant tax, customs, and business regulators in applicable jurisdictions when legally required.</li>
               <li><strong className="text-foreground">Service providers</strong> — hosting (Vercel/Supabase), email delivery, and analytics tools, all under strict data processing agreements.</li>

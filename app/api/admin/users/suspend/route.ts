@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/supabase/require-admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
@@ -6,6 +7,7 @@ import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdmin()
     const { userId, suspended, reason } = await request.json()
 
     if (!userId || typeof suspended !== 'boolean') {
@@ -26,19 +28,7 @@ export async function POST(request: NextRequest) {
       .select('id, email, full_name, is_suspended, suspension_reason')
       .single()
 
-    if (error) {
-      // Try without is_suspended column (schema may differ)
-      if (String(error.message || '').toLowerCase().includes('column') || String(error.message || '').toLowerCase().includes('does not exist')) {
-        // Fall back: store in a separate suspensions table or return partial success
-        return NextResponse.json({
-          success: true,
-          suspended,
-          userId,
-          note: 'Suspension recorded. Run SQL migration to persist is_suspended column.',
-        })
-      }
-      throw error
-    }
+    if (error) throw error
 
     return NextResponse.json({ success: true, data, suspended })
   } catch (error: any) {

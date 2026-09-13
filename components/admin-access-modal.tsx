@@ -14,29 +14,19 @@ export function AdminAccessModal({ onClose }: AdminAccessModalProps) {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  const accessCodes = {
-    "ORCHID_012": "/admin/orchid",
-    "BIGCAT_00": "/admin/bigcat",
-    "TRADELOG_001": "/admin/trade-logistics",
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setIsLoading(true)
 
-    const trimmedCode = accessCode.trim().toUpperCase()
-    const redirectUrl = accessCodes[trimmedCode as keyof typeof accessCodes]
-
-    if (redirectUrl) {
-      // Store admin access in sessionStorage
-      sessionStorage.setItem("adminAccess", trimmedCode)
-      router.push(redirectUrl)
-    } else {
-      setError("Invalid access code")
-    }
-
-    setIsLoading(false)
+    try {
+      const response = await fetch('/api/admin/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: accessCode }) })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Access denied.')
+      window.location.assign(result.redirect)
+    } catch (err) { setError(err instanceof Error ? err.message : 'Access unavailable.') }
+    finally { setIsLoading(false) }
   }
 
   return (

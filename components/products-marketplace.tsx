@@ -1,5 +1,6 @@
 'use client'
 
+import { distanceForSort } from '@/lib/discovery-utils'
 import { useState, useEffect } from 'react'
 import { Search, Filter, X, ArrowLeft, ShoppingCart, CheckCircle2 } from 'lucide-react'
 import { ProductGrid } from './product-card'
@@ -223,11 +224,11 @@ export function ProductsMarketplace({
 
     if (distanceLimit && Number.isFinite(Number(distanceLimit))) {
       const limit = Number(distanceLimit)
-      filtered = filtered.filter((p) => Number.isFinite(Number(p?.merchant_profiles?.distance_km)) && Number(p.merchant_profiles.distance_km) <= limit)
+      filtered = filtered.filter((p) => distanceForSort(p?.merchant_profiles?.distance_km) <= limit)
     }
 
     if (sortBy === 'nearest') {
-      filtered.sort((a, b) => Number(a?.merchant_profiles?.distance_km || 9999) - Number(b?.merchant_profiles?.distance_km || 9999))
+      filtered.sort((a, b) => distanceForSort(a?.merchant_profiles?.distance_km) - distanceForSort(b?.merchant_profiles?.distance_km))
     }
     if (sortBy === 'priceAsc') {
       filtered.sort((a, b) => Number(a?.price || 0) - Number(b?.price || 0))
@@ -473,6 +474,9 @@ export function ProductsMarketplace({
             id: p.id,
             name: p.name,
             price: p.price,
+            listing_currency: p.listing_currency,
+            listing_price: p.listing_price,
+              minimum_order_quantity: p.minimum_order_quantity,
             category: p.category,
             image: p.images?.[0] || null,
             stock: Number(p.stock || 0),

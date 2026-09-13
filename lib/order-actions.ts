@@ -1,5 +1,7 @@
 'use server'
+import { requireAdmin } from '@/lib/supabase/require-admin'
 
+import { getRequestAuthUser } from '@/lib/supabase/request-auth'
 import { createClient } from '@/lib/supabase/server'
 import { holdFundsInEscrow, releaseFundsFromEscrow } from '@/lib/escrow-actions'
 import { getUserSafetyStatus } from '@/lib/server-trust-safety'
@@ -10,6 +12,12 @@ import {
   getBestPromotionDiscountForItems,
   incrementPromotionUsage,
 } from '@/lib/promotion-actions'
+
+async function requireOrderUser(expectedId?: string) {
+  const { user, error } = await getRequestAuthUser()
+  if (error || !user || (expectedId && expectedId !== user.id)) throw new Error('Please sign in to access your orders.')
+  return user.id as string
+}
 
 function isMissingColumnError(error: any) {
   const message = String(error?.message || '').toLowerCase()
@@ -49,12 +57,11 @@ async function checkStockAvailability(
   if (productIds.length === 0) return { success: true as const }
 
   const { data, error } = await (supabase.from('products') as any)
-    .select('id, stock, name')
+    .select('id, stock, name, minimum_order_quantity')
     .in('id', productIds)
     .eq('merchant_id', merchantId)
 
   if (error) {
-    if (isMissingResourceError(error)) return { success: true as const }
     return { success: false as const, error: String(error?.message || 'Failed to check stock') }
   }
 
@@ -62,7 +69,9 @@ async function checkStockAvailability(
 
   for (const [productId, needed] of qtyByProduct.entries()) {
     const row = stockById.get(productId)
-    if (!row) continue
+    if (!row) return { success: false as const, error: 'A product is no longer available from this merchant. Please refresh your cart.' }
+    const minimum = Number(row.minimum_order_quantity ?? 1)
+    if (!Number.isSafeInteger(minimum) || minimum < 1 || needed.quantity < minimum) return { success: false as const, error: `Minimum order for ${row.name || 'this product'} is ${minimum} units. Update your cart.` }
     const available = Math.max(0, Number(row.stock || 0))
     if (available < needed.quantity) {
       return {
@@ -202,6 +211,7 @@ async function recordBuyerWalletRefund(
 
 export async function getBuyerOrders(buyerId: string) {
   try {
+    await requireOrderUser(buyerId)
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('orders')
@@ -271,6 +281,7 @@ export async function getBuyerOrders(buyerId: string) {
 
 export async function getMerchantOrders(merchantId: string) {
   try {
+    await requireOrderUser(merchantId)
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('orders')
@@ -374,7 +385,12 @@ export async function createOrder(
         }
       : payloadOrBuyerId
 
-    const idempotencyKey = getCheckoutIdempotencyKey(payload)
+    await requireOrderUser(payload.buyerId)
+    if (!Array.isArray(payload.items) || !payload.items.length || payload.items.length > 100 || payload.items.some(item =>
+      !item.productId || !item.merchantId || !Number.isSafeInteger(Number(item.quantity)) || Number(item.quantity) <= 0 ||
+      !Number.isFinite(Number(item.unitPrice)) || Number(item.unitPrice) <= 0
+    )) return { success: false, error: 'Your cart contains an invalid product, quantity or price. Please review it.' }
+    const idempotencyKey = payload.buyerId + ':' + getCheckoutIdempotencyKey(payload)
     const now = Date.now()
     const cachedResult = checkoutResultCache.get(idempotencyKey)
     if (cachedResult && cachedResult.expiresAt > now) {
@@ -704,6 +720,7 @@ export async function createOrder(
 
 export async function updateOrderStatus(orderId: string, status: string, actorId?: string) {
   try {
+    actorId = await requireOrderUser(actorId)
     const supabase = await createClient()
     const normalizedStatus = normalizeWorkflowStatus(status)
 
@@ -715,9 +732,15 @@ export async function updateOrderStatus(orderId: string, status: string, actorId
     const merchantId = String(order.merchant_id || '')
     const currentStatus = normalizeWorkflowStatus(String(order.status || ''))
 
-    const actorRole = actorId
-      ? (actorId === merchantId ? 'merchant' : actorId === buyerId ? 'buyer' : 'unknown')
-      : 'system'
+    const { data: actorProfile, error: actorError } = await supabase.from('auth_users').select('role').eq('id', actorId).single()
+    if (actorError) throw actorError
+    const actorRole = ['admin', 'trade_logistics_admin'].includes(String(actorProfile?.role))
+      ? 'logistics' : actorId === merchantId ? 'merchant' : actorId === buyerId ? 'buyer' : 'unknown'
+    if (actorRole === 'logistics') await requireAdmin('trade-logistics')
+    if (actorRole === 'logistics' && !(
+      (normalizedStatus === 'in_transit' && ['order_taken_for_delivery', 'in_transit'].includes(currentStatus)) ||
+      (normalizedStatus === 'completed' && ['in_transit', 'completed'].includes(currentStatus))
+    )) return { success: false, error: 'Logistics must follow dispatch, transit, then completion.' }
 
     if (actorRole === 'unknown') {
       return { success: false, error: 'You are not allowed to update this order.' }
@@ -760,7 +783,7 @@ export async function updateOrderStatus(orderId: string, status: string, actorId
     }
 
     if (actorRole === 'buyer' && normalizedStatus === 'cancelled') {
-      if (['cancelled', 'completed', 'delivered', 'in_transit'].includes(currentStatus)) {
+      if (['cancelled', 'completed', 'delivered', 'in_transit', 'order_taken_for_delivery'].includes(currentStatus)) {
         return { success: false, error: 'This order cannot be cancelled in its current state.' }
       }
 
@@ -789,9 +812,10 @@ export async function updateOrderStatus(orderId: string, status: string, actorId
         .select('id, status')
         .eq('order_id', orderId)
         .in('status', ['open', 'in_review'])
-        .maybeSingle()
+        .limit(1)
 
-      if (!disputeError && dispute) {
+      if (disputeError) throw new Error('Cannot verify dispute status. Please try again.')
+      if (Array.isArray(dispute) && dispute.length > 0) {
         return {
           success: false,
           error: 'Cannot mark as delivered: This order has an active dispute. Funds are frozen until the dispute is resolved by BigCat admin.',

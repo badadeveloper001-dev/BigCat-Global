@@ -47,6 +47,7 @@ export function formatCurrency(
   return new Intl.NumberFormat(locale || CURRENCY_LOCALE[currency], {
     style: 'currency',
     currency,
+    currencyDisplay: 'code',
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(numeric)

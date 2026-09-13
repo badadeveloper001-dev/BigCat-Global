@@ -6,11 +6,10 @@ import { ArrowLeft, CircleDollarSign, Clock4, CreditCard, ShieldCheck, Wallet } 
 import { formatCurrency } from "@/lib/currency-utils"
 
 interface PalmpayAdminDashboardProps {
-  bypassAccessCheck?: boolean
   embedded?: boolean
 }
 
-export function PalmpayAdminDashboard({ bypassAccessCheck = false, embedded = false }: PalmpayAdminDashboardProps = {}) {
+export function PalmpayAdminDashboard({ embedded = false }: PalmpayAdminDashboardProps = {}) {
   const router = useRouter()
   const [authorized, setAuthorized] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -23,17 +22,11 @@ export function PalmpayAdminDashboard({ bypassAccessCheck = false, embedded = fa
   })
 
   useEffect(() => {
-    if (bypassAccessCheck) {
-      setAuthorized(true)
-      return
-    }
-    const access = typeof window !== "undefined" ? sessionStorage.getItem("adminAccess") : null
-    if (access === "ORCHID_012") {
-      setAuthorized(true)
-      return
-    }
-    router.replace("/admin-portal")
-  }, [bypassAccessCheck, router])
+    fetch('/api/admin/session', { cache: 'no-store' }).then(r => r.json()).then(result => {
+      if (result.scope === 'bigcat' || result.scope === 'orchid') setAuthorized(true)
+      else router.replace('/admin-portal')
+    }).catch(() => router.replace('/admin-portal'))
+  }, [router])
 
   useEffect(() => {
     if (!authorized) return
@@ -62,8 +55,8 @@ export function PalmpayAdminDashboard({ bypassAccessCheck = false, embedded = fa
   const cards = useMemo(
     () => [
       { icon: CreditCard, label: "Transactions", value: String(stats.totalTransactions) },
-      { icon: CircleDollarSign, label: "Revenue", value: formatCurrency(stats.totalRevenue, "USD") },
-      { icon: Wallet, label: "Trade Protection Pool", value: formatCurrency(stats.totalEscrow, "USD") },
+      { icon: CircleDollarSign, label: "Revenue", value: formatCurrency(stats.totalRevenue, "NGN") },
+      { icon: Wallet, label: "Trade Protection Pool", value: formatCurrency(stats.totalEscrow, "NGN") },
       { icon: Clock4, label: "Pending Payments", value: String(stats.pendingPayments) },
     ],
     [stats],
@@ -90,6 +83,7 @@ export function PalmpayAdminDashboard({ bypassAccessCheck = false, embedded = fa
         </header>
       ) : null}
 
+      <div className="px-4 pt-3 text-right"><button className="text-sm text-muted-foreground" onClick={async () => { const response = await fetch('/api/admin/session', { method: 'DELETE' }); if (response.ok) window.location.assign('/admin-portal') }}>End admin session</button></div>
       <main className="mx-auto max-w-6xl px-4 py-6 space-y-5">
         <section className="rounded-2xl border border-border bg-card p-5">
           <div className="flex items-center gap-3 mb-2">

@@ -1,9 +1,18 @@
 'use server'
 
+import { getRequestAuthUser } from '@/lib/supabase/request-auth'
+import { containsBlockedContactRequest } from '@/lib/trust-safety'
+import { getUserSafetyStatus, recordContactSafetyViolation } from '@/lib/server-trust-safety'
 import { randomUUID } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { dispatchNotification } from '@/lib/notifications'
 import { detectMessageLanguage, translateMessageForUser } from '@/lib/chat-translation'
+
+async function requireChatUser(expectedId?: string) {
+  const { user, error } = await getRequestAuthUser()
+  if (error || !user || (expectedId && expectedId !== user.id)) throw new Error('Authentication required for this account.')
+  return user.id as string
+}
 
 function generateId(prefix: string) {
   return `${prefix}_${randomUUID()}`
@@ -11,6 +20,8 @@ function generateId(prefix: string) {
 
 export async function getOrCreateConversation(buyerId: string, merchantId: string, productId?: string) {
   try {
+    const actor = await requireChatUser()
+    if (actor !== buyerId && actor !== merchantId) throw new Error('You are not a participant in this conversation.')
     const supabase = await createClient()
 
     let query = supabase.from('conversations').select('*').eq('buyer_id', buyerId).eq('merchant_id', merchantId)
@@ -61,6 +72,7 @@ export async function getConversationMessages(
   viewerLanguage: 'en' | 'zh' = 'en',
 ) {
   try {
+    viewerId = await requireChatUser(viewerId)
     const supabase = await createClient()
 
     if (viewerId) {
@@ -110,6 +122,7 @@ export async function getConversationMessages(
 
 export async function markConversationAsRead(conversationId: string, userId: string) {
   try {
+    await requireChatUser(userId)
     const supabase = await createClient()
     const { data: conversation, error: conversationError } = await supabase
       .from('conversations')
@@ -122,12 +135,13 @@ export async function markConversationAsRead(conversationId: string, userId: str
       return { success: false, error: 'You are not allowed to update this conversation.' }
     }
 
-    await supabase
+    const { error: readError } = await supabase
       .from('messages')
       .update({ read_at: new Date().toISOString() } as any)
       .eq('conversation_id', conversationId)
       .neq('sender_id', userId)
       .is('read_at', null)
+    if (readError) throw readError
 
     return { success: true }
   } catch (error: any) {
@@ -142,6 +156,9 @@ export async function sendMessage(
   senderLanguage: 'en' | 'zh' = 'en',
 ) {
   try {
+    await requireChatUser(senderId)
+    if (typeof content !== 'string' || !content.trim() || content.length > 5000) throw new Error('Message must contain 1–5000 characters.')
+    content = content.trim()
     const supabase = await createClient()
     const { data: conversation, error: conversationError } = await supabase
       .from('conversations')
@@ -152,6 +169,13 @@ export async function sendMessage(
     if (conversationError) throw conversationError
     if (conversation?.buyer_id !== senderId && conversation?.merchant_id !== senderId) {
       return { success: false, error: 'You are not allowed to send a message in this conversation.' }
+    }
+
+    const safety = await getUserSafetyStatus(senderId)
+    if (safety.suspended) return { success: false, error: 'Messaging is temporarily suspended.', code: 'POLICY_USER_SUSPENDED', ...safety }
+    if (containsBlockedContactRequest(content)) {
+      const status = await recordContactSafetyViolation(senderId)
+      return { success: false, error: 'Please keep communication and transactions within BigCat.', code: status.suspended ? 'POLICY_USER_SUSPENDED' : 'POLICY_CONTACT_REQUEST_BLOCKED', ...status }
     }
 
     const detectedLanguage = detectMessageLanguage(content)
@@ -188,6 +212,7 @@ export async function sendMessage(
       : String(conversation?.buyer_id || '')
 
     if (recipientId) {
+      try {
       const senderProfile = await (supabase.from('auth_users') as any)
         .select('name, business_name')
         .eq('id', senderId)
@@ -203,6 +228,9 @@ export async function sendMessage(
         message: `${senderName}: ${preview}`,
         emailSubject: 'You have a new message on BigCat Global',
       })
+      } catch {
+        console.warn('Chat message saved; notification delivery failed.')
+      }
     }
 
     return {
@@ -221,6 +249,7 @@ export async function sendMessage(
 
 export async function getUserConversations(userId: string) {
   try {
+    await requireChatUser(userId)
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('conversations')

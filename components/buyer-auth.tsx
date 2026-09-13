@@ -14,46 +14,6 @@ declare global {
   }
 }
 
-const NIGERIAN_STATES = [
-  "Abia",
-  "Adamawa",
-  "Akwa Ibom",
-  "Anambra",
-  "Bauchi",
-  "Bayelsa",
-  "Benue",
-  "Borno",
-  "Cross River",
-  "Delta",
-  "Ebonyi",
-  "Edo",
-  "Ekiti",
-  "Enugu",
-  "FCT Abuja",
-  "Gombe",
-  "Imo",
-  "Jigawa",
-  "Kaduna",
-  "Kano",
-  "Katsina",
-  "Kebbi",
-  "Kogi",
-  "Kwara",
-  "Lagos",
-  "Nasarawa",
-  "Niger",
-  "Ogun",
-  "Ondo",
-  "Osun",
-  "Oyo",
-  "Plateau",
-  "Rivers",
-  "Sokoto",
-  "Taraba",
-  "Yobe",
-  "Zamfara",
-]
-
 export function BuyerAuth({
   onBack,
   onSuccess,
@@ -466,23 +426,12 @@ export function BuyerAuth({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">State</label>
+                        <label className="text-sm font-medium text-foreground">State / Province / Region</label>
                         <div className="relative">
                           <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
-                          <select
-                            name="state"
-                            value={formData.state}
-                            onChange={handleChange}
-                            className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground"
-                            required
-                          >
-                            <option value="">Select your state</option>
-                            {NIGERIAN_STATES.map((stateName) => (
-                              <option key={stateName} value={stateName}>
-                                {stateName}
-                              </option>
-                            ))}
-                          </select>
+                          <input name="state" value={formData.state} onChange={handleChange}
+                            placeholder="Enter your state, province or region"
+                            className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground" required />
                         </div>
                       </div>
 

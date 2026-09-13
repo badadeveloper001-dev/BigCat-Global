@@ -231,19 +231,10 @@ export async function holdFundsInEscrow(
 
 // Check if an order has an active dispute (prevents escrow release)
 async function hasActiveDispute(supabase: any, orderId: string): Promise<boolean> {
-  try {
-    const { data, error } = await supabase
-      .from('support_issues')
-      .select('id, status')
-      .eq('order_id', orderId)
-      .in('status', ['open', 'in_review'])
-      .maybeSingle()
-    
-    if (error) return false
-    return !!data
-  } catch {
-    return false
-  }
+  const { data, error } = await supabase.from('support_issues').select('id')
+    .eq('order_id', orderId).in('status', ['open', 'in_review']).limit(1)
+  if (error) throw new Error('Cannot verify dispute status. Try again before releasing funds.')
+  return Array.isArray(data) && data.length > 0
 }
 
 export async function releaseFundsFromEscrow(

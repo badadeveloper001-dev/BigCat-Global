@@ -1,5 +1,18 @@
+import { requireAdmin } from '@/lib/supabase/require-admin'
+import 'server-only'
+import { getRequestAuthUser } from '@/lib/supabase/request-auth'
 import { createClient } from '@/lib/supabase/server'
 import { releaseFundsFromEscrow } from '@/lib/escrow-actions'
+
+async function requireIssueAccess(expectedBuyer?: string) {
+  const { user, error } = await getRequestAuthUser()
+  if (error || !user) throw new Error('Authentication required.')
+  if (expectedBuyer) {
+    if (user.id !== expectedBuyer) throw new Error('You can only access your own disputes.')
+  } else {
+    await requireAdmin()
+  }
+}
 
 type ReportIssueInput = {
   orderId: string
@@ -11,11 +24,12 @@ type ReportIssueInput = {
 function normalizeStatus(value: string) {
   const normalized = String(value || '').toLowerCase().trim()
   if (['open', 'in_review', 'resolved', 'rejected'].includes(normalized)) return normalized
-  return 'open'
+  throw new Error('Invalid dispute status.')
 }
 
 export async function reportOrderIssue(input: ReportIssueInput) {
   try {
+    await requireIssueAccess(input.buyerId)
     const supabase = await createClient()
 
     const { data: order, error: orderError } = await supabase
@@ -41,8 +55,8 @@ export async function reportOrderIssue(input: ReportIssueInput) {
       status: 'open',
     }
 
-    if (!payload.description) {
-      return { success: false, error: 'Please describe the issue' }
+    if (!payload.description || payload.description.length > 5000 || payload.issue_type.length > 100) {
+      return { success: false, error: 'Describe the issue using 1–5000 characters.' }
     }
 
     const { data, error } = await (supabase.from('support_issues') as any).insert(payload).select('*').single()
@@ -56,6 +70,7 @@ export async function reportOrderIssue(input: ReportIssueInput) {
 
 export async function getAdminSupportIssues() {
   try {
+    await requireIssueAccess()
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('support_issues')
@@ -72,6 +87,7 @@ export async function getAdminSupportIssues() {
 
 export async function getBuyerSupportIssues(buyerId: string) {
   try {
+    await requireIssueAccess(buyerId)
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('support_issues')
@@ -89,6 +105,7 @@ export async function getBuyerSupportIssues(buyerId: string) {
 
 export async function updateSupportIssueStatus(issueId: string, status: string, adminNotes?: string) {
   try {
+    await requireIssueAccess()
     const supabase = await createClient()
     const nextStatus = normalizeStatus(status)
 

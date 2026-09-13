@@ -65,7 +65,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       }
 
       const detectedPreferences = await detectCountryAndRegionFromBrowser()
-      if (!isActive) return
+      if (!isActive || localStorage.getItem('globalPreferences')) return
       setPreferencesState(detectedPreferences)
     }
 
@@ -339,6 +339,10 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     setPreferencesState(nextPreferences)
     localStorage.setItem('globalPreferences', JSON.stringify(nextPreferences))
   }
+
+  useEffect(() => {
+    document.documentElement.lang = preferences.language === 'zh' ? 'zh-CN' : 'en'
+  }, [preferences.language])
 
   const setCountry = (country: SupportedCountry) => {
     setPreferences(applyCountryPreset(preferences, country))

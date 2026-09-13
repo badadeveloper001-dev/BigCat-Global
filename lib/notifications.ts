@@ -1,4 +1,4 @@
-"use server"
+import 'server-only'
 
 import { sendEmail } from "@/lib/mailer"
 import { createClient } from "@/lib/supabase/server"
@@ -879,10 +879,12 @@ export async function dispatchNotification(input: DispatchNotificationInput) {
     event_key: eventKey || null,
   })
 
-  const emailResult = await maybeSendEmail(userId, input)
-  const whatsappResult = await maybeSendWhatsApp(userId, input)
+  const [emailResult, whatsappResult] = await Promise.all([
+    maybeSendEmail(userId, input).catch(() => ({ sent: false as const, reason: 'Email delivery failed' })),
+    maybeSendWhatsApp(userId, input).catch(() => ({ sent: false as const, reason: 'WhatsApp delivery failed' })),
+  ])
 
-  if (eventKey) {
+  if (eventKey && notificationInsert.inserted) {
     try {
       await recordProcessedEvent(eventKey, userId, input.type, {
         ...(input.metadata || {}),
@@ -899,7 +901,7 @@ export async function dispatchNotification(input: DispatchNotificationInput) {
   }
 
   return {
-    success: true,
+    success: Boolean(notificationInsert.inserted || emailResult.sent || whatsappResult.sent),
     notification: notificationInsert,
     email: emailResult,
     whatsapp: whatsappResult,
@@ -912,7 +914,7 @@ export async function fetchUserNotifications(userId: string, options?: { limit?:
     .select("id, user_id, title, message, type, created_at, read_at, metadata")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
-    .limit(Math.max(1, Math.min(options?.limit || 50, 200)))
+    .limit(Number.isFinite(options?.limit) ? Math.max(1, Math.min(Math.floor(options!.limit!), 200)) : 50)
 
   if (options?.unreadOnly) {
     query = query.is("read_at", null)
@@ -936,6 +938,7 @@ export async function markNotificationRead(userId: string, notificationId: strin
     .update({ read_at: new Date().toISOString() })
     .eq("id", notificationId)
     .eq("user_id", userId)
+    .is("read_at", null)
 
   if (error) {
     return { success: false, error: error.message }

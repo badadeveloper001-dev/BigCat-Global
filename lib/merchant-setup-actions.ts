@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { requireMerchant } from '@/lib/supabase/require-merchant'
 
 interface MerchantSetupData {
   businessName: string
@@ -13,6 +14,7 @@ interface MerchantSetupData {
 
 export async function saveMerchantSetup(userId: string, setup: MerchantSetupData) {
   try {
+    await requireMerchant(userId)
     const supabase = await createClient()
     const updateData = {
       business_name: setup.businessName,
@@ -46,6 +48,7 @@ export async function saveMerchantSetup(userId: string, setup: MerchantSetupData
 
 export async function getMerchantSetup(userId: string) {
   try {
+    await requireMerchant(userId)
     const supabase = await createClient()
     const { data, error } = await supabase.from('auth_users').select('*').eq('id', userId).single()
     if (error) throw error

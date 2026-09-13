@@ -1,15 +1,12 @@
+import { requireAdmin } from '@/lib/supabase/require-admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { completeLogisticsOrder } from '@/lib/logistics-actions'
 
-function isAuthorized(request: NextRequest) {
-  const supplied = request.headers.get('x-logistics-access-code') || ''
-  const expected = process.env.LOGISTICS_ACCESS_CODE || 'LOGISTICS_001'
-  return supplied.trim().toUpperCase() === expected.trim().toUpperCase()
-}
+async function isAuthorized(request: NextRequest) { try { await requireAdmin('trade-logistics'); return true } catch { return false } }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    if (!isAuthorized(request)) {
+    if (!(await isAuthorized(request))) {
       return NextResponse.json({ success: false, error: 'Unauthorized logistics access' }, { status: 401 })
     }
 

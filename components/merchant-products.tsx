@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { formatNaira } from '@/lib/currency-utils'
+import { useRole } from '@/lib/role-context'
+import { formatCurrency, formatNaira } from '@/lib/currency-utils'
 import { Plus, Trash2, AlertCircle, Package, Loader2, X, Check, ImageIcon, Upload } from 'lucide-react'
 import { ImageUpload } from './image-upload'
 
@@ -24,6 +25,9 @@ const CATEGORIES = [
 ]
 
 export function MerchantProducts({ merchantId }: MerchantProductsProps) {
+  const { preferences } = useRole()
+  const [listingCurrency, setListingCurrency] = useState<'NGN' | 'CNY' | 'USD' | null>(null)
+  const currency = listingCurrency || preferences.currency
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
@@ -39,7 +43,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
     price: '',
     costPrice: '',
     category: 'Electronics',
-    stock: '0',
+    stock: '0', minimum_order_quantity: '1',
     weight: '',
     images: [] as string[],
   })
@@ -112,6 +116,8 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
       return
     }
 
+    const minimumOrder = Number(formData.minimum_order_quantity)
+    if (!Number.isSafeInteger(minimumOrder) || minimumOrder < 1 || minimumOrder > 99999999) { setError('Minimum order quantity must be a positive whole number.'); return }
     const stock = formData.stock === '' ? 0 : Number(formData.stock)
     if (!Number.isInteger(stock) || stock < 0) {
       setError('Enter a valid stock quantity')
@@ -146,9 +152,11 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
             name: formData.name,
             description: formData.description,
             price,
+            listing_currency: currency,
             cost_price: costPrice,
             category: formData.category,
             stock,
+            minimum_order_quantity: minimumOrder,
             weight,
             images: formData.images,
           }
@@ -158,7 +166,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
 
       if (result.success) {
         setSuccess('Product created successfully!')
-        setFormData({ name: '', description: '', price: '', costPrice: '', category: 'Electronics', stock: '0', weight: '', images: [] })
+        setFormData({ name: '', description: '', price: '', costPrice: '', category: 'Electronics', stock: '0', minimum_order_quantity: '1', weight: '', images: [] })
         setShowAddForm(false)
         loadProducts()
       } else {
@@ -188,7 +196,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
     }
   }
 
-  const handleUpdateInventory = async (productId: string, stockValue: number, costPriceValue: number) => {
+  const handleUpdateInventory = async (productId: string, stockValue: number, costPriceValue: number, minimumOrder: number) => {
     if (!Number.isInteger(stockValue) || stockValue < 0) {
       setError('Enter a valid stock quantity')
       return
@@ -214,6 +222,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
           merchantId,
           updates: {
             stock: stockValue,
+            minimum_order_quantity: minimumOrder,
             cost_price: costPriceValue,
           },
         }),
@@ -354,8 +363,10 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
               name,
               description,
               price,
+              listing_currency: row.currency || currency,
               cost_price: costPrice,
               category,
+              minimum_order_quantity: Number(row.minimum_order_quantity || 1),
               stock: Number.isFinite(stock) && stock >= 0 ? stock : 0,
               weight: Number.isFinite(weight ?? NaN) && (weight ?? 0) >= 0 ? weight : undefined,
               images,
@@ -499,8 +510,11 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Selling Price
+                  Selling Price ({currency})
                 </label>
+                <select aria-label="Listing currency" value={currency} onChange={e => setListingCurrency(e.target.value as 'NGN' | 'CNY' | 'USD')} className="mb-2 w-full px-3 py-2 bg-secondary border border-border rounded-lg">
+                  <option value="NGN">NGN</option><option value="CNY">CNY</option><option value="USD">USD</option>
+                </select>
                 <input
                   type="number"
                   step="0.01"
@@ -513,6 +527,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
                 />
               </div>
 
+              <div><label className="block text-sm font-medium mb-2">Minimum order quantity</label><input type="number" min="1" step="1" max="99999999" value={formData.minimum_order_quantity} onChange={e => setFormData({ ...formData, minimum_order_quantity: e.target.value })} className="w-full px-3 py-2 bg-secondary border border-border rounded-lg" /><p className="text-xs text-muted-foreground">Price is per unit. Buyers must order at least this many units.</p></div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
                   Stock Quantity
@@ -547,7 +562,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
             </div>
 
             <p className="text-xs text-muted-foreground">
-              Cost price is private to merchants and used only for audit, profit and loss tracking.
+              Cost price is recorded in NGN and is private to merchants and used only for audit, profit and loss tracking.
             </p>
 
             <div>
@@ -582,7 +597,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
           <div>
             <h3 className="text-lg font-semibold text-foreground">Bulk Import Products</h3>
             <p className="text-sm text-muted-foreground mt-1">
-              Upload a CSV with columns like name, description, price, cost_price, category, stock, weight, and images.
+              Upload a CSV with columns like name, description, price, cost_price, category, stock, minimum_order_quantity (defaults to 1), weight, currency (NGN/CNY/USD), and images. Cost prices are NGN.
             </p>
           </div>
           <Upload className="w-5 h-5 text-primary" />
@@ -649,7 +664,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
                   </p>
                   <div className="flex items-center gap-4 mt-3 flex-wrap">
                     <span className="text-sm font-medium text-foreground">
-                      Selling: {formatNaira(product.price)}
+                      Selling: {formatCurrency(product.listing_price ?? product.price, product.listing_currency || 'NGN')}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       Cost: {formatNaira(Number(product.cost_price || 0))}
@@ -717,8 +732,9 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
                       className="w-full rounded-lg border border-border bg-secondary px-2 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                       aria-label={`Cost price for ${product.name}`}
                     />
+                    <label className="text-xs">Minimum order quantity<input type="number" min="1" step="1" max="99999999" value={product.minimum_order_quantity ?? 1} onChange={e => setProducts(current => current.map(item => item.id === product.id ? { ...item, minimum_order_quantity: e.target.value } : item))} className="w-full rounded-lg border border-border bg-secondary px-2 py-2 text-sm" /></label>
                     <button
-                      onClick={() => handleUpdateInventory(product.id, Number(product.stock || 0), Number(product.cost_price || 0))}
+                      onClick={() => handleUpdateInventory(product.id, Number(product.stock || 0), Number(product.cost_price || 0), Number(product.minimum_order_quantity ?? 1))}
                       disabled={updatingStockId === product.id}
                       className="rounded-lg bg-secondary px-3 py-2 text-xs font-medium text-foreground hover:bg-secondary/80 disabled:opacity-50"
                     >

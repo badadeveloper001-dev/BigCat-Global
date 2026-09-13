@@ -27,7 +27,7 @@ import {
   Users,
 } from "lucide-react"
 import Image from "next/image"
-import { formatNaira } from "@/lib/currency-utils"
+import { convertCurrency, formatCurrency, formatNaira } from "@/lib/currency-utils"
 import { BrandWordmark } from "./brand-wordmark"
 import { useCart } from "@/lib/cart-context"
 import { useWishlist } from "@/lib/wishlist-context"
@@ -60,7 +60,7 @@ interface VendorPageProps {
 }
 
 export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewProduct, onOpenCart, onCheckout }: VendorPageProps) {
-  const { user } = useRole()
+  const { user, preferences } = useRole()
   const [addedToCart, setAddedToCart] = useState<string | null>(null)
   const [popupProduct, setPopupProduct] = useState<any | null>(null)
   const { addItem, getItemCount, getTotal } = useCart()
@@ -253,8 +253,8 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
       return
     }
 
-    if (Number(product.stock || 0) <= 0) {
-      setPolicyNotice("This item is currently out of stock.")
+    if (Number(product.stock || 0) < Number(product.minimum_order_quantity ?? 1)) {
+      setPolicyNotice("Insufficient stock for minimum order.")
       return
     }
 
@@ -263,7 +263,9 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
       productId: product.id,
       name: product.name,
       price: parseFloat(product.price),
-      quantity: 1,
+      quantity: Number(product.minimum_order_quantity ?? 1),
+      minimum_order_quantity: Number(product.minimum_order_quantity ?? 1),
+      stock: Number(product.stock || 0),
       merchantId: String(vendor.id),
       merchantName: vendor.name,
     })
@@ -548,7 +550,10 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                       <p className="text-sm text-muted-foreground mb-2 line-clamp-1">{product.description}</p>
                       
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="font-bold text-foreground">{formatNaira(parseFloat(product.price))}</span>
+                        <span className="text-xs text-muted-foreground">Minimum {product.minimum_order_quantity ?? 1} units · Price per unit</span>
+                        <span className="font-bold text-foreground">{formatCurrency(product.listing_price ?? product.price, product.listing_currency || 'NGN')}
+                          {(product.listing_currency || 'NGN') !== preferences.currency && <small className="block text-muted-foreground">≈ {formatCurrency(convertCurrency(product.listing_price ?? product.price, product.listing_currency || 'NGN', preferences.currency), preferences.currency)} · Demo rate</small>}
+                        </span>
                       </div>
                       
                       <div className="flex items-center gap-3 text-sm">
@@ -587,16 +592,16 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                       </button>
                       <button
                         onClick={() => handleAddToCart(product)}
-                        disabled={Number(product.stock || 0) <= 0}
+                        disabled={Number(product.stock || 0) < Number(product.minimum_order_quantity ?? 1)}
                         className={`flex-shrink-0 px-4 py-2 h-fit text-sm font-medium rounded-lg whitespace-nowrap transition-colors ${
-                          Number(product.stock || 0) <= 0
+                          Number(product.stock || 0) < Number(product.minimum_order_quantity ?? 1)
                             ? "bg-secondary text-muted-foreground cursor-not-allowed"
                             : addedToCart === product.id
                               ? "bg-green-500 text-white"
                               : "bg-primary text-primary-foreground hover:bg-primary/90"
                         }`}
                       >
-                        {Number(product.stock || 0) <= 0 ? "Out of Stock" : addedToCart === product.id ? "Added ✓" : "Add to Cart"}
+                        {Number(product.stock || 0) < Number(product.minimum_order_quantity ?? 1) ? "Insufficient stock for minimum order" : addedToCart === product.id ? "Added ✓" : "Add to Cart"}
                       </button>
                     </div>
                   </div>

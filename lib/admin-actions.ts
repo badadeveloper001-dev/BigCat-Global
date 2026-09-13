@@ -1,3 +1,5 @@
+import 'server-only'
+import { requireAdmin } from '@/lib/supabase/require-admin'
 import { createClient } from '@/lib/supabase/server'
 import { buildLocationQuery, geocodeLocation, haversineDistanceKm } from '@/lib/location-utils'
 import { getBusinessScale, getBusinessScaleProgress } from '@/lib/business-metrics'
@@ -208,6 +210,7 @@ async function recordMerchantScaleHistory(supabase: any, merchants: any[]) {
 
 export async function getMerchants(options: { buyerLat?: number | null; buyerLng?: number | null } = {}) {
   try {
+    await requireAdmin()
     const supabase = await createClient()
     const [{ data, error }, orderRowsResult] = await Promise.all([
       supabase.from('auth_users').select('*').eq('role', 'merchant'),
@@ -336,6 +339,7 @@ export async function getMerchants(options: { buyerLat?: number | null; buyerLng
 
 export async function getMerchantGrowthHistory(limit = 50) {
   try {
+    await requireAdmin()
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('merchant_scale_history')
@@ -361,6 +365,7 @@ export async function getMerchantGrowthHistory(limit = 50) {
 
 export async function getPlatformStats() {
   try {
+    await requireAdmin()
     const supabase = await createClient()
     const { count: userCount } = await supabase.from('auth_users').select('*', { count: 'exact', head: true })
     const { count: merchantCount } = await supabase.from('auth_users').select('*', { count: 'exact', head: true }).eq('role', 'merchant')
@@ -402,8 +407,9 @@ export async function getPlatformStats() {
 
 export async function approveMerchant(merchantId: string) {
   try {
+    await requireAdmin()
     const supabase = await createClient()
-    const { error } = await supabase.from('auth_users').update({ setup_completed: true }).eq('id', merchantId)
+    const { error } = await supabase.from('auth_users').update({ setup_completed: true }).eq('id', merchantId).eq('role', 'merchant')
     if (error) throw error
     return { success: true }
   } catch (error: any) {
@@ -413,8 +419,9 @@ export async function approveMerchant(merchantId: string) {
 
 export async function rejectMerchant(merchantId: string) {
   try {
+    await requireAdmin()
     const supabase = await createClient()
-    const { error } = await supabase.from('auth_users').delete().eq('id', merchantId)
+    const { error } = await supabase.from('auth_users').update({ setup_completed: false }).eq('id', merchantId).eq('role', 'merchant')
     if (error) throw error
     return { success: true }
   } catch (error: any) {
@@ -424,8 +431,9 @@ export async function rejectMerchant(merchantId: string) {
 
 export async function getRecentUsers() {
   try {
+    await requireAdmin()
     const supabase = await createClient()
-    const { data, error } = await supabase.from('auth_users').select('*').order('created_at', { ascending: false }).limit(10)
+    const { data, error } = await supabase.from('auth_users').select('id, email, name, full_name, role, created_at').order('created_at', { ascending: false }).limit(10)
     if (error) throw error
     return { success: true, data: data || [] }
   } catch (error: any) {
@@ -435,6 +443,7 @@ export async function getRecentUsers() {
 
 export async function getRecentOrders() {
   try {
+    await requireAdmin()
     const supabase = await createClient()
     const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(10)
     if (error) throw error
@@ -446,6 +455,7 @@ export async function getRecentOrders() {
 
 export async function getLogisticsStats() {
   try {
+    await requireAdmin('trade-logistics')
     const supabase = await createClient()
     // Placeholder - implement logistics/delivery stats
     const { count: totalDeliveries } = await supabase.from('orders').select('*', { count: 'exact', head: true }).not('status', 'eq', 'pending')
@@ -459,6 +469,7 @@ export async function getLogisticsStats() {
 
 export async function getMerchantStats() {
   try {
+    await requireAdmin()
     const merchantsResult = await getMerchants()
     if (!merchantsResult.success) {
       return { success: false, error: merchantsResult.error }
@@ -497,6 +508,7 @@ export async function getMerchantStats() {
 
 export async function getTransactions() {
   try {
+    await requireAdmin('orchid')
     const supabase = await createClient()
     // Assuming there's a transactions table or using orders as transactions
     const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(20)
@@ -509,6 +521,7 @@ export async function getTransactions() {
 
 export async function getTransactionStats() {
   try {
+    await requireAdmin('orchid')
     const supabase = await createClient()
     const { data: orders, error } = await selectOrdersForTransactionStats(supabase)
 

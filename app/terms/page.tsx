@@ -29,6 +29,7 @@ export default function TermsPage() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="bg-card border border-border rounded-2xl p-6 space-y-8 text-sm text-foreground leading-relaxed">
 
+          <aside className="rounded-xl border border-border bg-secondary/30 p-4">Test-only pilot: no real payment processing or funds custody. <Link href="/pilot" className="underline">Read the pilot rules / 阅读试点规则</Link>.</aside>
           <section>
             <p className="text-muted-foreground">
               Welcome to {COMPANY}. By accessing or using our platform (website, mobile app, or any related services), you agree to be bound by these Terms of Service. Please read them carefully before using our services.
@@ -38,7 +39,7 @@ export default function TermsPage() {
           <section>
             <h2 className="font-bold text-base mb-3">1. About BigCat Global</h2>
             <p className="text-muted-foreground">
-              {COMPANY} is a Nigerian e-commerce marketplace that connects buyers and sellers of goods and services. We provide the platform, payment infrastructure, escrow protection, and related tools. We are not a party to transactions between buyers and merchants, but we facilitate and protect them through our escrow system.
+              {COMPANY} is a Nigerian e-commerce marketplace that connects buyers and sellers of goods and services. This pilot tests marketplace and transaction workflows using simulated payments. It does not provide real payment custody or escrow protection.
             </p>
           </section>
 
@@ -78,15 +79,15 @@ export default function TermsPage() {
           <section>
             <h2 className="font-bold text-base mb-3">5. Payments, GIT Fee & Escrow</h2>
             <ul className="text-muted-foreground space-y-2 list-disc list-inside">
-              <li>All payments are processed through Orchid&rsquo;s secure infrastructure.</li>
+              <li>Pilot payments are simulated. No payment provider is connected for real collections.</li>
               <li>All users have access to a multi-currency wallet (NGN, USD, and CNY) that supports funding and currency conversion features.</li>
               <li>When you convert or pay across currencies, the applicable exchange rate shown at execution time is used for settlement.</li>
               <li>Exchange rates are sourced from live third-party market data providers where available, with resilient fallback rates used only when live providers are unavailable.</li>
-              <li>Funds are held in escrow until the buyer confirms receipt and releases payment.</li>
+              <li>Wallet and escrow labels represent simulated records only; BigCat is not holding real funds in this pilot.</li>
               <li>A Goods in Transit (GIT) fee of 1.5% is applied to goods and services at checkout to cover goods damaged in transit only. The GIT fee is not charged on delivery fees and does not cover return delivery.</li>
-              <li>Escrow funds are auto-released to the merchant after 7 days if the buyer does not confirm or dispute.</li>
+              <li>Test completion and release are manually coordinated; no automatic real-money release is promised.</li>
               <li>Platform fees are deducted from merchant payouts before credit to the merchant wallet.</li>
-              <li>Refunds for resolved disputes are processed within 3–5 business days.</li>
+              <li>Test refund outcomes are reviewed by the pilot operator; no real refund processing time is promised.</li>
             </ul>
           </section>
 

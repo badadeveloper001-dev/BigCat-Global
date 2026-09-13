@@ -18,36 +18,23 @@ type LogisticsOrder = {
 }
 
 type LogisticsAdminDashboardProps = {
-  bypassAccessCheck?: boolean
   embedded?: boolean
 }
 
-function mapCustomsStatus(logisticsStatus: string) {
-  const status = String(logisticsStatus || "pending").toLowerCase()
-  if (["completed", "return_completed"].includes(status)) return "Cleared"
-  if (["in_transit", "return_in_transit"].includes(status)) return "In Transit"
-  if (["assigned", "return_assigned"].includes(status)) return "Processing"
-  return "Awaiting Documentation"
-}
+function mapCustomsStatus(logisticsStatus: string) { return String(logisticsStatus || 'pending').replaceAll('_', ' ') }
 
-export function LogisticsAdminDashboard({ bypassAccessCheck = false, embedded = false }: LogisticsAdminDashboardProps = {}) {
+export function LogisticsAdminDashboard({ embedded = false }: LogisticsAdminDashboardProps = {}) {
   const router = useRouter()
   const [authorized, setAuthorized] = useState(false)
   const [loading, setLoading] = useState(true)
   const [orders, setOrders] = useState<LogisticsOrder[]>([])
 
   useEffect(() => {
-    if (bypassAccessCheck) {
-      setAuthorized(true)
-      return
-    }
-    const access = typeof window !== "undefined" ? sessionStorage.getItem("adminAccess") : null
-    if (access === "TRADELOG_001") {
-      setAuthorized(true)
-      return
-    }
-    router.replace("/admin-portal")
-  }, [bypassAccessCheck, router])
+    fetch('/api/admin/session', { cache: 'no-store' }).then(r => r.json()).then(result => {
+      if (result.scope === 'bigcat' || result.scope === 'trade-logistics') setAuthorized(true)
+      else router.replace('/admin-portal')
+    }).catch(() => router.replace('/admin-portal'))
+  }, [router])
 
   useEffect(() => {
     if (!authorized) return
@@ -56,7 +43,6 @@ export function LogisticsAdminDashboard({ bypassAccessCheck = false, embedded = 
       try {
         const response = await fetch("/api/logistics/orders", {
           cache: "no-store",
-          headers: { "x-logistics-access-code": "LOGISTICS_001" },
         })
         const result = await response.json()
         const nextOrders = Array.isArray(result?.data?.orders) ? result.data.orders : []
@@ -97,6 +83,7 @@ export function LogisticsAdminDashboard({ bypassAccessCheck = false, embedded = 
         </header>
       ) : null}
 
+      <div className="px-4 pt-3 text-right"><button className="text-sm text-muted-foreground" onClick={async () => { const response = await fetch('/api/admin/session', { method: 'DELETE' }); if (response.ok) window.location.assign('/admin-portal') }}>End admin session</button></div>
       <main className="mx-auto max-w-6xl px-4 py-6 space-y-5">
         <section className="rounded-2xl border border-border bg-card p-5">
           <div className="flex items-center gap-3 mb-2">
@@ -104,7 +91,7 @@ export function LogisticsAdminDashboard({ bypassAccessCheck = false, embedded = 
             <h2 className="font-semibold">International Trade & Logistics</h2>
           </div>
           <p className="text-sm text-muted-foreground">
-            Manage freight workflows, customs updates, shipment milestones, and delivery timelines for Nigeria-China orders.
+            Manage freight workflows, shipment milestones, and delivery timelines for Nigeria-China orders.
           </p>
         </section>
 
@@ -126,7 +113,7 @@ export function LogisticsAdminDashboard({ bypassAccessCheck = false, embedded = 
           </div>
           <div className="rounded-xl border border-border bg-card p-4">
             <ShieldCheck className="w-4 h-4 text-primary mb-2" />
-            <p className="text-lg font-bold">{formatCurrency(summary.totalFreight, "USD")}</p>
+            <p className="text-lg font-bold">{formatCurrency(summary.totalFreight, "NGN")}</p>
             <p className="text-xs text-muted-foreground">Freight Cost</p>
           </div>
         </section>
@@ -143,7 +130,7 @@ export function LogisticsAdminDashboard({ bypassAccessCheck = false, embedded = 
                   <p className="font-medium">{String(order.id).slice(0, 10)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Customs Status</p>
+                  <p className="text-xs text-muted-foreground">Shipment Status</p>
                   <p>{mapCustomsStatus(order.logistics_status)}</p>
                 </div>
                 <div>
@@ -156,7 +143,7 @@ export function LogisticsAdminDashboard({ bypassAccessCheck = false, embedded = 
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Freight Cost</p>
-                  <p>{formatCurrency(Number(order.delivery_fee || 0), "USD")}</p>
+                  <p>{formatCurrency(Number(order.delivery_fee || 0), "NGN")}</p>
                 </div>
               </div>
             ))}

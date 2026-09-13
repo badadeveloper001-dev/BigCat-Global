@@ -130,8 +130,8 @@ export function DeploymentGuide() {
       description: 'Test admin panel access',
       details: [
         'Click "Admin Access" on onboarding',
-        'Enter SMEDAN admin code',
-        'View SMEDAN dashboard with merchant approvals',
+        'Enter the backend-configured BigCat admin code',
+        'View BigCat dashboard with merchant approvals',
         'Try PalmPay admin code',
         'View payment and escrow data',
         'Try BigCat super admin code',

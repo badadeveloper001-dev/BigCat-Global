@@ -4,6 +4,12 @@ import { geocodeLocation, reverseGeocode } from '@/lib/location-utils'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
+    if (searchParams.get('detect') === 'country') {
+      const country = request.headers.get('x-vercel-ip-country')?.toUpperCase()
+      return NextResponse.json({ success: true, data: { country: country === 'CN' || country === 'NG' ? country : null } }, {
+        headers: { 'Cache-Control': 'private, no-store', 'Vary': 'x-vercel-ip-country' },
+      })
+    }
     const latitudeParam = searchParams.get('latitude')
     const longitudeParam = searchParams.get('longitude')
     const latitude = latitudeParam !== null ? Number(latitudeParam) : Number.NaN

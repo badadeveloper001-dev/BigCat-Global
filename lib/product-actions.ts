@@ -1,6 +1,10 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { convertCurrency } from '@/lib/currency-utils'
+import { searchFilterValue } from '@/lib/discovery-utils'
+import { validateMoq } from '@/lib/product-moq'
+import { requireMerchant } from '@/lib/supabase/require-merchant'
 import { buildLocationQuery, geocodeLocation, haversineDistanceKm } from '@/lib/location-utils'
 import { getPromotionPercentOffForProduct } from '@/lib/promotion-actions'
 
@@ -8,10 +12,13 @@ interface ProductInput {
   name: string
   description?: string
   price: number
+  listing_currency?: 'NGN' | 'CNY' | 'USD'
+  listing_price?: number
   cost_price?: number
   category?: string
   image_url?: string
   images?: string[]
+  minimum_order_quantity?: number
   stock?: number
   weight?: number
   is_active?: boolean
@@ -38,6 +45,7 @@ function sortBigZeeFirst<T>(items: T[], getText: (item: T) => string) {
 }
 
 function toFiniteNumber(value: unknown) {
+  if (value === null || value === undefined || value === '') return null
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : null
 }
@@ -250,11 +258,14 @@ function buildBaseProductPayload(product: Partial<ProductInput>, options: { incl
     ...(product.name !== undefined ? { name: product.name } : {}),
     ...(product.description !== undefined ? { description: product.description } : {}),
     ...(product.price !== undefined ? { price: product.price } : {}),
+    ...(product.listing_currency !== undefined ? { listing_currency: product.listing_currency } : {}),
+    ...(product.listing_price !== undefined ? { listing_price: product.listing_price } : {}),
     ...(product.cost_price !== undefined ? { cost_price: product.cost_price } : {}),
     ...(product.category !== undefined ? { category: product.category } : {}),
     ...(product.image_url !== undefined || product.images !== undefined
       ? { image_url: product.image_url || product.images?.[0] || null }
       : {}),
+    ...(product.minimum_order_quantity !== undefined || options.includeDefaults ? { minimum_order_quantity: validateMoq(product.minimum_order_quantity) } : {}),
     ...(product.stock !== undefined ? { stock: product.stock } : options.includeDefaults ? { stock: 0 } : {}),
   }
 }
@@ -280,6 +291,7 @@ function buildLegacyProductPayload(product: Partial<ProductInput>, options: { in
 
 export async function getMerchantProducts(merchantId: string) {
   try {
+    await requireMerchant(merchantId)
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('products')
@@ -320,7 +332,7 @@ export async function getAllProducts(options: {
 
     // Push text search to DB using ilike on name and description
     if (options.search && options.search.trim()) {
-      const term = `%${options.search.trim()}%`
+      const term = searchFilterValue(options.search)
       query = (query as any).or(`name.ilike.${term},description.ilike.${term}`)
     }
 
@@ -380,15 +392,22 @@ export async function getProductById(productId: string) {
 
 export async function createProduct(merchantId: string, product: ProductInput, actorId?: string) {
   try {
+    actorId = await requireMerchant(merchantId)
     const supabase = await createClient()
 
     if (actorId && actorId !== merchantId) {
       return { success: false, error: 'You are not allowed to create products for this merchant.' }
     }
 
+    if (typeof product.name !== 'string' || !product.name.trim()) throw new Error('Product name is required')
+    const listingCurrency = product.listing_currency || 'NGN'
+    if (!['NGN', 'CNY', 'USD'].includes(listingCurrency)) throw new Error('Unsupported listing currency')
+    const listingPrice = sanitizeDecimal(product.price, 'Listing price', { required: true, min: 0.01 })!
     const normalizedProduct = {
       ...product,
-      price: sanitizeDecimal(product.price, 'Product price', { required: true, min: 0.01 }),
+      name: product.name?.trim(),
+      price: sanitizeDecimal(convertCurrency(listingPrice, listingCurrency, 'NGN'), 'Product price', { required: true, min: 0.01 }),
+      ...(product.listing_currency ? { listing_currency: listingCurrency, listing_price: listingPrice } : {}),
       cost_price: sanitizeDecimal(product.cost_price, 'Cost price', { required: true, min: 0 }),
       stock: sanitizeWholeNumber(product.stock, 'Stock quantity', { min: 0 }),
       weight: sanitizeDecimal(product.weight, 'Product weight', { min: 0 }),
@@ -404,6 +423,8 @@ export async function createProduct(merchantId: string, product: ProductInput, a
 
     let result = await (supabase.from('products') as any).insert(richPayload).select().single()
 
+    if (result.error && /minimum_order_quantity/.test(String(result.error.message))) throw new Error('Apply scripts/032-product-moq.sql before saving MOQ.')
+    if (result.error && product.listing_currency && /listing_currency|listing_price/.test(String(result.error.message))) throw new Error('Apply scripts/030-product-listing-currency.sql before saving listing currencies.')
     if (result.error && String(result.error.message || '').includes('column')) {
       result = await (supabase.from('products') as any)
         .insert({ ...buildLegacyProductPayload(normalizedProduct), merchant_id: merchantId })
@@ -420,16 +441,26 @@ export async function createProduct(merchantId: string, product: ProductInput, a
 
 export async function updateProduct(productId: string, updates: Partial<ProductInput>, actorId?: string) {
   try {
+    actorId = await requireMerchant(actorId)
     const supabase = await createClient()
 
+    if (updates.name !== undefined && (typeof updates.name !== 'string' || !updates.name.trim())) throw new Error('Product name is required')
+    if (updates.listing_price !== undefined) throw new Error('Supply price and listing_currency together to change a listing price.')
+    if (updates.listing_currency !== undefined && (!['NGN','CNY','USD'].includes(updates.listing_currency) || updates.price === undefined)) throw new Error('Supply a valid listing currency and price together.')
+    if (updates.price !== undefined && !updates.listing_currency) {
+      const existing = await supabase.from('products').select('listing_currency').eq('id', productId).eq('merchant_id', actorId).single()
+      if (existing.error || existing.data?.listing_currency !== 'NGN') throw new Error('Specify the original listing currency when changing this price.')
+      updates = { ...updates, listing_currency: 'NGN' }
+    }
     const normalizedUpdates = {
       ...updates,
       ...(updates.price !== undefined
-        ? { price: sanitizeDecimal(updates.price, 'Product price', { min: 0.01 }) }
+        ? { listing_price: sanitizeDecimal(updates.price, 'Listing price', { min: 0.01 }), price: sanitizeDecimal(convertCurrency(updates.price!, updates.listing_currency || 'NGN', 'NGN'), 'Product price', { min: 0.01 }) }
         : {}),
       ...(updates.cost_price !== undefined
         ? { cost_price: sanitizeDecimal(updates.cost_price, 'Cost price', { min: 0 }) }
         : {}),
+      ...(updates.minimum_order_quantity !== undefined ? { minimum_order_quantity: validateMoq(updates.minimum_order_quantity) } : {}),
       ...(updates.stock !== undefined
         ? { stock: sanitizeWholeNumber(updates.stock, 'Stock quantity', { min: 0 }) }
         : {}),
@@ -465,6 +496,8 @@ export async function updateProduct(productId: string, updates: Partial<ProductI
       if (!missingColumn || !(missingColumn in richPayload)) break
 
       // If cost_price itself is unavailable, switch to compatibility fallback for metadata storage.
+      if (missingColumn === 'minimum_order_quantity') throw new Error('Apply scripts/032-product-moq.sql before saving MOQ.');
+      if (missingColumn === 'listing_currency' || missingColumn === 'listing_price') throw new Error('Apply the product listing currency migration before changing prices.')
       if (missingColumn === 'cost_price' && normalizedUpdates.cost_price !== undefined) {
         costPriceColumnUnavailable = true
         break
@@ -527,6 +560,8 @@ export async function updateProduct(productId: string, updates: Partial<ProductI
         const missingColumn = extractMissingColumnName(message)
         if (!missingColumn || !(missingColumn in fallbackPayload)) break
 
+        if (missingColumn === 'minimum_order_quantity') throw new Error('Apply scripts/032-product-moq.sql before saving MOQ.');
+      if (missingColumn === 'listing_currency' || missingColumn === 'listing_price') throw new Error('Listing currency could not be saved. Apply the currency migration.')
         if (missingColumn === 'images') {
           canPersistCostWithImages = false
         }
@@ -555,6 +590,7 @@ export async function updateProduct(productId: string, updates: Partial<ProductI
 
 export async function deleteProduct(productId: string, actorId?: string) {
   try {
+    actorId = await requireMerchant(actorId)
     const supabase = await createClient()
     let query = supabase.from('products').delete().eq('id', productId)
     if (actorId) query = query.eq('merchant_id', actorId)

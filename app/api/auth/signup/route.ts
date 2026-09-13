@@ -25,6 +25,10 @@ export async function POST(request: NextRequest) {
     const normalizedMerchantType = merchantType === 'services' ? 'services' : 'products'
     const normalizedCountry = country === 'CN' ? 'CN' : 'NG'
 
+    if (role !== 'buyer' && role !== 'merchant') {
+      return NextResponse.json({ success: false, error: 'Choose buyer or merchant.' }, { status: 400 })
+    }
+
     if (!email || !password || !name || !phone || !role) {
       return NextResponse.json(
         { success: false, error: 'All fields are required' },

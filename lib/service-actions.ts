@@ -1,5 +1,6 @@
 'use server'
 
+import { searchFilterValue } from '@/lib/discovery-utils'
 import { createClient } from '@/lib/supabase/server'
 import { dispatchNotification } from '@/lib/notifications'
 
@@ -60,18 +61,15 @@ export async function getMarketplaceServices(filters?: {
     if (filters?.city) query = query.ilike('service_city', `%${filters.city}%`)
     if (filters?.merchantId) query = query.eq('merchant_id', filters.merchantId)
 
+    if (filters?.search?.trim()) {
+      const term = searchFilterValue(filters.search)
+      query = query.or(`title.ilike.${term},description.ilike.${term},category.ilike.${term}`)
+    }
+
     const { data, error } = await query
     if (error) throw error
 
     let rows = data || []
-    if (filters?.search) {
-      const needle = filters.search.toLowerCase()
-      rows = rows.filter((service: any) =>
-        [service.title, service.description, service.category]
-          .filter(Boolean)
-          .some((field) => String(field).toLowerCase().includes(needle)),
-      )
-    }
 
     const withNames = await attachMerchantNames(rows)
     return { success: true, data: withNames }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { Mail, Phone, Clock, MessageSquare, Send, CheckCircle } from 'lucide-react'
 
@@ -10,9 +10,31 @@ export default function ContactPage() {
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [feedbackError, setFeedbackError] = useState('')
+  const [reference, setReference] = useState('')
+  const attempt = useRef({ signature: '', id: '' })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (saving) return
+    if (['bug','confusion','suggestion'].includes(subject)) {
+      setSaving(true)
+      setFeedbackError('')
+      const signature = subject + ':' + message.trim()
+      if (attempt.current.signature !== signature) attempt.current = { signature, id: crypto.randomUUID() }
+      try {
+        const response = await fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: attempt.current.id, category: subject, description: message }) })
+        const result = await response.json()
+        if (!result.success) throw new Error(result.error || 'Could not save feedback')
+        setReference(result.id)
+        setSubmitted(true)
+        attempt.current = { signature: '', id: '' }
+      } catch (error) { setFeedbackError(error instanceof Error ? error.message : 'Could not save feedback') }
+      finally { setSaving(false) }
+      return
+    }
+    setReference('')
     const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`)
     const subjectEncoded = encodeURIComponent(subject || 'BigCat Support Request')
     window.location.href = `mailto:support@bigcat.ng?subject=${subjectEncoded}&body=${body}`
@@ -77,13 +99,13 @@ export default function ContactPage() {
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <div className="p-4 border-b border-border bg-secondary/30">
             <h2 className="font-semibold text-foreground text-sm">Send Us a Message</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">Fill the form below — it will open your email app with the message ready to send.</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Pilot feedback is saved here when signed in. Other support topics open your email app.</p>
           </div>
           {submitted ? (
             <div className="p-8 flex flex-col items-center text-center gap-3">
               <CheckCircle className="w-10 h-10 text-green-500" />
-              <p className="font-semibold text-foreground">Your email app should have opened!</p>
-              <p className="text-sm text-muted-foreground">If it didn&rsquo;t, email us directly at <a href="mailto:support@bigcat.ng" className="text-primary underline">support@bigcat.ng</a></p>
+              <p className="font-semibold text-foreground">{reference ? 'Feedback saved: ' + reference : 'Your email app should have opened!'}</p>
+              <p className="text-sm text-muted-foreground">{reference ? "Keep this reference for follow-up. For urgent help, " : "If it did not open, "} email us directly at <a href="mailto:support@bigcat.ng" className="text-primary underline">support@bigcat.ng</a></p>
               <button
                 onClick={() => setSubmitted(false)}
                 className="mt-2 text-sm text-primary underline"
@@ -93,6 +115,7 @@ export default function ContactPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="p-4 space-y-4">
+              {feedbackError && <p role="alert" className="text-sm text-destructive">{feedbackError}</p>}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-foreground mb-1">Your Name</label>
@@ -131,6 +154,9 @@ export default function ContactPage() {
                   <option value="Account Access">Account Access</option>
                   <option value="Dispute Resolution">Dispute Resolution</option>
                   <option value="Report a User">Report a User</option>
+                  <option value="bug">Pilot: Bug / 错误</option>
+                  <option value="confusion">Pilot: Confusion / 使用困惑</option>
+                  <option value="suggestion">Pilot: Suggestion / 建议</option>
                   <option value="Other">Other</option>
                 </select>
               </div>
@@ -147,10 +173,11 @@ export default function ContactPage() {
               </div>
               <button
                 type="submit"
+                disabled={saving}
                 className="w-full flex items-center justify-center gap-2 bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary/90 transition-colors text-sm"
               >
                 <Send className="w-4 h-4" />
-                Send Message
+                {saving ? 'Saving…' : 'Send Message'}
               </button>
             </form>
           )}

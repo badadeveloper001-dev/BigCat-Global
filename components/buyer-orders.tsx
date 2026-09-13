@@ -254,7 +254,7 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
     return () => window.clearInterval(interval)
   }, [user?.userId])
 
-  const handleReorder = (order: any) => {
+  const handleReorder = async (order: any) => {
     const orderItems = Array.isArray(order?.order_items)
       ? order.order_items
       : Array.isArray(order?.items)
@@ -266,7 +266,18 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
       return
     }
 
-    orderItems.forEach((item: any) => {
+    try {
+    const refreshedItems = await Promise.all(orderItems.map(async (item: any) => {
+      const id = String(item?.product_id || item?.id || "")
+      const response = await fetch(`/api/products/${encodeURIComponent(id)}`, { cache: "no-store" })
+      const result = await response.json()
+      if (!response.ok || !result.success || !result.data) throw new Error("Could not refresh products. Please try again.")
+      const product = result.data
+      const minimum = Number(product.minimum_order_quantity ?? 1)
+      if (Number(product.stock || 0) < minimum) throw new Error(`${product.name}: insufficient stock for minimum order.`)
+      return { ...item, product, quantity: Math.min(Number(product.stock), Math.max(minimum, Number(item.quantity || 1))) }
+    }))
+    refreshedItems.forEach((item: any) => {
       const productId = String(item?.product_id || item?.id || '')
       if (!productId) return
 
@@ -278,7 +289,9 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
         id: productId,
         productId,
         name: item?.product_name || item?.name || 'Product',
-        price: Number.isFinite(unitPrice) ? unitPrice : 0,
+        price: Number(item.product.price),
+        minimum_order_quantity: Number(item.product.minimum_order_quantity ?? 1),
+        stock: Number(item.product.stock),
         quantity,
         merchantId: String(order?.merchant_id || item?.merchant_id || 'unknown_merchant'),
         merchantName: String(order?.merchant_name || 'Merchant'),
@@ -288,6 +301,7 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
     setReorderMessage('Items added to cart. Ready to checkout.')
     window.setTimeout(() => setReorderMessage(''), 3000)
     onOpenCart?.()
+    } catch (error) { setReorderMessage(error instanceof Error ? error.message : "Could not reorder.") }
   }
 
   const getDeliveryETA = (order: any) => {

@@ -109,10 +109,7 @@ export function MarketplaceApp() {
     case "orchid_admin":
     case "trade_logistics_admin":
     case "admin":
-      if (!adminAuthenticated) {
-        return <AdminLogin onSuccess={() => setAdminAuthenticated(true)} />
-      }
-      return <AdminDashboard />
+      return <AdminLogin onSuccess={() => {}} />
     default:
       return <Onboarding />
   }

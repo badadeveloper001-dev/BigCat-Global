@@ -8,6 +8,8 @@ export interface CartItem {
   productId: string
   name: string
   price: number
+  minimum_order_quantity?: number
+  stock?: number
   quantity: number
   merchantId: string
   merchantName: string
@@ -30,18 +32,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
 
   const addItem = useCallback((newItem: CartItem) => {
+    const minimum = Math.max(1, newItem.minimum_order_quantity || 1)
+    if (newItem.stock !== undefined && newItem.stock < minimum) return
+    newItem = { ...newItem, quantity: Math.max(minimum, newItem.quantity) }
     setItems((prevItems) => {
       const existingItem = prevItems.find((i) => i.productId === newItem.productId)
 
       if (existingItem) {
         return prevItems.map((i) =>
           i.productId === newItem.productId
-            ? { ...i, quantity: i.quantity + newItem.quantity }
+            ? { ...i, ...newItem, quantity: Math.min(newItem.stock ?? Infinity, i.quantity + newItem.quantity) }
             : i
         )
       }
 
-      return [...prevItems, newItem]
+      return [...prevItems, { ...newItem, quantity: Math.min(newItem.stock ?? Infinity, newItem.quantity) }]
     })
   }, [])
 
@@ -50,14 +55,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const updateQuantity = useCallback((productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeItem(productId)
-      return
-    }
+    if (!Number.isSafeInteger(quantity)) return
 
     setItems((prevItems) =>
       prevItems.map((i) =>
-        i.productId === productId ? { ...i, quantity } : i
+        i.productId === productId ? { ...i, quantity: Math.max(i.minimum_order_quantity || 1, Math.min(i.stock ?? Infinity, quantity)) } : i
       )
     )
   }, [removeItem])

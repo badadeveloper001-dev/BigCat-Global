@@ -98,37 +98,15 @@ export function detectCountryFromBrowser(): SupportedCountry {
 export async function detectCountryAndRegionFromBrowser(): Promise<GlobalPreferences> {
   const fallback = buildDefaultPreferences(detectCountryFromBrowser())
 
-  if (typeof window === 'undefined' || !('geolocation' in navigator)) {
-    return fallback
-  }
-
+  if (typeof window === 'undefined') return fallback
   try {
-    const position = await new Promise<GeolocationPosition | null>((resolve) => {
-      navigator.geolocation.getCurrentPosition(
-        (nextPosition) => resolve(nextPosition),
-        () => resolve(null),
-        { enableHighAccuracy: false, maximumAge: 60_000, timeout: 4_000 },
-      )
+    const response = await fetch('/api/location?detect=country', {
+      cache: 'no-store', signal: AbortSignal.timeout(3000),
     })
-
-    if (!position) return fallback
-
-    const response = await fetch(`/api/location?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}`, { cache: 'no-store' })
     if (!response.ok) return fallback
-
     const result = await response.json()
-    const countryName = String(result?.data?.country || '').toLowerCase()
-    const detectedCountry: SupportedCountry = countryName.includes('china') ? 'CN' : 'NG'
-    const region = String(result?.data?.city || result?.data?.state || fallback.region || '')
-
-    return {
-      ...fallback,
-      country: detectedCountry,
-      language: COUNTRY_CONFIG[detectedCountry].defaultLanguage,
-      currency: COUNTRY_CONFIG[detectedCountry].defaultCurrency,
-      aiLanguage: COUNTRY_CONFIG[detectedCountry].defaultLanguage,
-      region: region || fallback.region,
-    }
+    const country = result?.data?.country
+    return country === 'CN' || country === 'NG' ? buildDefaultPreferences(country) : fallback
   } catch {
     return fallback
   }

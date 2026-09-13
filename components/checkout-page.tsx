@@ -1,17 +1,22 @@
 "use client"
 
+import { track } from "@vercel/analytics"
 import { useState, useEffect } from "react"
 import { ArrowLeft, Truck, Zap, MapPin, Package, CreditCard, CheckCircle2, Wallet, Building2, Loader2, Plus, RefreshCw, ArrowDownLeft } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useRole } from "@/lib/role-context"
 import { createOrder } from "@/lib/order-actions"
 import { calculateDeliveryFee } from "@/lib/delivery-utils"
-import { formatNaira } from "@/lib/currency-utils"
+import { formatCurrency, convertCurrency } from "@/lib/currency-utils"
 import { PaymentMethodSelector, type PaymentMethod } from "@/components/payment-method-selector"
 import { getUserStrikeCount, isUserSuspended, resetSafetyState } from "@/lib/trust-safety"
 import { createEscrowRecord } from "@/lib/escrow"
 import { MultiCurrencyWallet } from "@/components/multi-currency-wallet"
 import { sendOrderToLogistics } from "@/lib/logistics"
+
+function trackCheckout(event: string) {
+  try { track(event, { mode: 'demo' }) } catch { /* Analytics must not interrupt checkout. */ }
+}
 
 interface CheckoutPageProps {
   onBack: () => void
@@ -19,13 +24,16 @@ interface CheckoutPageProps {
 }
 
 export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
+  useEffect(() => { trackCheckout('checkout_opened') }, [])
   const { items, getTotal, clearCart } = useCart()
-  const { user } = useRole()
+  const { user, preferences } = useRole()
+  const formatCheckoutAmount = (amount: number) => formatCurrency(convertCurrency(amount, 'NGN', preferences.currency), preferences.currency)
   const [fulfillmentMethod, setFulfillmentMethod] = useState<'doorstep' | 'pickup'>('doorstep')
   const [deliveryType, setDeliveryType] = useState<'normal' | 'express'>('normal')
   const [deliveryAddress, setDeliveryAddress] = useState('')
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('orchid')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [pilotAcknowledged, setPilotAcknowledged] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [couponCode, setCouponCode] = useState('')
@@ -370,6 +378,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
   const handleServiceBookingCheckout = async () => {
     if (!serviceBooking) return
 
+    trackCheckout('checkout_attempted')
     setIsSubmitting(true)
     try {
       const response = await fetch('/api/service-bookings', {
@@ -407,9 +416,9 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
           setIsSubmitting(false)
           return
         }
-        setSuccess('Service booking confirmed! Payment secured in escrow.')
+        setSuccess('Test service booking confirmed. No real payment was collected.')
       } else {
-        setSuccess('Service booking confirmed! Payment secured in escrow.')
+        setSuccess('Test service booking confirmed. No real payment was collected.')
       }
 
       // Clear session storage
@@ -471,7 +480,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
         sessionStorage.removeItem('serviceBillCheckout')
       }
 
-      setSuccess('Service bill paid successfully. Funds are secured in escrow.')
+      setSuccess('Test service bill recorded. No real payment was collected.')
       setIsSubmitting(false)
       setTimeout(() => {
         onSuccess(String(result.bookingId || serviceBillPayment.billId || `bill_${Date.now()}`))
@@ -596,7 +605,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
       if (isWalletPayment) {
         try {
           await finalizeWalletPayment(orderId, grandTotal)
-          setSuccess('Payment successful and funds secured in escrow')
+          setSuccess('Test wallet payment recorded. No real funds are held.')
         } catch (walletError) {
           setError(String(walletError instanceof Error ? walletError.message : walletError))
           setIsSubmitting(false)
@@ -605,10 +614,11 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
       } else {
         setSuccess(
           paymentMethod === 'bank'
-            ? 'Bank transfer confirmed and funds secured in escrow'
-            : 'Card payment processed and funds secured in escrow'
+            ? 'Simulated bank payment recorded. Do not transfer real funds.'
+            : 'Simulated card payment recorded. No card was charged.'
         )
       }
+      trackCheckout('goods_checkout_completed')
       clearCart()
       setTimeout(() => {
         onSuccess(orderId)
@@ -670,7 +680,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                     <p className="font-medium text-foreground">{isServiceBillCheckout ? (serviceBillPayment.scopeSummary || 'Service bill') : serviceBooking.serviceTitle}</p>
                     <p className="text-sm text-muted-foreground">{isServiceBillCheckout ? (serviceBillPayment.merchantName || 'Merchant') : serviceBooking.merchantName}</p>
                   </div>
-                  <p className="font-medium text-foreground">{formatNaira(serviceTotal)}</p>
+                  <p className="font-medium text-foreground">{formatCheckoutAmount(serviceTotal)}</p>
                 </div>
                 {isServiceBillCheckout && serviceBillPayment.timeline && (
                   <div className="text-sm text-muted-foreground">
@@ -691,7 +701,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                     <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                   </div>
                   <p className="font-medium text-foreground">
-                    {formatNaira(item.price * item.quantity)}
+                    {formatCheckoutAmount(item.price * item.quantity)}
                   </p>
                 </div>
               ))
@@ -863,6 +873,11 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
 
         {/* Pricing Summary */}
         <section className="p-4 border-b border-border space-y-4">
+          <p className="text-sm text-muted-foreground" role="note">Displayed totals use your selected currency at a demo rate: USD 1 = NGN 1,600 = CNY 7.20. Order records remain in NGN. 显示金额按演示汇率换算，订单仍以 NGN 记账。 Test pilot / 测试试点: payments and wallet balances are simulated. Do not send real money. 请勿转入真实资金。</p>
+          <label className="flex items-start gap-2 text-sm text-muted-foreground">
+            <input type="checkbox" checked={pilotAcknowledged} onChange={e => setPilotAcknowledged(e.target.checked)} />
+            <span>I understand this is a simulated transaction with no real payment. 我了解这是一笔模拟交易，不涉及真实付款。 <a href="/pilot" target="_blank" rel="noreferrer" className="underline">Pilot rules</a></span>
+          </label>
           <PaymentMethodSelector selectedMethod={paymentMethod} onSelect={setPaymentMethod} />
 
           {isWalletPayment && user?.userId && (
@@ -978,53 +993,53 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
               <>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Service Amount</span>
-                  <span className="font-medium text-foreground">{formatNaira(serviceTotal)}</span>
+                  <span className="font-medium text-foreground">{formatCheckoutAmount(serviceTotal)}</span>
                 </div>
                 {gitFeeAmount > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">GIT Fee (1.5%)</span>
-                    <span className="font-medium text-foreground">{formatNaira(gitFeeAmount)}</span>
+                    <span className="font-medium text-foreground">{formatCheckoutAmount(gitFeeAmount)}</span>
                   </div>
                 )}
                 <div className="h-px bg-border my-2" />
                 <div className="flex justify-between">
                   <span className="font-semibold text-foreground">Total Amount</span>
-                  <span className="font-bold text-primary text-lg">{formatNaira(grandTotal)}</span>
+                  <span className="font-bold text-primary text-lg">{formatCheckoutAmount(grandTotal)}</span>
                 </div>
               </>
             ) : (
               <>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Product Total</span>
-                  <span className="font-medium text-foreground">{formatNaira(productTotal)}</span>
+                  <span className="font-medium text-foreground">{formatCheckoutAmount(productTotal)}</span>
                 </div>
                 {effectivePromotionDiscount > 0 && (
                   <div className="flex justify-between">
                     <span className="text-emerald-700">Promotion Discount{promotionNames.length ? ` (${promotionNames[0]}${promotionNames.length > 1 ? ' +' + (promotionNames.length - 1) : ''})` : ''}</span>
-                    <span className="font-medium text-emerald-700">-{formatNaira(effectivePromotionDiscount)}</span>
+                    <span className="font-medium text-emerald-700">-{formatCheckoutAmount(effectivePromotionDiscount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{fulfillmentMethod === 'pickup' ? 'Pickup Fee' : 'Delivery Fee'}</span>
                   <span className="font-medium text-foreground">
-                    {deliveryAddress.trim() ? formatNaira(deliveryFee) : '--'}
+                    {deliveryAddress.trim() ? formatCheckoutAmount(deliveryFee) : '--'}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">GIT Fee (1.5%)</span>
-                  <span className="font-medium text-foreground">{formatNaira(gitFeeAmount)}</span>
+                  <span className="font-medium text-foreground">{formatCheckoutAmount(gitFeeAmount)}</span>
                 </div>
                 {effectiveCouponDiscount > 0 && (
                   <div className="flex justify-between">
                     <span className="text-emerald-700">Coupon Discount ({appliedCoupon?.code})</span>
-                    <span className="font-medium text-emerald-700">-{formatNaira(effectiveCouponDiscount)}</span>
+                    <span className="font-medium text-emerald-700">-{formatCheckoutAmount(effectiveCouponDiscount)}</span>
                   </div>
                 )}
                 <div className="h-px bg-border my-2" />
                 <div className="flex justify-between">
                   <span className="font-semibold text-foreground">Grand Total</span>
                   <span className="font-bold text-primary text-lg">
-                    {deliveryAddress.trim() ? formatNaira(grandTotal) : '--'}
+                    {deliveryAddress.trim() ? formatCheckoutAmount(grandTotal) : '--'}
                   </span>
                 </div>
               </>
@@ -1042,12 +1057,12 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
             <p className="font-semibold">Why checkout is safe</p>
             {isServiceCheckout ? (
               <>
-                <p>Funds are held in escrow until service is completed.</p>
+                <p>Pilot simulation only. No real funds are held; service completion is being tested.</p>
                 <p>You can release funds or dispute the service from your bookings.</p>
               </>
             ) : (
               <>
-                <p>Funds are held in escrow until delivery confirmation.</p>
+                <p>Pilot simulation only. No real funds are held; delivery confirmation is being tested.</p>
                 <p>
                   Expected delivery window: {fulfillmentMethod === 'pickup' ? 'Same day pickup arrangement' : deliveryType === 'express' ? '1-2 business days' : '3-5 business days'}.
                 </p>
@@ -1076,12 +1091,12 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
           <div>
             <p className="text-sm text-muted-foreground">Total to pay</p>
             <p className="text-xl font-bold text-foreground">
-              {deliveryAddress.trim() || isServiceCheckout ? formatNaira(grandTotal) : '--'}
+              {deliveryAddress.trim() || isServiceCheckout ? formatCheckoutAmount(grandTotal) : '--'}
             </p>
           </div>
           <button
             onClick={handleSubmit}
-            disabled={isSubmitting || !deliveryAddress.trim() || isWalletInsufficient || suspended}
+            disabled={!pilotAcknowledged || isSubmitting || !deliveryAddress.trim() || isWalletInsufficient || suspended}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed ${
               isWalletPayment
                 ? 'bg-[#6C2BD9] text-white'
