@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState } from 'react'
 import { ShoppingCart, Heart, MapPin, Package, Check } from 'lucide-react'
@@ -129,10 +131,9 @@ export function ProductCard({
       <div className="aspect-[4/3] bg-gradient-to-br from-secondary to-secondary/50 flex items-center justify-center overflow-hidden relative">
         {normalizedPromotionPercent > 0 && (
           <div className="absolute left-2 top-2 z-10 rounded-full bg-red-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
-            {normalizedPromotionPercent}% OFF
-          </div>
+            {normalizedPromotionPercent}<UiText text={"% OFF"} />{" "}</div>
         )}
-        <button
+        <UiAttributes><button
           onClick={(e) => {
             e.stopPropagation()
             toggleItem(wishlistItem)
@@ -146,29 +147,29 @@ export function ProductCard({
           title={savedToWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
         >
           <Heart className={`w-4 h-4 ${savedToWishlist ? 'fill-current' : ''}`} />
-        </button>
+        </button></UiAttributes>
 
         {image ? (
           image.startsWith('http') || image.startsWith('/') ? (
-            <img
+            <UiAttributes><img
               src={image}
               alt={name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform"
               loading="lazy"
-            />
+            /></UiAttributes>
           ) : (
-            <Image
+            <UiAttributes><Image
               src={image}
               alt={name}
               fill
               className="object-cover group-hover:scale-105 transition-transform"
               sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 16vw"
-            />
+            /></UiAttributes>
           )
         ) : (
           <div className="flex flex-col items-center justify-center text-muted-foreground group-hover:scale-110 transition-transform">
             <Package className="w-12 h-12 opacity-50" />
-            <span className="text-xs mt-2 text-center px-2">{category}</span>
+            <span className="text-xs mt-2 text-center px-2"><UiValue value={category} /></span>
           </div>
         )}
       </div>
@@ -181,20 +182,19 @@ export function ProductCard({
           </h3>
           <div className="mt-1.5 flex items-center gap-2 flex-wrap">
             <p className="text-lg font-bold text-foreground">{formatCurrency(originalDiscountedPrice, listing_currency)}</p>
-            {displayCurrency !== listing_currency && <span className="text-xs text-muted-foreground">≈ {displayPriceLabel} · {preferences.language === 'zh' ? '演示汇率' : 'Demo rate'}</span>}
+            {displayCurrency !== listing_currency && <span className="text-xs text-muted-foreground">≈ {displayPriceLabel} · <UiValue value={preferences.language === 'zh' ? '演示汇率' : 'Demo rate'} /></span>}
             {normalizedPromotionPercent > 0 && (
               <>
                 <p className="text-xs font-medium text-muted-foreground line-through decoration-2">
                   {formatCurrency(originalPrice, listing_currency)}
                 </p>
                 <span className="rounded-full bg-red-600 px-2 py-0.5 text-[11px] font-bold text-white">
-                  {normalizedPromotionPercent}% OFF
-                </span>
+                  {normalizedPromotionPercent}<UiText text={"% OFF"} />{" "}</span>
               </>
             )}
             <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${isOutOfStock ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'}`}>
-              <span className="block">Minimum {minimum_order_quantity} units · {formatCurrency(originalDiscountedPrice * minimum_order_quantity, listing_currency)}{listing_currency !== displayCurrency && <> ≈ {formatCurrency(displayPrice * minimum_order_quantity, displayCurrency)} (demo)</>}</span>
-              {isOutOfStock ? 'Insufficient stock for minimum order' : `${availableStock} in stock`}
+              <span className="block"><UiText text={"Minimum"} />{" "}{minimum_order_quantity} {" "}<UiText text={"units ·"} />{" "}{formatCurrency(originalDiscountedPrice * minimum_order_quantity, listing_currency)}{listing_currency !== displayCurrency && <> ≈ {formatCurrency(displayPrice * minimum_order_quantity, displayCurrency)} {" "}<UiText text={"(demo)"} /></>}</span>
+              <UiValue value={isOutOfStock ? 'Insufficient stock for minimum order' : `${availableStock} in stock`} />
             </span>
           </div>
         </div>
@@ -215,7 +215,7 @@ export function ProductCard({
                   ? 'bg-blue-100 text-blue-700'
                   : 'bg-muted text-muted-foreground'
             }`}>
-              {verificationLabel}
+              <UiValue value={verificationLabel} />
             </span>
             {(merchant.location || distanceLabel) && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
@@ -243,18 +243,15 @@ export function ProductCard({
           {isOutOfStock ? (
             <>
               <Package className="w-4 h-4" />
-              Out of stock
-            </>
+              <UiText text={"Out of stock"} />{" "}</>
           ) : addedToCart ? (
             <>
               <Check className="w-4 h-4" />
-              Added!
-            </>
+              <UiText text={"Added!"} />{" "}</>
           ) : (
             <>
               <ShoppingCart className="w-4 h-4" />
-              Add to Cart
-            </>
+              <UiText text={"Add to Cart"} />{" "}</>
           )}
         </button>
       </div>
@@ -310,7 +307,7 @@ export function ProductGrid({
     return (
       <div className="text-center py-12">
         <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-        <p className="text-muted-foreground">No products found</p>
+        <p className="text-muted-foreground"><UiText text={"No products found"} /></p>
       </div>
     )
   }

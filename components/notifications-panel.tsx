@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect } from "react"
 import { useRole } from "@/lib/role-context"
@@ -203,20 +205,20 @@ export function NotificationsPanel({ isOpen, onClose, onUnreadChange, onOpenOrde
         {/* Header */}
         <header className="flex items-center justify-between px-4 py-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <button
+            <UiAttributes><button
               onClick={onClose}
               className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Go back"
             >
               <ArrowLeft className="w-5 h-5" />
-            </button>
+            </button></UiAttributes>
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
               <Bell className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h2 className="font-semibold text-foreground">Notifications</h2>
+              <h2 className="font-semibold text-foreground"><UiText text={"Notifications"} /></h2>
               {unreadCount > 0 && (
-                <p className="text-xs text-muted-foreground">{unreadCount} unread</p>
+                <p className="text-xs text-muted-foreground">{unreadCount} {" "}<UiText text={"unread"} /></p>
               )}
             </div>
           </div>
@@ -226,8 +228,7 @@ export function NotificationsPanel({ isOpen, onClose, onUnreadChange, onOpenOrde
                 onClick={markAllAsRead}
                 className="text-sm text-primary font-medium"
               >
-                Mark all read
-              </button>
+                <UiText text={"Mark all read"} />{" "}</button>
             )}
           </div>
         </header>
@@ -241,8 +242,7 @@ export function NotificationsPanel({ isOpen, onClose, onUnreadChange, onOpenOrde
                 className="inline-flex items-center gap-2 text-sm text-primary font-medium"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Back to notifications
-              </button>
+                <UiText text={"Back to notifications"} />{" "}</button>
 
               <div className="bg-card border border-border rounded-2xl p-5">
                 <div className="flex items-start gap-3 mb-4">
@@ -251,7 +251,7 @@ export function NotificationsPanel({ isOpen, onClose, onUnreadChange, onOpenOrde
                   </div>
                   <div className="min-w-0">
                     <h3 className="text-lg font-semibold text-foreground leading-tight">
-                      {selectedNotificationDetails.title}
+                      <UiValue value={selectedNotificationDetails.title} />
                     </h3>
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                       <span className="inline-flex rounded-full bg-secondary px-2 py-1 font-medium capitalize text-foreground">
@@ -273,7 +273,7 @@ export function NotificationsPanel({ isOpen, onClose, onUnreadChange, onOpenOrde
 
                 {selectedNotificationDetails.createdAt && (
                   <p className="mt-4 text-xs text-muted-foreground">
-                    Received: {new Date(selectedNotificationDetails.createdAt).toLocaleString('en-NG', {
+                    <UiText text={"Received:"} />{" "}{new Date(selectedNotificationDetails.createdAt).toLocaleString('en-NG', {
                       dateStyle: 'medium',
                       timeStyle: 'short',
                     })}
@@ -285,7 +285,7 @@ export function NotificationsPanel({ isOpen, onClose, onUnreadChange, onOpenOrde
                     onClick={getPrimaryAction(selectedNotificationDetails)?.onClick}
                     className="mt-4 w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
                   >
-                    {getPrimaryAction(selectedNotificationDetails)?.label}
+                    <UiValue value={getPrimaryAction(selectedNotificationDetails)?.label} />
                   </button>
                 )}
               </div>
@@ -299,7 +299,7 @@ export function NotificationsPanel({ isOpen, onClose, onUnreadChange, onOpenOrde
                     onClick={() => setActiveFilter(filter)}
                     className={`rounded-full px-3 py-1 text-xs font-medium ${activeFilter === filter ? 'bg-primary text-primary-foreground' : 'bg-secondary text-foreground'}`}
                   >
-                    {filter === 'all' ? 'All' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                    <UiValue value={filter === 'all' ? 'All' : filter.charAt(0).toUpperCase() + filter.slice(1)} />
                   </button>
                 ))}
               </div>
@@ -309,10 +309,9 @@ export function NotificationsPanel({ isOpen, onClose, onUnreadChange, onOpenOrde
                   <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
                     <Bell className="w-8 h-8 text-muted-foreground" />
                   </div>
-                  <h3 className="font-medium text-foreground mb-1">No notifications</h3>
+                  <h3 className="font-medium text-foreground mb-1"><UiText text={"No notifications"} /></h3>
                   <p className="text-sm text-muted-foreground">
-                    You&apos;re all caught up!
-                  </p>
+                    <UiText text={"You&apos;re all caught up!"} />{" "}</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">

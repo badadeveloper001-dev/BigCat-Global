@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect } from 'react'
 import { useRole } from '@/lib/role-context'
@@ -286,7 +288,7 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="font-semibold text-foreground">Settings</h1>
+          <h1 className="font-semibold text-foreground"><UiText text={"Settings"} /></h1>
           <div className="w-9" />
         </div>
       </header>
@@ -310,7 +312,7 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
             }`}
           >
             <Icon className="w-4 h-4" />
-            <span className="text-sm">{label}</span>
+            <span className="text-sm"><UiValue value={label} /></span>
           </button>
         ))}
       </div>
@@ -331,21 +333,21 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
             ) : (
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
             )}
-            <p className="text-sm font-medium">{message.text}</p>
+            <p className="text-sm font-medium"><UiValue value={message.text} /></p>
           </div>
         )}
 
         {activeTab === 'global' && (
           <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-            <h3 className="font-semibold text-foreground">Global Preferences</h3>
+            <h3 className="font-semibold text-foreground"><UiText text={"Global Preferences"} /></h3>
 
             <div className="rounded-xl border border-primary/15 bg-primary/5 p-3 text-sm text-muted-foreground">
-              <p className="font-semibold text-foreground mb-1">Automatic region detection</p>
-              <p>We detect your region from your browser and location settings. English is used for Nigeria and Chinese is used for China, but you can switch manually at any time.</p>
+              <p className="font-semibold text-foreground mb-1"><UiText text={"Automatic region detection"} /></p>
+              <p><UiText text={"We detect your region from your browser and location settings. English is used for Nigeria and Chinese is used for China, but you can switch manually at any time."} /></p>
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-foreground block mb-2">Country</label>
+              <label className="text-sm font-semibold text-foreground block mb-2"><UiText text={"Country"} /></label>
               <select
                 value={globalSettings.country}
                 onChange={(e) => {
@@ -361,65 +363,64 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
                 }}
                 className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary"
               >
-                <option value="NG">Nigeria</option>
-                <option value="CN">China</option>
+                <option value="NG"><UiText text={"Nigeria"} /></option>
+                <option value="CN"><UiText text={"China"} /></option>
               </select>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-sm font-semibold text-foreground block mb-2">Language</label>
+                <label className="text-sm font-semibold text-foreground block mb-2"><UiText text={"Language"} /></label>
                 <select
                   value={globalSettings.language}
                   onChange={(e) => setGlobalSettings((prev) => ({ ...prev, language: e.target.value as SupportedLanguage }))}
                   className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary"
                 >
-                  <option value="en">English</option>
-                  <option value="zh">Chinese (Simplified)</option>
+                  <option value="en"><UiText text={"English"} /></option>
+                  <option value="zh"><UiText text={"Chinese (Simplified)"} /></option>
                 </select>
               </div>
               <div>
-                <label className="text-sm font-semibold text-foreground block mb-2">Currency</label>
+                <label className="text-sm font-semibold text-foreground block mb-2"><UiText text={"Currency"} /></label>
                 <select
                   value={globalSettings.currency}
                   onChange={(e) => setGlobalSettings((prev) => ({ ...prev, currency: e.target.value as SupportedCurrency }))}
                   className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary"
                 >
-                  <option value="NGN">NGN</option>
-                  <option value="CNY">CNY</option>
-                  <option value="USD">USD</option>
+                  <option value="NGN"><UiText text={"NGN"} /></option>
+                  <option value="CNY"><UiText text={"CNY"} /></option>
+                  <option value="USD"><UiText text={"USD"} /></option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-foreground block mb-2">AI Language</label>
+              <label className="text-sm font-semibold text-foreground block mb-2"><UiText text={"AI Language"} /></label>
               <select
                 value={globalSettings.aiLanguage}
                 onChange={(e) => setGlobalSettings((prev) => ({ ...prev, aiLanguage: e.target.value as SupportedLanguage }))}
                 className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary"
               >
-                <option value="en">English</option>
-                <option value="zh">Chinese (Simplified)</option>
+                <option value="en"><UiText text={"English"} /></option>
+                <option value="zh"><UiText text={"Chinese (Simplified)"} /></option>
               </select>
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-foreground block mb-2">Region</label>
-              <input
+              <label className="text-sm font-semibold text-foreground block mb-2"><UiText text={"Region"} /></label>
+              <UiAttributes><input
                 value={globalSettings.region}
                 onChange={(e) => setGlobalSettings((prev) => ({ ...prev, region: e.target.value }))}
                 className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary"
                 placeholder="e.g. Lagos, Guangdong"
-              />
+              /></UiAttributes>
             </div>
 
             <button
               onClick={handleGlobalSettingsSave}
               className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity"
             >
-              Save Global Settings
-            </button>
+              <UiText text={"Save Global Settings"} />{" "}</button>
           </div>
         )}
 
@@ -428,16 +429,15 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
           <form onSubmit={handlePasswordChange} className="bg-card border border-border rounded-2xl p-6 space-y-4">
             <div>
               <label className="text-sm font-semibold text-foreground block mb-2">
-                Current Password
-              </label>
+                <UiText text={"Current Password"} />{" "}</label>
               <div className="relative">
-                <input
+                <UiAttributes><input
                   type={showPasswords.current ? 'text' : 'password'}
                   value={passwordForm.currentPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
                   className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary transition-colors pr-10"
                   placeholder="Enter current password"
-                />
+                /></UiAttributes>
                 <button
                   type="button"
                   onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
@@ -450,16 +450,15 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
 
             <div>
               <label className="text-sm font-semibold text-foreground block mb-2">
-                New Password
-              </label>
+                <UiText text={"New Password"} />{" "}</label>
               <div className="relative">
-                <input
+                <UiAttributes><input
                   type={showPasswords.new ? 'text' : 'password'}
                   value={passwordForm.newPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
                   className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary transition-colors pr-10"
                   placeholder="Enter new password"
-                />
+                /></UiAttributes>
                 <button
                   type="button"
                   onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
@@ -469,22 +468,20 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
                 </button>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                At least 8 characters, 1 uppercase, 1 number
-              </p>
+                <UiText text={"At least 8 characters, 1 uppercase, 1 number"} />{" "}</p>
             </div>
 
             <div>
               <label className="text-sm font-semibold text-foreground block mb-2">
-                Confirm New Password
-              </label>
+                <UiText text={"Confirm New Password"} />{" "}</label>
               <div className="relative">
-                <input
+                <UiAttributes><input
                   type={showPasswords.confirm ? 'text' : 'password'}
                   value={passwordForm.confirmPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
                   className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary transition-colors pr-10"
                   placeholder="Confirm new password"
-                />
+                /></UiAttributes>
                 <button
                   type="button"
                   onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}
@@ -503,13 +500,11 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
               {loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Updating...
-                </>
+                  <UiText text={"Updating..."} />{" "}</>
               ) : (
                 <>
                   <Check className="w-5 h-5" />
-                  Update Password
-                </>
+                  <UiText text={"Update Password"} />{" "}</>
               )}
             </button>
           </form>
@@ -520,31 +515,28 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
           <form onSubmit={handleEmailUpdate} className="bg-card border border-border rounded-2xl p-6 space-y-4">
             <div>
               <label className="text-sm font-semibold text-foreground block mb-2">
-                New Email Address
-              </label>
-              <input
+                <UiText text={"New Email Address"} />{" "}</label>
+              <UiAttributes><input
                 type="email"
                 value={emailForm.newEmail}
                 onChange={(e) => setEmailForm({ ...emailForm, newEmail: e.target.value })}
                 className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary transition-colors"
                 placeholder="Enter new email"
-              />
+              /></UiAttributes>
             </div>
 
             <div>
               <label className="text-sm font-semibold text-foreground block mb-2">
-                Current Password
-              </label>
-              <input
+                <UiText text={"Current Password"} />{" "}</label>
+              <UiAttributes><input
                 type="password"
                 value={emailForm.password}
                 onChange={(e) => setEmailForm({ ...emailForm, password: e.target.value })}
                 className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary transition-colors"
                 placeholder="Enter your password"
-              />
+              /></UiAttributes>
               <p className="text-xs text-muted-foreground mt-1">
-                Required for security verification
-              </p>
+                <UiText text={"Required for security verification"} />{" "}</p>
             </div>
 
             <button
@@ -555,13 +547,11 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
               {loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Updating...
-                </>
+                  <UiText text={"Updating..."} />{" "}</>
               ) : (
                 <>
                   <Check className="w-5 h-5" />
-                  Update Email
-                </>
+                  <UiText text={"Update Email"} />{" "}</>
               )}
             </button>
           </form>
@@ -573,8 +563,8 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
             <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-foreground">Email Notifications</p>
-                  <p className="text-sm text-muted-foreground">Receive updates via email</p>
+                  <p className="font-semibold text-foreground"><UiText text={"Email Notifications"} /></p>
+                  <p className="text-sm text-muted-foreground"><UiText text={"Receive updates via email"} /></p>
                 </div>
                 <button
                   onClick={() =>
@@ -597,8 +587,8 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
 
               <div className="flex items-center justify-between pt-4 border-t border-border">
                 <div>
-                  <p className="font-semibold text-foreground">Push Notifications</p>
-                  <p className="text-sm text-muted-foreground">Browser notifications</p>
+                  <p className="font-semibold text-foreground"><UiText text={"Push Notifications"} /></p>
+                  <p className="text-sm text-muted-foreground"><UiText text={"Browser notifications"} /></p>
                 </div>
                 <button
                   onClick={() =>
@@ -621,8 +611,8 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
 
               <div className="flex items-center justify-between pt-4 border-t border-border">
                 <div>
-                  <p className="font-semibold text-foreground">SMS Notifications</p>
-                  <p className="text-sm text-muted-foreground">Text messages (premium)</p>
+                  <p className="font-semibold text-foreground"><UiText text={"SMS Notifications"} /></p>
+                  <p className="text-sm text-muted-foreground"><UiText text={"Text messages (premium)"} /></p>
                 </div>
                 <button
                   onClick={() =>
@@ -652,13 +642,11 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
               {loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Saving...
-                </>
+                  <UiText text={"Saving..."} />{" "}</>
               ) : (
                 <>
                   <Check className="w-5 h-5" />
-                  Save Preferences
-                </>
+                  <UiText text={"Save Preferences"} />{" "}</>
               )}
             </button>
           </div>
@@ -671,10 +659,9 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
               <div className="flex items-start gap-3">
                 <AlertCircle className="w-6 h-6 text-destructive flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold text-destructive">Delete Account</h3>
+                  <h3 className="font-semibold text-destructive"><UiText text={"Delete Account"} /></h3>
                   <p className="text-sm text-destructive/80 mt-1">
-                    This action cannot be undone. All your data will be permanently removed from our servers.
-                  </p>
+                    <UiText text={"This action cannot be undone. All your data will be permanently removed from our servers."} />{" "}</p>
                 </div>
               </div>
             </div>
@@ -682,17 +669,16 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Enter your password to confirm
-                </label>
+                  <UiText text={"Enter your password to confirm"} />{" "}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <input
+                  <UiAttributes><input
                     type={showPasswords.delete ? 'text' : 'password'}
                     value={deletePassword}
                     onChange={(e) => setDeletePassword(e.target.value)}
                     placeholder="Enter your password"
                     className="w-full pl-10 pr-12 py-3 bg-secondary border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-destructive/50"
-                  />
+                  /></UiAttributes>
                   <button
                     type="button"
                     onClick={() =>
@@ -717,8 +703,7 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
                   className="mt-1 w-5 h-5 rounded border-border text-destructive focus:ring-destructive"
                 />
                 <span className="text-sm text-muted-foreground">
-                  I understand that deleting my account is permanent and all my data, including order history, saved items, and payment methods will be removed.
-                </span>
+                  <UiText text={"I understand that deleting my account is permanent and all my data, including order history, saved items, and payment methods will be removed."} />{" "}</span>
               </label>
             </div>
 
@@ -730,13 +715,11 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
               {loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Deleting...
-                </>
+                  <UiText text={"Deleting..."} />{" "}</>
               ) : (
                 <>
                   <Trash2 className="w-5 h-5" />
-                  Delete My Account
-                </>
+                  <UiText text={"Delete My Account"} />{" "}</>
               )}
             </button>
           </div>

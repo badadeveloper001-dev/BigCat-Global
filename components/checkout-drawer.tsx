@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useEffect, useState } from "react"
 import { Shield, Clock, Truck, MapPin, Loader2, CheckCircle2, AlertCircle, X, Minus, Plus } from "lucide-react"
@@ -179,18 +181,18 @@ export function CheckoutDrawer({ open, onOpenChange, product, vendor }: Checkout
         {/* Header with Close Button */}
         <DrawerHeader className="flex items-center justify-between px-4 pt-4 pb-0">
           <div>
-            <DrawerTitle className="text-lg">Checkout</DrawerTitle>
+            <DrawerTitle className="text-lg"><UiText text={"Checkout"} /></DrawerTitle>
             <DrawerDescription className="sr-only">
-              Complete your order for {product.name} from {vendor.name}
+              <UiText text={"Complete your order for"} />{" "}{product.name} {" "}<UiText text={"from"} />{" "}{vendor.name}
             </DrawerDescription>
           </div>
-          <button
+          <UiAttributes><button
             onClick={() => onOpenChange(false)}
             className="p-1.5 -mr-2 text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Close checkout"
           >
             <X className="w-5 h-5" />
-          </button>
+          </button></UiAttributes>
         </DrawerHeader>
 
         {/* Scrollable Content */}
@@ -200,8 +202,7 @@ export function CheckoutDrawer({ open, onOpenChange, product, vendor }: Checkout
               {/* Order Summary Section */}
               <section className="mb-6">
                 <h3 className="font-semibold text-foreground text-sm mb-4 uppercase tracking-wide text-muted-foreground">
-                  Order Summary
-                </h3>
+                  <UiText text={"Order Summary"} />{" "}</h3>
                 <div className="bg-card border border-border rounded-2xl p-4 mb-4">
                   {/* Product Card */}
                   <div className="flex gap-3 mb-4 pb-4 border-b border-border">
@@ -217,52 +218,52 @@ export function CheckoutDrawer({ open, onOpenChange, product, vendor }: Checkout
 
                   {/* Quantity Control */}
                   <div className="flex items-center justify-between mb-4 pb-4 border-b border-border">
-                    <span className="text-sm text-muted-foreground">Quantity</span>
+                    <span className="text-sm text-muted-foreground"><UiText text={"Quantity"} /></span>
                     <div className="flex items-center gap-2">
-                      <button
+                      <UiAttributes><button
                         onClick={() => handleQuantityChange(-1)}
                         disabled={quantity <= 1 || paymentStatus === "processing"}
                         className="w-8 h-8 rounded-lg bg-secondary hover:bg-secondary/80 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                         aria-label="Decrease quantity"
                       >
                         <Minus className="w-4 h-4" />
-                      </button>
+                      </button></UiAttributes>
                       <span className="w-8 text-center font-semibold text-foreground">{quantity}</span>
-                      <button
+                      <UiAttributes><button
                         onClick={() => handleQuantityChange(1)}
                         disabled={quantity >= 99 || paymentStatus === "processing"}
                         className="w-8 h-8 rounded-lg bg-secondary hover:bg-secondary/80 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                         aria-label="Increase quantity"
                       >
                         <Plus className="w-4 h-4" />
-                      </button>
+                      </button></UiAttributes>
                     </div>
                   </div>
 
                   {/* Price Breakdown */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Subtotal</span>
+                      <span className="text-muted-foreground"><UiText text={"Subtotal"} /></span>
                       <span className="text-foreground">${subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Delivery Fee</span>
+                      <span className="text-muted-foreground"><UiText text={"Delivery Fee"} /></span>
                       <span className="text-foreground">${deliveryFee.toFixed(2)}</span>
                     </div>
                     {promotionDiscount > 0 && (
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-green-600">Promotion{promotionName ? ` (${promotionName})` : ''}</span>
+                        <span className="text-green-600"><UiText text={"Promotion"} />{promotionName ? ` (${promotionName})` : ''}</span>
                         <span className="text-green-600 font-semibold">-${promotionDiscount.toFixed(2)}</span>
                       </div>
                     )}
                     {couponDiscount > 0 && (
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-green-600">Coupon Discount</span>
+                        <span className="text-green-600"><UiText text={"Coupon Discount"} /></span>
                         <span className="text-green-600 font-semibold">-${couponDiscount.toFixed(2)}</span>
                       </div>
                     )}
                     <div className="flex items-center justify-between pt-2 border-t border-border">
-                      <span className="font-semibold text-foreground">Total</span>
+                      <span className="font-semibold text-foreground"><UiText text={"Total"} /></span>
                       <span className="font-bold text-foreground text-lg">${total.toFixed(2)}</span>
                     </div>
                   </div>
@@ -273,14 +274,14 @@ export function CheckoutDrawer({ open, onOpenChange, product, vendor }: Checkout
               {!appliedCoupon && (
                 <section className="mb-6">
                   <div className="flex gap-2">
-                    <input
+                    <UiAttributes><input
                       type="text"
                       placeholder="Enter coupon code"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                       disabled={validatingCoupon}
                       className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                    />
+                    /></UiAttributes>
                     <button
                       onClick={async () => {
                         if (!couponCode.trim()) return
@@ -316,7 +317,7 @@ export function CheckoutDrawer({ open, onOpenChange, product, vendor }: Checkout
                       disabled={validatingCoupon || !couponCode.trim()}
                       className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50"
                     >
-                      {validatingCoupon ? "Checking..." : "Apply"}
+                      <UiValue value={validatingCoupon ? "Checking..." : "Apply"} />
                     </button>
                   </div>
                 </section>
@@ -327,7 +328,7 @@ export function CheckoutDrawer({ open, onOpenChange, product, vendor }: Checkout
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-semibold text-green-900">{appliedCoupon.code}</p>
-                      <p className="text-sm text-green-700">Save ${appliedCoupon.discount.toFixed(2)}</p>
+                      <p className="text-sm text-green-700"><UiText text={"Save $"} />{appliedCoupon.discount.toFixed(2)}</p>
                     </div>
                     <button
                       onClick={() => {
@@ -336,8 +337,7 @@ export function CheckoutDrawer({ open, onOpenChange, product, vendor }: Checkout
                       }}
                       className="text-sm text-green-700 hover:text-green-900"
                     >
-                      Remove
-                    </button>
+                      <UiText text={"Remove"} />{" "}</button>
                   </div>
                 </section>
               )}
@@ -345,8 +345,7 @@ export function CheckoutDrawer({ open, onOpenChange, product, vendor }: Checkout
               {/* Delivery Section */}
               <section className="mb-6">
                 <h3 className="font-semibold text-foreground text-sm mb-4 uppercase tracking-wide text-muted-foreground">
-                  Delivery Options
-                </h3>
+                  <UiText text={"Delivery Options"} />{" "}</h3>
                 <RadioGroup value={deliveryMethod} onValueChange={(v) => setDeliveryMethod(v as DeliveryMethod)}>
                   {(["platform", "vendor", "pickup"] as const).map((method) => (
                     <div key={method} className="flex items-start gap-3 p-3 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all">
@@ -367,16 +366,15 @@ export function CheckoutDrawer({ open, onOpenChange, product, vendor }: Checkout
               {/* Payment Method Section */}
               <section className="mb-6">
                 <h3 className="font-semibold text-foreground text-sm mb-4 uppercase tracking-wide text-muted-foreground">
-                  Payment Method
-                </h3>
+                  <UiText text={"Payment Method"} />{" "}</h3>
                 <div className="bg-card border-2 border-primary rounded-2xl p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-lg">
                       🟣
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground">PalmPay</h4>
-                      <p className="text-xs text-muted-foreground">Pay directly from wallet</p>
+                      <h4 className="font-semibold text-foreground"><UiText text={"PalmPay"} /></h4>
+                      <p className="text-xs text-muted-foreground"><UiText text={"Pay directly from wallet"} /></p>
                     </div>
                   </div>
                   <CheckCircle2 className="w-5 h-5 text-primary" />
@@ -388,10 +386,9 @@ export function CheckoutDrawer({ open, onOpenChange, product, vendor }: Checkout
                 <div className="flex gap-3 p-4 rounded-2xl bg-primary/10 border border-primary/20">
                   <Shield className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-foreground text-sm mb-1">Secure Payment</p>
+                    <p className="font-semibold text-foreground text-sm mb-1"><UiText text={"Secure Payment"} /></p>
                     <p className="text-xs text-foreground/80 leading-relaxed">
-                      Your payment is secure and held in escrow until you confirm delivery.
-                    </p>
+                      <UiText text={"Your payment is secure and held in escrow until you confirm delivery."} />{" "}</p>
                   </div>
                 </div>
               </section>
@@ -402,7 +399,7 @@ export function CheckoutDrawer({ open, onOpenChange, product, vendor }: Checkout
                   <div className="flex gap-3 p-4 rounded-2xl bg-destructive/10 border border-destructive/20">
                     <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm text-destructive font-medium">{error}</p>
+                      <p className="text-sm text-destructive font-medium"><UiValue value={error} /></p>
                     </div>
                   </div>
                 </section>
@@ -413,18 +410,17 @@ export function CheckoutDrawer({ open, onOpenChange, product, vendor }: Checkout
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 animate-pulse">
                 <CheckCircle2 className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="font-bold text-foreground text-lg mb-2">Order Confirmed!</h3>
-              <p className="text-sm text-muted-foreground mb-2">Your payment has been processed successfully.</p>
-              <p className="text-xs text-muted-foreground">Redirecting...</p>
+              <h3 className="font-bold text-foreground text-lg mb-2"><UiText text={"Order Confirmed!"} /></h3>
+              <p className="text-sm text-muted-foreground mb-2"><UiText text={"Your payment has been processed successfully."} /></p>
+              <p className="text-xs text-muted-foreground"><UiText text={"Redirecting..."} /></p>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <AlertCircle className="w-12 h-12 text-destructive mb-4" />
-              <h3 className="font-bold text-foreground text-lg mb-2">Payment Failed</h3>
-              <p className="text-sm text-muted-foreground mb-4">{error}</p>
+              <h3 className="font-bold text-foreground text-lg mb-2"><UiText text={"Payment Failed"} /></h3>
+              <p className="text-sm text-muted-foreground mb-4"><UiValue value={error} /></p>
               <Button onClick={() => setPaymentStatus("idle")} variant="default" size="sm">
-                Try Again
-              </Button>
+                <UiText text={"Try Again"} />{" "}</Button>
             </div>
           )}
         </div>
@@ -441,8 +437,7 @@ export function CheckoutDrawer({ open, onOpenChange, product, vendor }: Checkout
               {paymentStatus === "processing" ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Processing...
-                </>
+                  <UiText text={"Processing..."} />{" "}</>
               ) : (
                 `Pay Securely - $${total.toFixed(2)}`
               )}

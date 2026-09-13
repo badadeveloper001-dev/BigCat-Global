@@ -1,4 +1,7 @@
 'use client'
+import { translateBrowserUiText } from "@/lib/ui-translation"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect } from 'react'
 import { useRole } from '@/lib/role-context'
@@ -178,7 +181,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
   }
 
   const handleDeleteProduct = async (productId: string) => {
-    if (confirm('Are you sure you want to delete this product?')) {
+    if (confirm(translateBrowserUiText('Are you sure you want to delete this product?'))) {
       try {
         const response = await fetch(`/api/products/delete?productId=${productId}`, {
           method: 'DELETE',
@@ -412,30 +415,29 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-4">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">My Products</h2>
-          <p className="text-sm text-muted-foreground mt-1">Manage your store inventory</p>
+          <h2 className="text-2xl font-bold text-foreground"><UiText text={"My Products"} /></h2>
+          <p className="text-sm text-muted-foreground mt-1"><UiText text={"Manage your store inventory"} /></p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
         >
           <Plus className="w-5 h-5" />
-          Add Product
-        </button>
+          <UiText text={"Add Product"} />{" "}</button>
       </div>
 
       {/* Messages */}
       {error && (
         <div className="mx-4 p-4 bg-destructive/10 border border-destructive/30 rounded-lg flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-destructive">{error}</p>
+          <p className="text-sm text-destructive"><UiValue value={error} /></p>
         </div>
       )}
 
       {success && (
         <div className="mx-4 p-4 bg-primary/10 border border-primary/30 rounded-lg flex items-start gap-3">
           <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-primary">{success}</p>
+          <p className="text-sm text-primary"><UiValue value={success} /></p>
         </div>
       )}
 
@@ -443,7 +445,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
       {showAddForm && (
         <div className="mx-4 bg-card border border-border rounded-lg p-6 space-y-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Add New Product</h3>
+            <h3 className="text-lg font-semibold text-foreground"><UiText text={"Add New Product"} /></h3>
             <button
               onClick={() => setShowAddForm(false)}
               className="p-1 hover:bg-secondary rounded-lg transition-colors"
@@ -456,8 +458,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
             {/* Product Images */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Product Images
-              </label>
+                <UiText text={"Product Images"} />{" "}</label>
               <ImageUpload
                 images={formData.images}
                 onImagesChange={(images) => setFormData({ ...formData, images })}
@@ -467,36 +468,33 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
 
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Product Name
-              </label>
-              <input
+                <UiText text={"Product Name"} />{" "}</label>
+              <UiAttributes><input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Enter product name"
                 className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-              />
+              /></UiAttributes>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Description
-              </label>
-              <textarea
+                <UiText text={"Description"} />{" "}</label>
+              <UiAttributes><textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Enter product description"
                 rows={3}
                 className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-              />
+              /></UiAttributes>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Cost Price
-                </label>
-                <input
+                  <UiText text={"Cost Price"} />{" "}</label>
+                <UiAttributes><input
                   type="number"
                   step="0.01"
                   min="0"
@@ -505,17 +503,17 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
                   onChange={(e) => setFormData({ ...formData, costPrice: e.target.value })}
                   placeholder="0.00"
                   className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-                />
+                /></UiAttributes>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Selling Price ({currency})
+                  <UiText text={"Selling Price ("} />{currency})
                 </label>
-                <select aria-label="Listing currency" value={currency} onChange={e => setListingCurrency(e.target.value as 'NGN' | 'CNY' | 'USD')} className="mb-2 w-full px-3 py-2 bg-secondary border border-border rounded-lg">
-                  <option value="NGN">NGN</option><option value="CNY">CNY</option><option value="USD">USD</option>
-                </select>
-                <input
+                <UiAttributes><select aria-label="Listing currency" value={currency} onChange={e => setListingCurrency(e.target.value as 'NGN' | 'CNY' | 'USD')} className="mb-2 w-full px-3 py-2 bg-secondary border border-border rounded-lg">
+                  <option value="NGN"><UiText text={"NGN"} /></option><option value="CNY"><UiText text={"CNY"} /></option><option value="USD"><UiText text={"USD"} /></option>
+                </select></UiAttributes>
+                <UiAttributes><input
                   type="number"
                   step="0.01"
                   min="0.01"
@@ -524,15 +522,14 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   placeholder="0.00"
                   className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-                />
+                /></UiAttributes>
               </div>
 
-              <div><label className="block text-sm font-medium mb-2">Minimum order quantity</label><input type="number" min="1" step="1" max="99999999" value={formData.minimum_order_quantity} onChange={e => setFormData({ ...formData, minimum_order_quantity: e.target.value })} className="w-full px-3 py-2 bg-secondary border border-border rounded-lg" /><p className="text-xs text-muted-foreground">Price is per unit. Buyers must order at least this many units.</p></div>
+              <div><label className="block text-sm font-medium mb-2"><UiText text={"Minimum order quantity"} /></label><input type="number" min="1" step="1" max="99999999" value={formData.minimum_order_quantity} onChange={e => setFormData({ ...formData, minimum_order_quantity: e.target.value })} className="w-full px-3 py-2 bg-secondary border border-border rounded-lg" /><p className="text-xs text-muted-foreground"><UiText text={"Price is per unit. Buyers must order at least this many units."} /></p></div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Stock Quantity
-                </label>
-                <input
+                  <UiText text={"Stock Quantity"} />{" "}</label>
+                <UiAttributes><input
                   type="number"
                   step="1"
                   min="0"
@@ -541,14 +538,13 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
                   onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                   placeholder="0"
                   className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-                />
+                /></UiAttributes>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Weight (kg)
-                </label>
-                <input
+                  <UiText text={"Weight (kg)"} />{" "}</label>
+                <UiAttributes><input
                   type="number"
                   step="0.01"
                   min="0"
@@ -557,18 +553,16 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
                   onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                   placeholder="Optional"
                   className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-                />
+                /></UiAttributes>
               </div>
             </div>
 
             <p className="text-xs text-muted-foreground">
-              Cost price is recorded in NGN and is private to merchants and used only for audit, profit and loss tracking.
-            </p>
+              <UiText text={"Cost price is recorded in NGN and is private to merchants and used only for audit, profit and loss tracking."} />{" "}</p>
 
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Category
-              </label>
+                <UiText text={"Category"} />{" "}</label>
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -576,7 +570,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
-                    {cat}
+                    <UiValue value={cat} />
                   </option>
                 ))}
               </select>
@@ -586,8 +580,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
               type="submit"
               className="w-full py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
             >
-              Create Product
-            </button>
+              <UiText text={"Create Product"} />{" "}</button>
           </form>
         </div>
       )}
@@ -595,10 +588,9 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
       <div className="mx-4 bg-card border border-border rounded-lg p-6 space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-foreground">Bulk Import Products</h3>
+            <h3 className="text-lg font-semibold text-foreground"><UiText text={"Bulk Import Products"} /></h3>
             <p className="text-sm text-muted-foreground mt-1">
-              Upload a CSV with columns like name, description, price, cost_price, category, stock, minimum_order_quantity (defaults to 1), weight, currency (NGN/CNY/USD), and images. Cost prices are NGN.
-            </p>
+              <UiText text={"Upload a CSV with columns like name, description, price, cost_price, category, stock, minimum_order_quantity (defaults to 1), weight, currency (NGN/CNY/USD), and images. Cost prices are NGN."} />{" "}</p>
           </div>
           <Upload className="w-5 h-5 text-primary" />
         </div>
@@ -611,8 +603,8 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
         />
 
         <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
-          <span>{bulkFileName ? `Loaded: ${bulkFileName}` : 'No file selected yet.'}</span>
-          <span>{bulkRows.length ? `${bulkRows.length} row${bulkRows.length === 1 ? '' : 's'} ready` : 'CSV import only'}</span>
+          <span><UiValue value={bulkFileName ? `Loaded: ${bulkFileName}` : 'No file selected yet.'} /></span>
+          <span><UiValue value={bulkRows.length ? `${bulkRows.length} row${bulkRows.length === 1 ? '' : 's'} ready` : 'CSV import only'} /></span>
         </div>
 
         <button
@@ -622,7 +614,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
           className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm font-medium text-foreground disabled:opacity-60"
         >
           {bulkLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-          {bulkLoading ? 'Importing...' : 'Import CSV Products'}
+          <UiValue value={bulkLoading ? 'Importing...' : 'Import CSV Products'} />
         </button>
       </div>
 
@@ -631,7 +623,7 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
         {products.length === 0 ? (
           <div className="text-center py-12">
             <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <p className="text-muted-foreground">No products yet. Add your first product!</p>
+            <p className="text-muted-foreground"><UiText text={"No products yet. Add your first product!"} /></p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -643,13 +635,13 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
                 {/* Product Image */}
                 <div className="w-20 h-20 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
                   {product.images && product.images[0] ? (
-                    <img
+                    <UiAttributes><img
                       src={product.images[0]}
                       alt={product.name}
                       width={80}
                       height={80}
                       className="w-full h-full object-cover"
-                    />
+                    /></UiAttributes>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <ImageIcon className="w-6 h-6 text-muted-foreground" />
@@ -664,41 +656,37 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
                   </p>
                   <div className="flex items-center gap-4 mt-3 flex-wrap">
                     <span className="text-sm font-medium text-foreground">
-                      Selling: {formatCurrency(product.listing_price ?? product.price, product.listing_currency || 'NGN')}
+                      <UiText text={"Selling:"} />{" "}{formatCurrency(product.listing_price ?? product.price, product.listing_currency || 'NGN')}
                     </span>
                     <span className="text-sm text-muted-foreground">
-                      Cost: {formatNaira(Number(product.cost_price || 0))}
+                      <UiText text={"Cost:"} />{" "}{formatNaira(Number(product.cost_price || 0))}
                     </span>
                     <span className={`text-xs px-2 py-1 rounded-full ${Number(product.price || 0) >= Number(product.cost_price || 0) ? 'bg-primary/10 text-primary' : 'bg-destructive/10 text-destructive'}`}>
-                      Margin: {formatNaira(Number(product.price || 0) - Number(product.cost_price || 0))}
+                      <UiText text={"Margin:"} />{" "}{formatNaira(Number(product.price || 0) - Number(product.cost_price || 0))}
                     </span>
                     <span className="text-xs px-2 py-1 bg-secondary rounded-full text-foreground">
                       {product.category}
                     </span>
                     <span className={`text-xs px-2 py-1 rounded-full ${Number(product.stock || 0) > 5 ? 'bg-primary/10 text-primary' : Number(product.stock || 0) > 0 ? 'bg-chart-4/10 text-chart-4' : 'bg-destructive/10 text-destructive'}`}>
-                      {Number(product.stock || 0)} in stock
-                    </span>
+                      {Number(product.stock || 0)} {" "}<UiText text={"in stock"} />{" "}</span>
                     {product.weight && (
                       <span className="text-xs text-muted-foreground">
-                        {product.weight}kg
-                      </span>
+                        {product.weight}<UiText text={"kg"} />{" "}</span>
                     )}
                     {product.status === 'pending_weight_verification' && (
                       <span className="text-xs px-2 py-1 bg-chart-4/10 text-chart-4 rounded-full">
-                        Pending Weight Verification
-                      </span>
+                        <UiText text={"Pending Weight Verification"} />{" "}</span>
                     )}
                     {product.status === 'active' && Number(product.stock || 0) > 0 && (
                       <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
-                        Active
-                      </span>
+                        <UiText text={"Active"} />{" "}</span>
                     )}
                   </div>
                 </div>
 
                 <div className="ml-4 flex flex-col gap-3">
                   <div className="grid grid-cols-1 sm:grid-cols-[88px_110px_auto] gap-2 items-center">
-                    <input
+                    <UiAttributes><input
                       type="number"
                       min="0"
                       step="1"
@@ -714,8 +702,8 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
                       }
                       className="w-full rounded-lg border border-border bg-secondary px-2 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                       aria-label={`Stock for ${product.name}`}
-                    />
-                    <input
+                    /></UiAttributes>
+                    <UiAttributes><input
                       type="number"
                       min="0"
                       step="0.01"
@@ -731,34 +719,34 @@ export function MerchantProducts({ merchantId }: MerchantProductsProps) {
                       }
                       className="w-full rounded-lg border border-border bg-secondary px-2 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                       aria-label={`Cost price for ${product.name}`}
-                    />
-                    <label className="text-xs">Minimum order quantity<input type="number" min="1" step="1" max="99999999" value={product.minimum_order_quantity ?? 1} onChange={e => setProducts(current => current.map(item => item.id === product.id ? { ...item, minimum_order_quantity: e.target.value } : item))} className="w-full rounded-lg border border-border bg-secondary px-2 py-2 text-sm" /></label>
+                    /></UiAttributes>
+                    <label className="text-xs"><UiText text={"Minimum order quantity"} /><input type="number" min="1" step="1" max="99999999" value={product.minimum_order_quantity ?? 1} onChange={e => setProducts(current => current.map(item => item.id === product.id ? { ...item, minimum_order_quantity: e.target.value } : item))} className="w-full rounded-lg border border-border bg-secondary px-2 py-2 text-sm" /></label>
                     <button
                       onClick={() => handleUpdateInventory(product.id, Number(product.stock || 0), Number(product.cost_price || 0), Number(product.minimum_order_quantity ?? 1))}
                       disabled={updatingStockId === product.id}
                       className="rounded-lg bg-secondary px-3 py-2 text-xs font-medium text-foreground hover:bg-secondary/80 disabled:opacity-50"
                     >
-                      {updatingStockId === product.id ? 'Saving...' : 'Save audit'}
+                      <UiValue value={updatingStockId === product.id ? 'Saving...' : 'Save audit'} />
                     </button>
                   </div>
 
                   <div className="flex items-center gap-2 justify-end">
                     {product.status === 'pending_weight_verification' && (
-                      <button
+                      <UiAttributes><button
                         onClick={() => handleRequestWeightVerification(product.id)}
                         className="p-2 text-chart-4 hover:bg-chart-4/10 rounded-lg transition-colors"
                         title="Request weight verification from agent"
                       >
                         <AlertCircle className="w-5 h-5" />
-                      </button>
+                      </button></UiAttributes>
                     )}
-                    <button
+                    <UiAttributes><button
                       onClick={() => handleDeleteProduct(product.id)}
                       className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
                       title="Delete product"
                     >
                       <Trash2 className="w-5 h-5" />
-                    </button>
+                    </button></UiAttributes>
                   </div>
                 </div>
               </div>

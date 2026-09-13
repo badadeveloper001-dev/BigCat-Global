@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useCart } from '@/lib/cart-context'
 import { formatNaira } from '@/lib/currency-utils'
@@ -16,14 +18,13 @@ export function CartView({ onCheckout, onBack }: CartViewProps) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
         <ShoppingCart className="w-16 h-16 text-muted-foreground opacity-50 mb-4" />
-        <h2 className="text-2xl font-bold text-foreground mb-2">Your cart is empty</h2>
-        <p className="text-muted-foreground mb-6">Start shopping to add items to your cart</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2"><UiText text={"Your cart is empty"} /></h2>
+        <p className="text-muted-foreground mb-6"><UiText text={"Start shopping to add items to your cart"} /></p>
         <button
           onClick={onBack}
           className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
         >
-          Continue Shopping
-        </button>
+          <UiText text={"Continue Shopping"} />{" "}</button>
       </div>
     )
   }
@@ -51,12 +52,12 @@ export function CartView({ onCheckout, onBack }: CartViewProps) {
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm font-medium">Back</span>
+          <span className="text-sm font-medium"><UiText text={"Back"} /></span>
         </button>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-foreground mb-6">Shopping Cart</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-6"><UiText text={"Shopping Cart"} /></h1>
 
         {/* Items by Merchant */}
         <div className="space-y-6 mb-8">
@@ -112,10 +113,10 @@ export function CartView({ onCheckout, onBack }: CartViewProps) {
                         <Trash2 className="w-4 h-4" />
                       </button>
                       <div className="text-right">
-                        <p className="text-xs text-muted-foreground">Subtotal</p>
+                        <p className="text-xs text-muted-foreground"><UiText text={"Subtotal"} /></p>
                         <p className="text-sm font-bold text-foreground">
                           {formatNaira(item.price * item.quantity)}
-                          <small className="block text-muted-foreground">Minimum {item.minimum_order_quantity || 1} units</small>
+                          <small className="block text-muted-foreground"><UiText text={"Minimum"} />{" "}{item.minimum_order_quantity || 1} {" "}<UiText text={"units"} /></small>
                         </p>
                       </div>
                     </div>
@@ -132,15 +133,15 @@ export function CartView({ onCheckout, onBack }: CartViewProps) {
             {/* Summary Lines */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-muted-foreground"><UiText text={"Subtotal"} /></span>
                 <span className="text-foreground">{formatNaira(total)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Shipping</span>
-                <span className="text-foreground">Calculated at checkout</span>
+                <span className="text-muted-foreground"><UiText text={"Shipping"} /></span>
+                <span className="text-foreground"><UiText text={"Calculated at checkout"} /></span>
               </div>
               <div className="border-t border-border pt-2 flex justify-between font-bold">
-                <span className="text-foreground">Total</span>
+                <span className="text-foreground"><UiText text={"Total"} /></span>
                 <span className="text-lg text-primary">{formatNaira(total)}</span>
               </div>
             </div>
@@ -151,14 +152,12 @@ export function CartView({ onCheckout, onBack }: CartViewProps) {
                 onClick={onCheckout}
                 className="w-full py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-semibold"
               >
-                Proceed to Checkout
-              </button>
+                <UiText text={"Proceed to Checkout"} />{" "}</button>
               <button
                 onClick={clearCart}
                 className="w-full py-2 bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors font-medium"
               >
-                Clear Cart
-              </button>
+                <UiText text={"Clear Cart"} />{" "}</button>
             </div>
           </div>
         </div>

@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState } from "react"
 import { Store, FileText, MapPin, Tag, Image, Loader2, Check, AlertCircle } from "lucide-react"
@@ -6,6 +8,7 @@ import { Store, FileText, MapPin, Tag, Image, Loader2, Check, AlertCircle } from
 interface MerchantSetupProps {
   userId: string
   smedanId: string
+  onBack?: () => void
   onComplete: (profile: any) => void
 }
 
@@ -23,7 +26,7 @@ const CATEGORIES = [
   'Other'
 ]
 
-export function MerchantSetup({ userId, smedanId, onComplete }: MerchantSetupProps) {
+export function MerchantSetup({ userId, smedanId, onComplete, onBack }: MerchantSetupProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>("")
   const [success, setSuccess] = useState(false)
@@ -145,14 +148,14 @@ export function MerchantSetup({ userId, smedanId, onComplete }: MerchantSetupPro
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/30 flex items-center justify-center p-4">
+      {onBack && <button type="button" onClick={onBack} className="px-4 py-2 text-sm"><UiText text={"Back to sign in"} /></button>}
         <div className="max-w-md w-full bg-card rounded-3xl shadow-2xl shadow-primary/10 border border-border/50 p-8 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-success/10 mb-6">
             <Check className="w-8 h-8 text-success" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Setup Complete!</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2"><UiText text={"Setup Complete!"} /></h2>
           <p className="text-muted-foreground mb-6">
-            Your business profile is ready. Redirecting to your dashboard...
-          </p>
+            <UiText text={"Your business profile is ready. Redirecting to your dashboard..."} />{" "}</p>
           <div className="w-2 h-2 bg-primary rounded-full mx-auto animate-pulse" />
         </div>
       </div>
@@ -161,9 +164,10 @@ export function MerchantSetup({ userId, smedanId, onComplete }: MerchantSetupPro
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/30 flex flex-col font-sans">
+      {onBack && <button type="button" onClick={onBack} className="px-4 py-2 text-sm"><UiText text="Back to sign in" /></button>}
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border px-4 py-4">
-        <h1 className="text-center font-semibold text-foreground text-lg">Setup Your Store</h1>
+        <h1 className="text-center font-semibold text-foreground text-lg"><UiText text={"Setup Your Store"} /></h1>
       </header>
 
       {/* Main Content */}
@@ -172,8 +176,8 @@ export function MerchantSetup({ userId, smedanId, onComplete }: MerchantSetupPro
           {/* Progress Indicator */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-foreground">Getting Started</span>
-              <span className="text-xs text-muted-foreground">Step 1 of 1</span>
+              <span className="text-sm font-semibold text-foreground"><UiText text={"Getting Started"} /></span>
+              <span className="text-xs text-muted-foreground"><UiText text={"Step 1 of 1"} /></span>
             </div>
             <div className="h-1 bg-secondary rounded-full overflow-hidden">
               <div className="h-full w-full bg-gradient-to-r from-primary to-primary/80" />
@@ -188,18 +192,16 @@ export function MerchantSetup({ userId, smedanId, onComplete }: MerchantSetupPro
                 <Store className="text-primary-foreground w-7 h-7" />
               </div>
               <h2 className="text-3xl font-bold text-foreground text-balance mb-2">
-                Tell Us About Your Business
-              </h2>
+                <UiText text={"Tell Us About Your Business"} />{" "}</h2>
               <p className="text-muted-foreground">
-                Help customers discover and connect with your store
-              </p>
+                <UiText text={"Help customers discover and connect with your store"} />{" "}</p>
             </div>
 
             {/* Error Alert */}
             {error && (
               <div className="mb-6 p-4 bg-destructive/10 border border-destructive/30 rounded-xl flex items-center gap-3">
                 <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0" />
-                <p className="text-sm text-destructive font-medium">{error}</p>
+                <p className="text-sm text-destructive font-medium"><UiValue value={error} /></p>
               </div>
             )}
 
@@ -208,35 +210,32 @@ export function MerchantSetup({ userId, smedanId, onComplete }: MerchantSetupPro
               {/* Logo Upload */}
               <div className="space-y-3">
                 <label className="block text-sm font-semibold text-foreground">
-                  Business Logo
-                </label>
+                  <UiText text={"Business Logo"} />{" "}</label>
                 <div className="relative">
-                  <input
+                  <UiAttributes><input
                     type="file"
                     accept="image/*"
                     onChange={handleLogoUpload}
                     className="hidden"
                     id="logo-upload"
                     aria-label="Upload business logo"
-                  />
+                  /></UiAttributes>
                   <label
                     htmlFor="logo-upload"
                     className="block cursor-pointer border-2 border-dashed border-border rounded-2xl p-8 text-center hover:border-primary/50 hover:bg-secondary/30 transition-all"
                   >
                     {logoPreview ? (
                       <div className="flex flex-col items-center gap-3">
-                        <img src={logoPreview} alt="Logo preview" className="w-20 h-20 rounded-xl object-cover" />
-                        <p className="text-sm text-muted-foreground">Click to change</p>
+                        <UiAttributes><img src={logoPreview} alt="Logo preview" className="w-20 h-20 rounded-xl object-cover" /></UiAttributes>
+                        <p className="text-sm text-muted-foreground"><UiText text={"Click to change"} /></p>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-2">
                         <Image className="w-8 h-8 text-muted-foreground" />
                         <p className="text-sm font-medium text-foreground">
-                          Drop your logo or click to browse
-                        </p>
+                          <UiText text={"Drop your logo or click to browse"} />{" "}</p>
                         <p className="text-xs text-muted-foreground">
-                          PNG, JPG, or GIF (max 5MB)
-                        </p>
+                          <UiText text={"PNG, JPG, or GIF (max 5MB)"} />{" "}</p>
                       </div>
                     )}
                   </label>
@@ -246,11 +245,11 @@ export function MerchantSetup({ userId, smedanId, onComplete }: MerchantSetupPro
               {/* Business Name */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-foreground">
-                  Business Name <span className="text-destructive">*</span>
+                  <UiText text={"Business Name"} />{" "}<span className="text-destructive">*</span>
                 </label>
                 <div className="relative">
                   <Store className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
-                  <input
+                  <UiAttributes><input
                     type="text"
                     name="businessName"
                     value={formData.businessName}
@@ -259,40 +258,40 @@ export function MerchantSetup({ userId, smedanId, onComplete }: MerchantSetupPro
                     maxLength={100}
                     className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
                     aria-label="Business name"
-                  />
+                  /></UiAttributes>
                 </div>
               </div>
 
               {/* Category */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-foreground">
-                  Category <span className="text-destructive">*</span>
+                  <UiText text={"Category"} />{" "}<span className="text-destructive">*</span>
                 </label>
                 <div className="relative">
                   <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
-                  <select
+                  <UiAttributes><select
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
                     className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all appearance-none cursor-pointer"
                     aria-label="Business category"
                   >
-                    <option value="">Select a category</option>
+                    <option value=""><UiText text={"Select a category"} /></option>
                     {CATEGORIES.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
+                      <option key={cat} value={cat}><UiValue value={cat} /></option>
                     ))}
-                  </select>
+                  </select></UiAttributes>
                 </div>
               </div>
 
               {/* Location */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-foreground">
-                  Location <span className="text-destructive">*</span>
+                  <UiText text={"Location"} />{" "}<span className="text-destructive">*</span>
                 </label>
                 <div className="relative">
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
-                  <input
+                  <UiAttributes><input
                     type="text"
                     name="location"
                     value={formData.location}
@@ -301,18 +300,18 @@ export function MerchantSetup({ userId, smedanId, onComplete }: MerchantSetupPro
                     maxLength={100}
                     className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
                     aria-label="Business location"
-                  />
+                  /></UiAttributes>
                 </div>
               </div>
 
               {/* Business Description */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-foreground">
-                  Business Description <span className="text-destructive">*</span>
+                  <UiText text={"Business Description"} />{" "}<span className="text-destructive">*</span>
                 </label>
                 <div className="relative">
                   <FileText className="absolute left-4 top-4 w-5 h-5 text-muted-foreground pointer-events-none" />
-                  <textarea
+                  <UiAttributes><textarea
                     name="businessDescription"
                     value={formData.businessDescription}
                     onChange={handleInputChange}
@@ -321,7 +320,7 @@ export function MerchantSetup({ userId, smedanId, onComplete }: MerchantSetupPro
                     rows={5}
                     className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all resize-none"
                     aria-label="Business description"
-                  />
+                  /></UiAttributes>
                 </div>
                 <p className="text-xs text-muted-foreground text-right">
                   {formData.businessDescription.length}/1000
@@ -335,15 +334,14 @@ export function MerchantSetup({ userId, smedanId, onComplete }: MerchantSetupPro
                 className="w-full py-3 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground font-semibold rounded-xl hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-8"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                {loading ? "Setting Up Your Store..." : "Complete Setup"}
+                <UiValue value={loading ? "Setting Up Your Store..." : "Complete Setup"} />
               </button>
             </form>
           </div>
 
           {/* Help Text */}
           <p className="text-center text-xs text-muted-foreground mt-6">
-            You can always update this information later from your merchant settings
-          </p>
+            <UiText text={"You can always update this information later from your merchant settings"} />{" "}</p>
         </div>
       </main>
     </div>

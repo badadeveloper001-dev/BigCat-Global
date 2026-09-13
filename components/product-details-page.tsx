@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect, useCallback } from 'react'
 import { convertCurrency, formatCurrency, formatNaira } from '@/lib/currency-utils'
@@ -214,18 +216,18 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
-              <span className="text-sm font-medium">Back</span>
+              <span className="text-sm font-medium"><UiText text={"Back"} /></span>
             </button>
             <BrandWordmark compact />
           </div>
-          <button
+          <UiAttributes><button
             onClick={() => onOpenCart?.()}
             className="relative flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-2 text-foreground hover:bg-secondary/80 transition-colors"
             aria-label="Open cart"
           >
             <ShoppingCart className="w-4 h-4" />
             <span className="text-sm font-semibold">{cartCount}</span>
-          </button>
+          </button></UiAttributes>
         </div>
       </header>
 
@@ -234,11 +236,11 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
         <div className="relative">
           <div className="aspect-square bg-gradient-to-br from-secondary to-secondary/50 rounded-xl overflow-hidden relative">
             {product.images && product.images.length > 0 ? (
-              <img
+              <UiAttributes><img
                 src={product.images[currentImageIndex]}
                 alt={product.name}
                 className="w-full h-full object-cover"
-              />
+              /></UiAttributes>
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <ImageIcon className="w-24 h-24 text-muted-foreground opacity-50" />
@@ -296,20 +298,19 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
               }`}
             >
               <Heart className={`w-4 h-4 ${savedToWishlist ? 'fill-current' : ''}`} />
-              {savedToWishlist ? 'Saved' : 'Save'}
+              <UiValue value={savedToWishlist ? 'Saved' : 'Save'} />
             </button>
           </div>
 
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <p className="text-2xl font-bold text-foreground">{displayPriceLabel}</p>
-              {displayCurrency !== listingCurrency && <p className="text-sm text-muted-foreground">≈ {equivalentPrice} · Demo rate / 演示汇率</p>}
+              {displayCurrency !== listingCurrency && <p className="text-sm text-muted-foreground">≈ {equivalentPrice} · <UiValue value={preferences.language === 'zh' ? '演示汇率' : 'Demo rate'} /></p>}
               {promotionPercentOff > 0 && (
                 <>
                   <p className="text-sm text-muted-foreground line-through">{formatCurrency(originalPrice, listingCurrency)}</p>
                   <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
-                    {promotionPercentOff}% OFF
-                  </span>
+                    {promotionPercentOff}<UiText text={"% OFF"} />{" "}</span>
                 </>
               )}
             </div>
@@ -320,8 +321,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
 
           {promotionPercentOff > 0 && (
             <p className="text-xs text-emerald-700">
-              Promo discount is estimated. Final discount applies at checkout.
-            </p>
+              <UiText text={"Promo discount is estimated. Final discount applies at checkout."} />{" "}</p>
           )}
         </div>
 
@@ -336,62 +336,62 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
             }`}
           >
             {priceAlertActive ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
-            {priceAlertActive ? 'Alert On' : 'Price Drop Alert'}
+            <UiValue value={priceAlertActive ? 'Alert On' : 'Price Drop Alert'} />
           </button>
           {priceAlertFeedback && (
-            <span className="text-xs text-amber-700">{priceAlertFeedback}</span>
+            <span className="text-xs text-amber-700"><UiValue value={priceAlertFeedback} /></span>
           )}
         </div>
 
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 flex items-start gap-2">
           <ShieldCheck className="w-4 h-4 mt-0.5 shrink-0" />
-          <span>Buyer protection: request photo or video proof before payment release, delivery confirmation, or final acceptance.</span>
+          <span><UiText text={"Buyer protection: request photo or video proof before payment release, delivery confirmation, or final acceptance."} /></span>
         </div>
 
         <div className="grid gap-2 sm:grid-cols-3">
           <div className="rounded-lg border border-border bg-background/70 p-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground"><Truck className="w-4 h-4 text-primary" /> Shipping</div>
-            <p className="text-xs text-muted-foreground mt-1">Cross-border delivery estimates, customs support, and tracking guidance are available.</p>
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground"><Truck className="w-4 h-4 text-primary" /> {" "}<UiText text={"Shipping"} /></div>
+            <p className="text-xs text-muted-foreground mt-1"><UiText text={"Cross-border delivery estimates, customs support, and tracking guidance are available."} /></p>
           </div>
           <div className="rounded-lg border border-border bg-background/70 p-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground"><Camera className="w-4 h-4 text-primary" /> Proof</div>
-            <p className="text-xs text-muted-foreground mt-1">Ask for photos or videos of the item, packaging, and receiving conditions.</p>
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground"><Camera className="w-4 h-4 text-primary" /> {" "}<UiText text={"Proof"} /></div>
+            <p className="text-xs text-muted-foreground mt-1"><UiText text={"Ask for photos or videos of the item, packaging, and receiving conditions."} /></p>
           </div>
           <div className="rounded-lg border border-border bg-background/70 p-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground"><Video className="w-4 h-4 text-primary" /> Escrow</div>
-            <p className="text-xs text-muted-foreground mt-1">Funds stay protected until the shipment is verified and accepted.</p>
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground"><Video className="w-4 h-4 text-primary" /> {" "}<UiText text={"Escrow"} /></div>
+            <p className="text-xs text-muted-foreground mt-1"><UiText text={"Funds stay protected until the shipment is verified and accepted."} /></p>
           </div>
         </div>
 
         {/* Description */}
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold text-foreground">About this product</h2>
+          <h2 className="text-sm font-semibold text-foreground"><UiText text={"About this product"} /></h2>
           <p className="text-foreground leading-relaxed text-sm">{product.description}</p>
         </div>
 
         {/* Product Details */}
         <div className="bg-card border border-border rounded-xl p-4 space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">Details</h2>
+          <h2 className="text-sm font-semibold text-foreground"><UiText text={"Details"} /></h2>
           
           {product.weight && (
             <div className="flex items-center gap-3 text-sm">
               <Package className="w-4 h-4 text-muted-foreground" />
-              <span className="text-foreground">Weight: {product.weight}kg</span>
+              <span className="text-foreground"><UiText text={"Weight:"} />{" "}{product.weight}<UiText text={"kg"} /></span>
             </div>
           )}
 
           <div className={`flex items-center gap-3 text-sm ${isOutOfStock ? 'text-destructive' : availableStock <= 5 ? 'text-chart-4' : 'text-primary'}`}>
             <div className={`w-2 h-2 rounded-full ${isOutOfStock ? 'bg-destructive' : availableStock <= 5 ? 'bg-chart-4' : 'bg-primary'}`} />
             <span>
-              <span className="block">Price per unit · Minimum {minimumOrder} units · Minimum purchase {formatCurrency(originalPrice * minimumOrder, product.listing_currency || 'NGN')} ≈ {formatCurrency(convertCurrency(originalPrice * minimumOrder, product.listing_currency || 'NGN', preferences.currency), preferences.currency)} (demo)</span>
-              {isOutOfStock ? 'Insufficient stock for minimum order' : `${availableStock} item${availableStock !== 1 ? 's' : ''} available`}
+              <span className="block"><UiText text={"Price per unit · Minimum"} />{" "}{minimumOrder} {" "}<UiText text={"units · Minimum purchase"} />{" "}{formatCurrency(originalPrice * minimumOrder, product.listing_currency || 'NGN')} ≈ {formatCurrency(convertCurrency(originalPrice * minimumOrder, product.listing_currency || 'NGN', preferences.currency), preferences.currency)} {" "}<UiText text={"(demo)"} /></span>
+              <UiValue value={isOutOfStock ? 'Insufficient stock for minimum order' : `${availableStock} item${availableStock !== 1 ? 's' : ''} available`} />
             </span>
           </div>
 
           {product.status === 'pending_weight_verification' && (
             <div className="flex items-center gap-3 text-sm text-chart-4">
               <AlertCircle className="w-4 h-4" />
-              <span>Pending weight verification</span>
+              <span><UiText text={"Pending weight verification"} /></span>
             </div>
           )}
         </div>
@@ -400,16 +400,15 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
         <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-2">
           <div className="flex items-center gap-2">
             <Truck className="w-4 h-4 text-primary" />
-            <h3 className="font-semibold text-foreground text-sm">Estimated Delivery</h3>
+            <h3 className="font-semibold text-foreground text-sm"><UiText text={"Estimated Delivery"} /></h3>
           </div>
           <p className="text-sm text-foreground">
-            Delivery time will be calculated based on your location and the item weight.
-          </p>
+            <UiText text={"Delivery time will be calculated based on your location and the item weight."} />{" "}</p>
         </div>
 
         {/* Merchant Info */}
         <div className="bg-card border border-border rounded-xl p-4">
-          <h2 className="text-sm font-semibold text-foreground mb-3">SME/Merchant Information</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-3"><UiText text={"SME/Merchant Information"} /></h2>
           <button
             type="button"
             onClick={() => onViewMerchant?.({
@@ -435,7 +434,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-medium text-foreground underline-offset-2 hover:underline">
-                {merchant.business_name || merchant.name || 'Merchant'}
+                <UiValue value={merchant.business_name || merchant.name || 'Merchant'} />
               </p>
               {merchant.location && (
                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
@@ -446,14 +445,14 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
             </div>
             <div className="flex items-center gap-1 text-xs text-primary font-medium flex-shrink-0">
               <Store className="w-4 h-4" />
-              <span>View Store</span>
+              <span><UiText text={"View Store"} /></span>
             </div>
           </button>
         </div>
 
         {/* Related Products */}
         <div className="space-y-3">
-          <h2 className="text-lg font-semibold text-foreground">Related Products</h2>
+          <h2 className="text-lg font-semibold text-foreground"><UiText text={"Related Products"} /></h2>
           {loadingRelated ? (
             <div className="grid grid-cols-2 gap-3">
               {Array.from({ length: 4 }).map((_, index) => (
@@ -462,8 +461,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
             </div>
           ) : relatedProducts.length === 0 ? (
             <div className="rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
-              No related products available right now.
-            </div>
+              <UiText text={"No related products available right now."} />{" "}</div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {relatedProducts.map((related) => (
@@ -479,12 +477,12 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
                 >
                   <div className="aspect-[4/3] bg-secondary relative">
                     {related.images?.[0] || related.image_url ? (
-                      <img
+                      <UiAttributes><img
                         src={related.images?.[0] || related.image_url}
                         alt={related.name}
                         className="w-full h-full object-cover"
                         loading="lazy"
-                      />
+                      /></UiAttributes>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <ImageIcon className="w-8 h-8 text-muted-foreground opacity-50" />
@@ -492,7 +490,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
                     )}
                   </div>
                   <div className="p-3 space-y-1.5">
-                    <p className="text-xs text-muted-foreground">{related.category || 'General'}</p>
+                    <p className="text-xs text-muted-foreground"><UiValue value={related.category || 'General'} /></p>
                     <p className="text-sm font-semibold text-foreground line-clamp-2 min-h-[2.5rem]">{related.name}</p>
                     <p className="text-sm font-bold text-primary">{formatNaira(Number(related.price || 0))}</p>
                   </div>
@@ -505,9 +503,9 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
         {/* Quantity Selector */}
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <label className="block text-sm font-medium text-foreground">Quantity</label>
+            <label className="block text-sm font-medium text-foreground"><UiText text={"Quantity"} /></label>
             <span className={`text-xs ${isOutOfStock ? 'text-destructive' : 'text-muted-foreground'}`}>
-              {isOutOfStock ? 'Unavailable right now' : `Up to ${availableStock} available`}
+              <UiValue value={isOutOfStock ? 'Unavailable right now' : `Up to ${availableStock} available`} />
             </span>
           </div>
           <div className="flex items-center gap-3 bg-secondary rounded-lg p-3 w-fit">
@@ -539,8 +537,8 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
               <ShoppingCart className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground">Cart</p>
-              <p className="text-xs text-muted-foreground">{cartCount} item{cartCount !== 1 ? 's' : ''} ready</p>
+              <p className="text-sm font-semibold text-foreground"><UiText text={"Cart"} /></p>
+              <p className="text-xs text-muted-foreground">{cartCount} {" "}<UiText text={"item"} />{cartCount !== 1 ? 's' : ''} {" "}<UiText text={"ready"} /></p>
             </div>
           </div>
           <p className="text-sm font-bold text-primary">{formatNaira(cartTotal)}</p>
@@ -548,7 +546,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
 
         {/* Reviews Section */}
         <div className="space-y-3">
-          <h2 className="text-lg font-semibold text-foreground">Customer Reviews</h2>
+          <h2 className="text-lg font-semibold text-foreground"><UiText text={"Customer Reviews"} /></h2>
           <ProductReviews productId={product.id} productName={product.name} />
         </div>
 
@@ -585,18 +583,15 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
             {isOutOfStock ? (
               <>
                 <Package className="w-5 h-5" />
-                Out of stock
-              </>
+                <UiText text={"Out of stock"} />{" "}</>
             ) : addedToCart ? (
               <>
                 <CheckCircle2 className="w-5 h-5" />
-                Added to Cart ✓
-              </>
+                <UiText text={"Added to Cart ✓"} />{" "}</>
             ) : (
               <>
                 <ShoppingCart className="w-5 h-5" />
-                Add to Cart
-              </>
+                <UiText text={"Add to Cart"} />{" "}</>
             )}
           </button>
 
@@ -609,15 +604,14 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
             }`}
           >
             <Heart className={`w-5 h-5 ${savedToWishlist ? 'fill-current' : ''}`} />
-            {savedToWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
+            <UiValue value={savedToWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'} />
           </button>
 
           <button
             onClick={() => onOpenCart?.()}
             className="w-full py-3 rounded-lg font-semibold border border-border bg-card text-foreground hover:bg-secondary transition-colors"
           >
-            View Cart
-          </button>
+            <UiText text={"View Cart"} />{" "}</button>
         </div>
       </main>
 
@@ -627,7 +621,7 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
             <div className="flex items-start gap-3">
               <div className="w-16 h-16 rounded-xl bg-secondary overflow-hidden flex-shrink-0">
                 {product.images?.[0] ? (
-                  <img src={product.images[0]} alt={product.name} width={64} height={64} className="w-full h-full object-cover" />
+                  <UiAttributes><img src={product.images[0]} alt={product.name} width={64} height={64} className="w-full h-full object-cover" /></UiAttributes>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground px-2 text-center">
                     {product.category}
@@ -637,10 +631,10 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <CheckCircle2 className="w-5 h-5 text-green-600" />
-                  <p className="font-semibold text-foreground">Added to cart</p>
+                  <p className="font-semibold text-foreground"><UiText text={"Added to cart"} /></p>
                 </div>
                 <p className="text-sm font-medium text-foreground line-clamp-2">{product.name}</p>
-                <p className="text-xs text-muted-foreground mt-1">Quantity: {quantity}</p>
+                <p className="text-xs text-muted-foreground mt-1"><UiText text={"Quantity:"} />{" "}{quantity}</p>
                 <p className="text-sm font-bold text-primary mt-2">{formatNaira(Number(product.price) * quantity)}</p>
               </div>
             </div>
@@ -656,14 +650,12 @@ export function ProductDetailsPage({ productId, onBack, onViewProduct, onViewMer
                 }}
                 className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
               >
-                Proceed to Checkout
-              </button>
+                <UiText text={"Proceed to Checkout"} />{" "}</button>
               <button
                 onClick={() => setShowAddedPopup(false)}
                 className="w-full rounded-xl bg-secondary py-3 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
               >
-                Continue Shopping
-              </button>
+                <UiText text={"Continue Shopping"} />{" "}</button>
             </div>
           </div>
         </div>

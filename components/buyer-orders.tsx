@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect } from "react"
 import { ArrowLeft, Package, Clock, Truck, CheckCircle2, AlertCircle, RefreshCw, Loader2, Download, Timer, Banknote } from "lucide-react"
@@ -467,40 +469,39 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="font-semibold text-foreground">My Orders</h1>
+          <h1 className="font-semibold text-foreground"><UiText text={"My Orders"} /></h1>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground">Auto-updates every 20s · Last sync {new Date(lastUpdatedAt).toLocaleTimeString()}</p>
+        <p className="mt-1 text-xs text-muted-foreground"><UiText text={"Auto-updates every 20s · Last sync"} />{" "}{new Date(lastUpdatedAt).toLocaleTimeString()}</p>
       </header>
 
       <main className="flex-1 overflow-auto p-4">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <RefreshCw className="w-8 h-8 text-muted-foreground animate-spin mb-3" />
-            <p className="text-muted-foreground">Loading orders...</p>
+            <p className="text-muted-foreground"><UiText text={"Loading orders..."} /></p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-12">
             <AlertCircle className="w-12 h-12 text-destructive mb-3" />
-            <p className="text-destructive">{error}</p>
+            <p className="text-destructive"><UiValue value={error} /></p>
           </div>
         ) : orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
             <Package className="w-16 h-16 text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No orders yet</h2>
+            <h2 className="text-xl font-semibold mb-2"><UiText text={"No orders yet"} /></h2>
             <p className="text-muted-foreground text-center">
-              Start shopping to see your orders here
-            </p>
+              <UiText text={"Start shopping to see your orders here"} />{" "}</p>
           </div>
         ) : (
           <div className="space-y-4">
             {reorderMessage && (
               <div className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-primary">
-                {reorderMessage}
+                <UiValue value={reorderMessage} />
               </div>
             )}
             {reportFeedback && (
               <div className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-primary">
-                {reportFeedback}
+                <UiValue value={reportFeedback} />
               </div>
             )}
             {orders.map((order) => {
@@ -516,14 +517,14 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
                   {/* Order Header */}
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <p className="text-xs text-muted-foreground">Order ID</p>
+                      <p className="text-xs text-muted-foreground"><UiText text={"Order ID"} /></p>
                       <p className="font-mono text-sm font-medium">
                         {order.id.slice(0, 8).toUpperCase()}
                       </p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 ${statusConfig[order.status]?.color || 'bg-muted text-muted-foreground'}`}>
                       <StatusIcon className="w-3.5 h-3.5" />
-                      {statusConfig[order.status]?.label || order.status}
+                      <UiValue value={statusConfig[order.status]?.label || order.status} />
                     </span>
                   </div>
 
@@ -547,7 +548,7 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
                       {formatDate(order.created_at)}
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-muted-foreground">Total</p>
+                      <p className="text-xs text-muted-foreground"><UiText text={"Total"} /></p>
                       <p className="font-semibold text-foreground">
                         {formatNaira(order.grand_total)}
                       </p>
@@ -556,7 +557,7 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
 
                   {/* Order Progress */}
                   <div className="mt-3 pt-3 border-t border-border">
-                    <p className="text-xs text-muted-foreground mb-3">Order Progress</p>
+                    <p className="text-xs text-muted-foreground mb-3"><UiText text={"Order Progress"} /></p>
                     <div className="flex items-center justify-between">
                       {orderSteps.map((step, index) => {
                         const currentStep = statusConfig[order.status]?.step || 1
@@ -598,45 +599,44 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
 
                   {/* Delivery Info */}
                   <div className="mt-3 pt-3 border-t border-border">
-                    <p className="text-xs text-muted-foreground mb-1">Delivery Address</p>
+                    <p className="text-xs text-muted-foreground mb-1"><UiText text={"Delivery Address"} /></p>
                     <p className="text-sm text-foreground">{order.delivery_address}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Tracking ID: {String(order.tracking_id || `BC-${String(order.id).replace(/-/g, '').slice(0, 10).toUpperCase()}`)}</p>
+                    <p className="text-xs text-muted-foreground mt-1"><UiText text={"Tracking ID:"} />{" "}{String(order.tracking_id || `BC-${String(order.id).replace(/-/g, '').slice(0, 10).toUpperCase()}`)}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {order.delivery_type === 'pickup'
+                      <UiValue value={order.delivery_type === 'pickup'
                         ? 'Pickup at Drop-off Point'
                         : order.delivery_type === 'express'
                           ? 'Express Delivery'
-                          : 'Normal Delivery'}
+                          : 'Normal Delivery'} />
                     </p>
                     {order.delivery_type === 'pickup' && order.pickup_token && (
                       <p className="text-xs text-foreground mt-1 font-medium">
-                        Pickup Token: {String(order.pickup_token)}
+                        <UiText text={"Pickup Token:"} />{" "}{String(order.pickup_token)}
                       </p>
                     )}
                     {order.status !== 'delivered' && (
                       <div className={`mt-2 flex items-center gap-1.5 text-xs ${getDeliveryETA(order).daysLeft === 0 ? 'text-green-700' : 'text-primary'}`}>
                         <Timer className="w-3.5 h-3.5" />
-                        <span>{getDeliveryETA(order).label}</span>
+                        <span><UiValue value={getDeliveryETA(order).label} /></span>
                         {typeof getDeliveryETA(order).daysLeft === 'number' && getDeliveryETA(order).daysLeft! > 0 && (
-                          <span className="text-muted-foreground">({getDeliveryETA(order).daysLeft}d left)</span>
+                          <span className="text-muted-foreground">({getDeliveryETA(order).daysLeft}<UiText text={"d left)"} /></span>
                         )}
                       </div>
                     )}
                     <p className="text-xs text-muted-foreground mt-2">
-                      Use Report issue from order details when you need BigCat admin support.
-                    </p>
+                      <UiText text={"Use Report issue from order details when you need BigCat admin support."} />{" "}</p>
                     {orderIssue && (
                       <div className="mt-2 rounded-lg border border-border bg-secondary/40 px-2.5 py-2">
                         <div className="flex items-center justify-between gap-2">
                           <div>
-                            <p className="text-[11px] text-muted-foreground">Support Case</p>
+                            <p className="text-[11px] text-muted-foreground"><UiText text={"Support Case"} /></p>
                             <p className="text-xs font-semibold text-foreground">{getIssueCaseNumber(String(orderIssue.id || ''))}</p>
                           </div>
                           <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getIssueStatusClass(orderIssue.status)}`}>
                             {getIssueStatusLabel(orderIssue.status)}
                           </span>
                         </div>
-                        <p className="mt-1 text-[11px] text-muted-foreground">Track the stage of this issue using your case number.</p>
+                        <p className="mt-1 text-[11px] text-muted-foreground"><UiText text={"Track the stage of this issue using your case number."} /></p>
                       </div>
                     )}
                   </div>
@@ -645,21 +645,21 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
                   {escrow && (
                     <div className="mt-3 pt-3 border-t border-border space-y-2">
                       <div className="flex items-center justify-between">
-                        <p className="text-xs text-muted-foreground">Payment Status</p>
+                        <p className="text-xs text-muted-foreground"><UiText text={"Payment Status"} /></p>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${paymentHeld ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'}`}>
-                          {paymentHeld ? 'Held in Escrow' : 'Released from Escrow'}
+                          <UiValue value={paymentHeld ? 'Held in Escrow' : 'Released from Escrow'} />
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-foreground">Merchant Payment</span>
+                        <span className="text-foreground"><UiText text={"Merchant Payment"} /></span>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClass(escrow.merchant_status)}`}>
-                          {escrow.merchant_status === 'held' ? 'Held' : 'Released'}
+                          <UiValue value={escrow.merchant_status === 'held' ? 'Held' : 'Released'} />
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-foreground">Logistics Payment</span>
+                        <span className="text-foreground"><UiText text={"Logistics Payment"} /></span>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClass(escrow.logistics_status)}`}>
-                          {escrow.logistics_status === 'held' ? 'Held' : 'Released'}
+                          <UiValue value={escrow.logistics_status === 'held' ? 'Held' : 'Released'} />
                         </span>
                       </div>
                     </div>
@@ -675,8 +675,7 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
                         {updatingOrderId === String(order.id) ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            Updating...
-                          </>
+                            <UiText text={"Updating..."} />{" "}</>
                         ) : (
                           'Order Received and Satisfied'
                         )}
@@ -689,8 +688,7 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
                       href={`/track/${order.id}`}
                       className="w-full rounded-lg border border-indigo-200 bg-indigo-50 py-2.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 flex items-center justify-center"
                     >
-                      Track Package
-                    </a>
+                      <UiText text={"Track Package"} />{" "}</a>
                   </div>
 
                   <div className="mt-2">
@@ -698,8 +696,7 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
                       onClick={() => handleReorder(order)}
                       className="w-full rounded-lg border border-border bg-secondary py-2.5 text-sm font-medium text-foreground hover:bg-secondary/80"
                     >
-                      Buy Again
-                    </button>
+                      <UiText text={"Buy Again"} />{" "}</button>
                   </div>
 
                   <div className="mt-2">
@@ -708,8 +705,7 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
                       className="w-full rounded-lg border border-border bg-secondary/60 py-2.5 text-sm font-medium text-foreground hover:bg-secondary flex items-center justify-center gap-2"
                     >
                       <Download className="w-4 h-4" />
-                      Download Receipt / Invoice
-                    </button>
+                      <UiText text={"Download Receipt / Invoice"} />{" "}</button>
                   </div>
 
                   <div className="mt-2">
@@ -720,8 +716,7 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
                       }}
                       className="w-full rounded-lg border border-primary/30 bg-primary/5 py-2.5 text-sm font-medium text-primary hover:bg-primary/10"
                     >
-                      Report Issue / Request Return or Refund
-                    </button>
+                      <UiText text={"Report Issue / Request Return or Refund"} />{" "}</button>
                     {orderIssue && (
                       <p className="mt-1 text-[11px] text-muted-foreground">
                         {getIssueCaseNumber(String(orderIssue.id || ''))} · {getIssueStatusLabel(orderIssue.status)}
@@ -731,51 +726,50 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
 
                   {reportingOrderId === String(order.id) && (
                     <div className="mt-3 rounded-lg border border-border bg-secondary/40 p-3 space-y-2">
-                      <p className="text-xs font-semibold text-foreground">Report Issue / Request Return or Refund</p>
+                      <p className="text-xs font-semibold text-foreground"><UiText text={"Report Issue / Request Return or Refund"} /></p>
                       <select
                         value={reportIssueType}
                         onChange={(e) => setReportIssueType(e.target.value)}
                         className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
                       >
-                        <option value="not_delivered">Order not delivered</option>
-                        <option value="wrong_item">Wrong item received</option>
-                        <option value="damaged_item">Damaged item</option>
-                        <option value="return_item">Return item (change of mind)</option>
-                        <option value="refund_request">Refund request</option>
-                        <option value="other">Other</option>
+                        <option value="not_delivered"><UiText text={"Order not delivered"} /></option>
+                        <option value="wrong_item"><UiText text={"Wrong item received"} /></option>
+                        <option value="damaged_item"><UiText text={"Damaged item"} /></option>
+                        <option value="return_item"><UiText text={"Return item (change of mind)"} /></option>
+                        <option value="refund_request"><UiText text={"Refund request"} /></option>
+                        <option value="other"><UiText text={"Other"} /></option>
                       </select>
-                      <textarea
+                      <UiAttributes><textarea
                         value={reportDescription}
                         onChange={(e) => setReportDescription(e.target.value)}
                         placeholder="Tell BigCat admin what happened..."
                         className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground min-h-[88px]"
-                      />
+                      /></UiAttributes>
                       {(reportIssueType === 'refund_request' || reportIssueType === 'return_item') && (
                         <div className="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
                           <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-800">
                             <Banknote className="w-3.5 h-3.5" />
-                            Refund Bank Details (optional)
-                          </div>
-                          <input
+                            <UiText text={"Refund Bank Details (optional)"} />{" "}</div>
+                          <UiAttributes><input
                             value={refundBankName}
                             onChange={(e) => setRefundBankName(e.target.value)}
                             placeholder="Bank name"
                             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-                          />
-                          <input
+                          /></UiAttributes>
+                          <UiAttributes><input
                             value={refundAccountNumber}
                             onChange={(e) => setRefundAccountNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
                             placeholder="Account number (10 digits)"
                             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
                             maxLength={10}
                             inputMode="numeric"
-                          />
-                          <input
+                          /></UiAttributes>
+                          <UiAttributes><input
                             value={refundAccountName}
                             onChange={(e) => setRefundAccountName(e.target.value)}
                             placeholder="Account name"
                             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-                          />
+                          /></UiAttributes>
                         </div>
                       )}
                       <button
@@ -783,7 +777,7 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
                         disabled={submittingReportFor === String(order.id)}
                         className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60"
                       >
-                        {submittingReportFor === String(order.id) ? 'Submitting...' : 'Submit report'}
+                        <UiValue value={submittingReportFor === String(order.id) ? 'Submitting...' : 'Submit report'} />
                       </button>
                     </div>
                   )}

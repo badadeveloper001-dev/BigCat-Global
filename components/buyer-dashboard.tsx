@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useRole } from "@/lib/role-context"
 import { logout } from "@/lib/auth-client"
@@ -705,12 +707,12 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
             <button onClick={() => setShowTradeProtection(false)} className="p-2 -ml-2 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <h1 className="font-semibold text-foreground">Trade Protection</h1>
+            <h1 className="font-semibold text-foreground"><UiText text={"Trade Protection"} /></h1>
             <div className="w-9" />
           </div>
         </header>
         <main className="p-4">
-          <TradeProtectionPanel
+          <UiAttributes><TradeProtectionPanel
             title="Buyer Trade Protection"
             orders={recentOrders.map((order) => ({
               id: order.id,
@@ -720,7 +722,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
               status: order.status,
               created_at: order.date,
             }))}
-          />
+          /></UiAttributes>
         </main>
       </div>
     )
@@ -763,14 +765,14 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
       <div className="min-h-screen bg-background flex flex-col">
         <header className="sticky top-0 z-50 bg-card border-b border-border px-4 py-3">
           <div className="flex items-center justify-between">
-            <button
+            <UiAttributes><button
               onClick={() => setShowChat(false)}
               className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Go back"
             >
               <ArrowLeft className="w-5 h-5" />
-            </button>
-            <h1 className="font-semibold text-foreground">Messages</h1>
+            </button></UiAttributes>
+            <h1 className="font-semibold text-foreground"><UiText text={"Messages"} /></h1>
             <div className="w-9" />
           </div>
         </header>
@@ -1004,11 +1006,10 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
     />
     {isSuspended && (
       <div className="mx-4 mt-4 rounded-2xl border border-red-200 bg-red-50 p-4">
-        <p className="font-semibold text-red-700">Account Suspended</p>
+        <p className="font-semibold text-red-700"><UiText text={"Account Suspended"} /></p>
         <p className="text-sm text-red-700 mt-1">
-          Your account has been temporarily suspended for violating platform policies.
-        </p>
-        <p className="text-xs text-red-600 mt-1">Strikes: {strikeCount}</p>
+          <UiText text={"Your account has been temporarily suspended for violating platform policies."} />{" "}</p>
+        <p className="text-xs text-red-600 mt-1"><UiText text={"Strikes:"} />{" "}{strikeCount}</p>
         <button
           onClick={() => {
             resetSafetyState(user?.userId)
@@ -1018,14 +1019,13 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
           }}
           className="mt-3 px-3 py-2 rounded-lg border border-red-200 bg-white text-red-700 text-xs font-medium"
         >
-          Reset Strikes (Demo)
-        </button>
+          <UiText text={"Reset Strikes (Demo)"} />{" "}</button>
       </div>
     )}
 
     {policyNotice && (
       <div className="mx-4 mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-        {policyNotice}
+        <UiValue value={policyNotice} />
       </div>
     )}
     <div className="min-h-screen bg-background flex flex-col font-sans pb-24">
@@ -1034,29 +1034,28 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <BrandWordmark compact />
-            <p className="text-xs text-muted-foreground mt-1">Good morning, {displayName}</p>
+            <p className="text-xs text-muted-foreground mt-1"><UiText text={"Good morning,"} />{" "}{displayName}</p>
           </div>
           <div className="flex items-center gap-1">
             {user ? (
-              <button
+              <UiAttributes><button
                 onClick={handleLogout}
                 className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Logout"
                 title="Logout"
               >
                 <LogOut className="w-5 h-5" />
-              </button>
+              </button></UiAttributes>
             ) : (
-              <button
+              <UiAttributes><button
                 onClick={() => setShowAuthPrompt(true)}
                 className="px-2 py-1 text-primary hover:text-primary/80 transition-colors text-xs font-semibold"
                 aria-label="Sign In"
                 title="Sign In"
               >
-                Sign In
-              </button>
+                <UiText text={"Sign In"} />{" "}</button></UiAttributes>
             )}
-            <button
+            <UiAttributes><button
               onClick={() => setActiveTab("wishlist")}
               className={`relative p-2 transition-colors ${
                 activeTab === "wishlist" ? "text-primary" : "text-muted-foreground hover:text-foreground"
@@ -1070,8 +1069,8 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
                   {getWishlistCount() > 99 ? '99+' : getWishlistCount()}
                 </span>
               )}
-            </button>
-            <button
+            </button></UiAttributes>
+            <UiAttributes><button
               onClick={() => setShowCart(true)}
               className="relative p-2 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Cart"
@@ -1083,8 +1082,8 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
                   {getCartItemCount() > 99 ? '99+' : getCartItemCount()}
                 </span>
               )}
-            </button>
-            <button
+            </button></UiAttributes>
+            <UiAttributes><button
               onClick={() => setShowNotifications(true)}
               className="relative p-2 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Notifications"
@@ -1094,7 +1093,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
               {notificationCount > 0 && (
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
               )}
-            </button>
+            </button></UiAttributes>
           </div>
         </div>
       </header>
@@ -1123,12 +1122,11 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <h2 className="font-bold text-primary-foreground text-lg">BigCat AI</h2>
+                  <h2 className="font-bold text-primary-foreground text-lg"><UiText text={"BigCat AI"} /></h2>
                   <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-foreground/20 text-xs font-medium text-primary-foreground">
-                    <Zap className="w-3 h-3" /> Smart
-                  </span>
+                    <Zap className="w-3 h-3" /> {" "}<UiText text={"Smart"} />{" "}</span>
                 </div>
-                <p className="text-sm text-primary-foreground/80">Your personal shopping assistant</p>
+                <p className="text-sm text-primary-foreground/80"><UiText text={"Your personal shopping assistant"} /></p>
               </div>
             </div>
 
@@ -1136,7 +1134,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
             <div className="relative">
               <div className="flex items-center gap-3 px-4 py-4 bg-card rounded-2xl shadow-md">
                 <Search className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                <input
+                <UiAttributes><input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -1147,15 +1145,15 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
                   }}
                   placeholder="Ask anything... find products, vendors, services"
                   className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-base"
-                />
-                <button
+                /></UiAttributes>
+                <UiAttributes><button
                   onClick={handleVoiceSearch}
                   aria-label="Voice search"
                   className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors flex-shrink-0 disabled:opacity-50"
                   disabled={aiSearching}
                 >
                   {aiSearching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Mic className="w-5 h-5" />}
-                </button>
+                </button></UiAttributes>
               </div>
             </div>
 
@@ -1167,7 +1165,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
                   onClick={() => handleSuggestionTap(s)}
                   className="flex-shrink-0 px-3 py-2 rounded-xl bg-primary-foreground/15 text-sm text-primary-foreground hover:bg-primary-foreground/25 transition-colors whitespace-nowrap"
                 >
-                  {s}
+                  <UiValue value={s} />
                 </button>
               ))}
             </div>
@@ -1179,11 +1177,11 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
             <div className="flex items-center gap-2 text-sm">
               <MapPin className={`w-4 h-4 ${locationStatus === 'ready' ? 'text-emerald-600' : 'text-muted-foreground'}`} />
               <span className="font-medium text-foreground">
-                {locationStatus === 'detecting'
+                <UiValue value={locationStatus === 'detecting'
                   ? 'Finding your live location...'
                   : buyerLocationLabel
                     ? `Showing the closest merchants to ${buyerLocationLabel}`
-                    : 'Allow location access to see merchants near you first'}
+                    : 'Allow location access to see merchants near you first'} />
               </span>
             </div>
           </div>
@@ -1192,12 +1190,12 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
         {/* Categories */}
         <section className="mb-6">
           <div className="flex items-center justify-between px-4 mb-3">
-            <h2 className="font-semibold text-foreground text-lg">Categories</h2>
+            <h2 className="font-semibold text-foreground text-lg"><UiText text={"Categories"} /></h2>
             <button 
               onClick={() => setShowProducts(true)}
               className="text-sm text-primary font-medium flex items-center gap-0.5"
             >
-              See all <ChevronRight className="w-4 h-4" />
+              <UiText text={"See all"} />{" "}<ChevronRight className="w-4 h-4" />
             </button>
           </div>
           <div className="flex gap-3 overflow-x-auto px-4 pb-1 scrollbar-hide">
@@ -1227,12 +1225,12 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
         {/* Featured Products */}
         <section className="px-4 mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-foreground text-lg">Featured Products</h2>
+            <h2 className="font-semibold text-foreground text-lg"><UiText text={"Featured Products"} /></h2>
             <button 
               onClick={() => setShowProducts(true)}
               className="text-sm text-primary font-medium flex items-center gap-0.5"
             >
-              See all <ChevronRight className="w-4 h-4" />
+              <UiText text={"See all"} />{" "}<ChevronRight className="w-4 h-4" />
             </button>
           </div>
           <ProductGrid
@@ -1264,12 +1262,12 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
         {/* Services */}
         <section className="px-4 mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-foreground text-lg">Services</h2>
+            <h2 className="font-semibold text-foreground text-lg"><UiText text={"Services"} /></h2>
             <button 
               onClick={() => setShowAllServices((current) => !current)}
               className="text-sm text-primary font-medium flex items-center gap-0.5"
             >
-              {showAllServices ? 'Show less' : 'Browse all'} <ChevronRight className="w-4 h-4" />
+              <UiValue value={showAllServices ? 'Show less' : 'Browse all'} /> <ChevronRight className="w-4 h-4" />
             </button>
           </div>
           {loadingServices ? (
@@ -1279,7 +1277,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
           ) : displayServices.length === 0 ? (
             <div className="p-8 text-center">
               <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">No services yet</p>
+              <p className="text-sm text-muted-foreground"><UiText text={"No services yet"} /></p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -1310,7 +1308,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
                   </div>
                   <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
                     <span>{service.merchant_name || 'Verified provider'}</span>
-                    <span>{service.base_price ? `₦${Number(service.base_price).toLocaleString()}` : 'Custom quote'}</span>
+                    <span><UiValue value={service.base_price ? `₦${Number(service.base_price).toLocaleString()}` : 'Custom quote'} /></span>
                   </div>
                 </button>
               ))}
@@ -1323,13 +1321,12 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold text-foreground text-lg flex items-center gap-2">
               <Package className="w-5 h-5 text-primary" />
-              Recent Orders
-            </h2>
+              <UiText text={"Recent Orders"} />{" "}</h2>
             <button 
               onClick={() => setShowOrders(true)}
               className="text-sm text-primary font-medium flex items-center gap-0.5"
             >
-              View all <ChevronRight className="w-4 h-4" />
+              <UiText text={"View all"} />{" "}<ChevronRight className="w-4 h-4" />
             </button>
           </div>
           {loadingOrders ? (
@@ -1339,7 +1336,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
           ) : recentOrders.length === 0 ? (
             <div className="p-8 text-center">
               <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">No orders yet</p>
+              <p className="text-sm text-muted-foreground"><UiText text={"No orders yet"} /></p>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
@@ -1358,7 +1355,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
                   <div className="text-right flex-shrink-0">
                     <p className="font-bold text-foreground">{formatNaira(order.amount)}</p>
                     <p className={`text-sm font-medium ${order.status === "Delivered" ? "text-primary" : "text-chart-4"}`}>
-                      {order.status}
+                      <UiValue value={order.status} />
                     </p>
                   </div>
                 </div>
@@ -1379,9 +1376,9 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
           <div className="p-4 space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-xl font-bold text-foreground">My Wishlist</h2>
+                <h2 className="text-xl font-bold text-foreground"><UiText text={"My Wishlist"} /></h2>
                 <p className="text-sm text-muted-foreground">
-                  {getWishlistCount()} saved product{getWishlistCount() !== 1 ? 's' : ''}
+                  {getWishlistCount()} {" "}<UiText text={"saved product"} />{getWishlistCount() !== 1 ? 's' : ''}
                 </p>
               </div>
               {wishlistItems.length > 0 && (
@@ -1389,16 +1386,15 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
                   onClick={clearWishlist}
                   className="rounded-xl border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary"
                 >
-                  Clear All
-                </button>
+                  <UiText text={"Clear All"} />{" "}</button>
               )}
             </div>
 
             {wishlistItems.length === 0 ? (
               <div className="bg-card border border-border rounded-2xl p-8 text-center">
                 <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-foreground mb-1">Your wishlist is empty</h3>
-                <p className="text-sm text-muted-foreground mb-4">Save products you love and come back to them anytime.</p>
+                <h3 className="text-lg font-semibold text-foreground mb-1"><UiText text={"Your wishlist is empty"} /></h3>
+                <p className="text-sm text-muted-foreground mb-4"><UiText text={"Save products you love and come back to them anytime."} /></p>
                 <button
                   onClick={() => {
                     setActiveTab("home")
@@ -1406,8 +1402,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
                   }}
                   className="px-4 py-3 rounded-xl bg-primary text-primary-foreground font-semibold"
                 >
-                  Browse Products
-                </button>
+                  <UiText text={"Browse Products"} />{" "}</button>
               </div>
             ) : (
               <ProductGrid
@@ -1440,21 +1435,19 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <User className="w-8 h-8 text-primary" />
                 </div>
-                <h2 className="text-lg font-bold text-foreground mb-1">You're browsing as a guest</h2>
-                <p className="text-sm text-muted-foreground mb-4">Sign in or create an account to access your profile, orders, and more.</p>
+                <h2 className="text-lg font-bold text-foreground mb-1"><UiText text={"You're browsing as a guest"} /></h2>
+                <p className="text-sm text-muted-foreground mb-4"><UiText text={"Sign in or create an account to access your profile, orders, and more."} /></p>
                 <button
                   onClick={() => setShowAuthPrompt(true)}
                   className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-semibold"
                 >
-                  Sign In / Sign Up
-                </button>
+                  <UiText text={"Sign In / Sign Up"} />{" "}</button>
                 {onNeedsOnboarding && (
                   <button
                     onClick={onNeedsOnboarding}
                     className="w-full mt-3 py-3 bg-secondary text-foreground rounded-xl font-medium text-sm"
                   >
-                    Are you a merchant? Go to merchant login →
-                  </button>
+                    <UiText text={"Are you a merchant? Go to merchant login →"} />{" "}</button>
                 )}
               </div>
             )}
@@ -1475,7 +1468,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
 
             {/* Profile Options */}
             <div className="bg-card border border-border rounded-2xl overflow-hidden">
-              <h3 className="font-semibold text-foreground p-4 border-b border-border">Account</h3>
+              <h3 className="font-semibold text-foreground p-4 border-b border-border"><UiText text={"Account"} /></h3>
               <div className="divide-y divide-border">
                 {[
                   { label: "Edit Profile", value: "Update your info", action: () => setShowProfile(true) },
@@ -1491,7 +1484,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
                     }}
                     className="w-full flex items-center justify-between p-4 hover:bg-secondary/50 transition-colors"
                   >
-                    <span className="text-sm text-foreground">{item.label}</span>
+                    <span className="text-sm text-foreground"><UiValue value={item.label} /></span>
                     <span className="text-sm text-muted-foreground">{item.value}</span>
                   </button>
                 ))}
@@ -1500,7 +1493,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
 
             {/* Support */}
             <div className="bg-card border border-border rounded-2xl overflow-hidden">
-              <h3 className="font-semibold text-foreground p-4 border-b border-border">Support</h3>
+              <h3 className="font-semibold text-foreground p-4 border-b border-border"><UiText text={"Support"} /></h3>
               <div className="divide-y divide-border">
                 {[
                   { label: "Help Center", value: "FAQs & guides" },
@@ -1513,7 +1506,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
                     onClick={() => handleSupportAction(item.label)}
                     className="w-full flex items-center justify-between p-4 hover:bg-secondary/50 transition-colors"
                   >
-                    <span className="text-sm text-foreground">{item.label}</span>
+                    <span className="text-sm text-foreground"><UiValue value={item.label} /></span>
                     <span className="text-sm text-muted-foreground">{item.value}</span>
                   </button>
                 ))}
@@ -1525,8 +1518,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
               onClick={handleLogout}
               className="w-full py-4 bg-destructive/10 text-destructive rounded-2xl font-semibold hover:bg-destructive/20 transition-colors"
             >
-              Log Out
-            </button>
+              <UiText text={"Log Out"} />{" "}</button>
             </>
             )}
           </div>
@@ -1536,13 +1528,13 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
       {aiFullscreenOpen && (
         <div className="fixed inset-0 z-[70] bg-background">
           <div className="absolute top-3 right-3 z-[71]">
-            <button
+            <UiAttributes><button
               onClick={closeAiAssistant}
               className="h-10 w-10 rounded-full bg-black/55 text-white flex items-center justify-center shadow-md"
               aria-label="Close AI assistant"
             >
               <X className="w-5 h-5" />
-            </button>
+            </button></UiAttributes>
           </div>
             <div className="h-full w-full pt-14">
               <NigeriaAiAssistant
@@ -1569,7 +1561,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
       {cartPopupProduct && (
         <div className="fixed inset-0 z-[72] bg-black/40 flex items-end sm:items-center justify-center p-4">
           <div className="w-full max-w-md rounded-2xl border border-border bg-card p-4 shadow-2xl">
-            <p className="font-semibold text-foreground mb-1">Added to cart</p>
+            <p className="font-semibold text-foreground mb-1"><UiText text={"Added to cart"} /></p>
             <p className="text-sm font-medium text-foreground line-clamp-2">{cartPopupProduct.name}</p>
             <p className="text-xs text-muted-foreground mt-1">{cartPopupProduct.merchant.business_name}</p>
             <p className="text-sm font-bold text-primary mt-2">{formatNaira(cartPopupProduct.price)}</p>
@@ -1587,14 +1579,12 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
                 }}
                 className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
               >
-                Proceed to Checkout
-              </button>
+                <UiText text={"Proceed to Checkout"} />{" "}</button>
               <button
                 onClick={() => setCartPopupProduct(null)}
                 className="w-full rounded-xl bg-secondary py-3 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
               >
-                Continue Shopping
-              </button>
+                <UiText text={"Continue Shopping"} />{" "}</button>
             </div>
           </div>
         </div>
@@ -1614,7 +1604,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
           }`}
         >
           <Home className="w-6 h-6" />
-          <span className="text-xs font-medium">Home</span>
+          <span className="text-xs font-medium"><UiText text={"Home"} /></span>
         </button>
 
         {/* Orders */}
@@ -1627,7 +1617,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
           }`}
         >
           <ShoppingBag className="w-6 h-6" />
-          <span className="text-xs font-medium">Orders</span>
+          <span className="text-xs font-medium"><UiText text={"Orders"} /></span>
         </button>
 
         {/* Messages */}
@@ -1645,7 +1635,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
               {unreadMessages > 99 ? '99+' : unreadMessages}
             </span>
           )}
-          <span className="text-xs font-medium">Messages</span>
+          <span className="text-xs font-medium"><UiText text={"Messages"} /></span>
         </button>
 
         {/* Profile */}
@@ -1658,7 +1648,7 @@ export function BuyerDashboard({ onNeedsOnboarding }: { onNeedsOnboarding?: () =
           }`}
         >
           <User className="w-6 h-6" />
-          <span className="text-xs font-medium">Profile</span>
+          <span className="text-xs font-medium"><UiText text={"Profile"} /></span>
         </button>
       </div>
     </div>

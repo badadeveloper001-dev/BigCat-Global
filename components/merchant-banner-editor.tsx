@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
@@ -126,22 +128,21 @@ export function MerchantBannerEditor({
   return (
     <div className="space-y-6 rounded-lg border border-gray-200 p-6 bg-white">
       <div>
-        <h3 className="font-semibold text-gray-900">Banner Product Image</h3>
+        <h3 className="font-semibold text-gray-900"><UiText text={"Banner Product Image"} /></h3>
         <p className="text-sm text-gray-600 mt-1">
-          Add a product image to make your banner more visually appealing. Choose from your catalog or upload a custom image.
-        </p>
+          <UiText text={"Add a product image to make your banner more visually appealing. Choose from your catalog or upload a custom image."} />{" "}</p>
       </div>
 
       {/* Current image display */}
       {imageUrl && (
         <div className="relative w-full h-40 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
-          <Image
+          <UiAttributes><Image
             src={imageUrl}
             alt="Banner preview"
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 768px"
-          />
+          /></UiAttributes>
           <button
             onClick={() => {
               setImageUrl('')
@@ -149,21 +150,20 @@ export function MerchantBannerEditor({
             }}
             className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold"
           >
-            Remove
-          </button>
+            <UiText text={"Remove"} />{" "}</button>
         </div>
       )}
 
       {/* Product picker */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Select from your products</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2"><UiText text={"Select from your products"} /></label>
         <button
           onClick={() => setShowProductPicker(!showProductPicker)}
           disabled={products.length === 0 || loadingProducts || isLoading}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 font-medium text-sm flex items-center justify-between hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span>{products.length === 0 ? 'No products available' : 'Choose a product'}</span>
-          <span>{loadingProducts ? 'Loading products...' : products.length === 0 ? 'No products available' : 'Choose a product'}</span>
+          <span><UiValue value={products.length === 0 ? 'No products available' : 'Choose a product'} /></span>
+          <span><UiValue value={loadingProducts ? 'Loading products...' : products.length === 0 ? 'No products available' : 'Choose a product'} /></span>
           <ChevronDown className="w-4 h-4" />
         </button>
 
@@ -177,13 +177,13 @@ export function MerchantBannerEditor({
               >
                 {product.image_url && (
                   <div className="relative w-10 h-10 rounded overflow-hidden">
-                    <Image
+                    <UiAttributes><Image
                       src={product.image_url}
                       alt={product.name}
                       fill
                       className="object-cover"
                       sizes="40px"
-                    />
+                    /></UiAttributes>
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
@@ -198,22 +198,22 @@ export function MerchantBannerEditor({
 
       {/* Custom image upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Or upload a custom image</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2"><UiText text={"Or upload a custom image"} /></label>
         <label className="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 group">
           <div className="flex flex-col items-center justify-center text-center">
             <Upload className="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
-            <p className="mt-2 text-sm text-gray-600 group-hover:text-gray-700">Click to upload or drag and drop</p>
-            <p className="text-xs text-gray-500 mt-1">PNG, JPG, WebP, GIF up to 5MB</p>
+            <p className="mt-2 text-sm text-gray-600 group-hover:text-gray-700"><UiText text={"Click to upload or drag and drop"} /></p>
+            <p className="text-xs text-gray-500 mt-1"><UiText text={"PNG, JPG, WebP, GIF up to 5MB"} /></p>
           </div>
           <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isLoading} />
         </label>
-        {uploadError && <p className="text-sm text-red-600 mt-2">{uploadError}</p>}
+        {uploadError && <p className="text-sm text-red-600 mt-2"><UiValue value={uploadError} /></p>}
       </div>
 
       {/* Image layout selection */}
       {imageUrl && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">Image layout</label>
+          <label className="block text-sm font-medium text-gray-700 mb-3"><UiText text={"Image layout"} /></label>
           <div className="grid grid-cols-3 gap-3">
             {[
               { value: 'left' as const, label: 'Image Left', description: 'Image on left side' },
@@ -229,8 +229,8 @@ export function MerchantBannerEditor({
                     : 'border-gray-200 bg-white hover:border-gray-300'
                 }`}
               >
-                <p className="text-sm font-medium text-gray-900">{option.label}</p>
-                <p className="text-xs text-gray-600 mt-1">{option.description}</p>
+                <p className="text-sm font-medium text-gray-900"><UiValue value={option.label} /></p>
+                <p className="text-xs text-gray-600 mt-1"><UiValue value={option.description} /></p>
               </button>
             ))}
           </div>
@@ -244,7 +244,7 @@ export function MerchantBannerEditor({
           className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg font-medium text-sm hover:bg-emerald-100"
         >
           <Eye className="w-4 h-4" />
-          {showPreview ? 'Hide preview' : 'Show preview'}
+          <UiValue value={showPreview ? 'Hide preview' : 'Show preview'} />
         </button>
       )}
 
@@ -276,13 +276,13 @@ export function MerchantBannerEditor({
 
               {(layoutChoice === 'left' || layoutChoice === 'right') && (
                 <div className="hidden md:block w-80 h-80 rounded-lg overflow-hidden bg-white/10 ml-4 flex-shrink-0">
-                  <Image
+                  <UiAttributes><Image
                     src={imageUrl}
                     alt="Preview"
                     fill
                     className="object-cover"
                     sizes="320px"
-                  />
+                  /></UiAttributes>
                 </div>
               )}
             </div>

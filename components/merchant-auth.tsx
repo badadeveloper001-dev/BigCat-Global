@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState } from "react"
 import { useRole } from "@/lib/role-context"
@@ -408,16 +410,16 @@ export function MerchantAuth({
                 <Store className="w-8 h-8 text-primary-foreground" />
               </div>
               <h1 className="text-2xl font-bold text-foreground mb-2">
-                {isSignUp ? "Create Merchant Account" : "Merchant Portal"}
+                <UiValue value={isSignUp ? "Create Merchant Account" : "Merchant Portal"} />
               </h1>
               <p className="text-muted-foreground text-sm">
-                {isSignUp ? "Start selling on our marketplace" : "Access your merchant dashboard"}
+                <UiValue value={isSignUp ? "Start selling on our marketplace" : "Access your merchant dashboard"} />
               </p>
             </div>
 
             {error && (
               <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
-                <p className="text-destructive text-sm font-medium">{error}</p>
+                <p className="text-destructive text-sm font-medium"><UiValue value={error} /></p>
               </div>
             )}
 
@@ -438,10 +440,10 @@ export function MerchantAuth({
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Email Address</label>
+                <label className="text-sm font-medium text-foreground"><UiText text={"Email Address"} /></label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <input
+                  <UiAttributes><input
                     type="email"
                     name="email"
                     placeholder="Enter your business email"
@@ -449,17 +451,17 @@ export function MerchantAuth({
                     onChange={handleChange}
                     className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
                     required
-                  />
+                  /></UiAttributes>
                 </div>
               </div>
 
               {isSignUp && (
                 <>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Business Name</label>
+                    <label className="text-sm font-medium text-foreground"><UiText text={"Business Name"} /></label>
                     <div className="relative">
                       <Store className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                      <input
+                      <UiAttributes><input
                         type="text"
                         name="businessName"
                         placeholder="Enter your registered business name"
@@ -467,15 +469,15 @@ export function MerchantAuth({
                         onChange={handleChange}
                         className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
                         required
-                      />
+                      /></UiAttributes>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Phone Number</label>
+                    <label className="text-sm font-medium text-foreground"><UiText text={"Phone Number"} /></label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                      <input
+                      <UiAttributes><input
                         type="tel"
                         name="phone"
                         placeholder="Enter your phone number"
@@ -483,16 +485,15 @@ export function MerchantAuth({
                         onChange={handleChange}
                         className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
                         required
-                      />
+                      /></UiAttributes>
                     </div>
                   </div>
 
                   <div className="rounded-xl border border-border/60 bg-secondary/30 p-4 space-y-3">
                     <div>
-                      <p className="text-sm font-medium text-foreground">Get code through</p>
+                      <p className="text-sm font-medium text-foreground"><UiText text={"Get code through"} /></p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Choose where we should send your verification code.
-                      </p>
+                        <UiText text={"Choose where we should send your verification code."} />{" "}</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
@@ -506,8 +507,7 @@ export function MerchantAuth({
                         }`}
                       >
                         <Mail className="w-4 h-4" />
-                        Email
-                      </button>
+                        <UiText text={"Email"} />{" "}</button>
 
                       <button
                         type="button"
@@ -519,22 +519,20 @@ export function MerchantAuth({
                         }`}
                       >
                         <MessageCircle className="w-4 h-4" />
-                        WhatsApp
-                      </button>
+                        <UiText text={"WhatsApp"} />{" "}</button>
                     </div>
                   </div>
 
                   <div className="rounded-xl border border-border/60 bg-secondary/30 p-4 space-y-3">
                     <div>
-                      <p className="text-sm font-medium text-foreground">Business Location</p>
+                      <p className="text-sm font-medium text-foreground"><UiText text={"Business Location"} /></p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Add your state and city so buyers can find your store more easily.
-                      </p>
+                        <UiText text={"Add your state and city so buyers can find your store more easily."} />{" "}</p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">State</label>
+                        <label className="text-sm font-medium text-foreground"><UiText text={"State"} /></label>
                         <div className="relative">
                           <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
                           <select
@@ -544,10 +542,10 @@ export function MerchantAuth({
                             className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground"
                             required
                           >
-                            <option value="">Select your region</option>
+                            <option value=""><UiText text={"Select your region"} /></option>
                             {(formData.country === 'CN' ? CHINESE_REGIONS : NIGERIAN_STATES).map((stateName) => (
                               <option key={stateName} value={stateName}>
-                                {stateName}
+                                <UiValue value={stateName} />
                               </option>
                             ))}
                           </select>
@@ -555,10 +553,10 @@ export function MerchantAuth({
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">City</label>
+                        <label className="text-sm font-medium text-foreground"><UiText text={"City"} /></label>
                         <div className="relative">
                           <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                          <input
+                          <UiAttributes><input
                             type="text"
                             name="city"
                             placeholder="Enter your city"
@@ -566,31 +564,30 @@ export function MerchantAuth({
                             onChange={handleChange}
                             className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
                             required
-                          />
+                          /></UiAttributes>
                         </div>
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Operating Country</label>
+                      <label className="text-sm font-medium text-foreground"><UiText text={"Operating Country"} /></label>
                       <select
                         name="country"
                         value={formData.country}
                         onChange={handleChange}
                         className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground"
                       >
-                        <option value="NG">Nigeria</option>
-                        <option value="CN">China</option>
+                        <option value="NG"><UiText text={"Nigeria"} /></option>
+                        <option value="CN"><UiText text={"China"} /></option>
                       </select>
                     </div>
                   </div>
 
                   <div className="rounded-xl border border-border/60 bg-secondary/30 p-4 space-y-3">
                     <div>
-                      <p className="text-sm font-medium text-foreground">What will you offer?</p>
+                      <p className="text-sm font-medium text-foreground"><UiText text={"What will you offer?"} /></p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Choose whether you want to sell physical products or offer services. This determines your dashboard.
-                      </p>
+                        <UiText text={"Choose whether you want to sell physical products or offer services. This determines your dashboard."} />{" "}</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
@@ -603,8 +600,8 @@ export function MerchantAuth({
                             : 'border-border bg-background text-muted-foreground hover:border-primary/50'
                         }`}
                       >
-                        <div className="text-sm font-semibold">📦 Products</div>
-                        <div className="text-xs mt-1">Sell physical items</div>
+                        <div className="text-sm font-semibold"><UiText text={"📦 Products"} /></div>
+                        <div className="text-xs mt-1"><UiText text={"Sell physical items"} /></div>
                       </button>
 
                       <button
@@ -616,8 +613,8 @@ export function MerchantAuth({
                             : 'border-border bg-background text-muted-foreground hover:border-primary/50'
                         }`}
                       >
-                        <div className="text-sm font-semibold">🔧 Services</div>
-                        <div className="text-xs mt-1">Offer professional services</div>
+                        <div className="text-sm font-semibold"><UiText text={"🔧 Services"} /></div>
+                        <div className="text-xs mt-1"><UiText text={"Offer professional services"} /></div>
                       </button>
                     </div>
                   </div>
@@ -627,24 +624,24 @@ export function MerchantAuth({
                       <div className="space-y-2">
                         <div className="relative">
                           <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                          <input
+                          <UiAttributes><input
                             type="text"
                             name="smedanId"
                             placeholder="SMEDAN registration ID (optional)"
                             value={formData.smedanId}
                             onChange={handleChange}
                             className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
-                          />
+                          /></UiAttributes>
                         </div>
                       </div>
 
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">
-                          CAC Registration ID {merchantType === 'services' ? '(optional for service merchants)' : ''}
+                          <UiText text={"CAC Registration ID"} />{" "}<UiValue value={merchantType === 'services' ? '(optional for service merchants)' : ''} />
                         </label>
                         <div className="relative">
                           <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                          <input
+                          <UiAttributes><input
                             type="text"
                             name="cacId"
                             placeholder={merchantType === 'services' ? 'Enter CAC registration ID (optional)' : 'Enter CAC registration ID'}
@@ -652,13 +649,13 @@ export function MerchantAuth({
                             onChange={handleChange}
                             className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
                             required={merchantType !== 'services'}
-                          />
+                          /></UiAttributes>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Government-issued ID</label>
-                        <input
+                        <label className="text-sm font-medium text-foreground"><UiText text={"Government-issued ID"} /></label>
+                        <UiAttributes><input
                           type="text"
                           name="governmentIdNumber"
                           placeholder="Enter ID number"
@@ -666,12 +663,12 @@ export function MerchantAuth({
                           onChange={handleChange}
                           className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
                           required
-                        />
+                        /></UiAttributes>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Bank Verification Reference</label>
-                        <input
+                        <label className="text-sm font-medium text-foreground"><UiText text={"Bank Verification Reference"} /></label>
+                        <UiAttributes><input
                           type="text"
                           name="bankVerificationRef"
                           placeholder="Enter bank verification reference"
@@ -679,32 +676,31 @@ export function MerchantAuth({
                           onChange={handleChange}
                           className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
                           required
-                        />
+                        /></UiAttributes>
                       </div>
                     </>
                   ) : (
                     <div className="rounded-xl border border-border/60 bg-secondary/30 p-4 space-y-2">
-                      <p className="text-sm font-semibold text-foreground">Chinese Business Verification</p>
+                      <p className="text-sm font-semibold text-foreground"><UiText text={"Chinese Business Verification"} /></p>
                       <p className="text-xs text-muted-foreground">
-                        Placeholder module enabled. Full requirements will be connected after Orchid API discussions.
-                      </p>
-                      <textarea
+                        <UiText text={"Placeholder module enabled. Full requirements will be connected after Orchid API discussions."} />{" "}</p>
+                      <UiAttributes><textarea
                         name="chineseVerificationNote"
                         value={formData.chineseVerificationNote}
                         onChange={(e) => setFormData({ ...formData, chineseVerificationNote: e.target.value })}
                         className="w-full min-h-[72px] px-3 py-2 bg-background border border-border rounded-xl text-sm"
                         placeholder="Add any current business verification notes (optional)"
-                      />
+                      /></UiAttributes>
                     </div>
                   )}
                 </>
               )}
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Password</label>
+                <label className="text-sm font-medium text-foreground"><UiText text={"Password"} /></label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <input
+                  <UiAttributes><input
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="Enter your password"
@@ -712,7 +708,7 @@ export function MerchantAuth({
                     onChange={handleChange}
                     className="w-full pl-11 pr-12 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
                     required
-                  />
+                  /></UiAttributes>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -731,10 +727,10 @@ export function MerchantAuth({
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    {isSignUp ? "Creating account..." : "Signing In..."}
+                    <UiValue value={isSignUp ? "Creating account..." : "Signing In..."} />
                   </>
                 ) : (
-                  <>{isSignUp ? "Create Account" : "Sign In"}</>
+                  <><UiValue value={isSignUp ? "Create Account" : "Sign In"} /></>
                 )}
               </button>
             </form>
@@ -746,7 +742,7 @@ export function MerchantAuth({
                 disabled={googleLoading || loading}
                 className="w-full py-3 px-4 bg-white border border-border text-foreground font-semibold rounded-xl hover:bg-muted/50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {googleLoading ? 'Connecting to Google...' : isSignUp ? 'Sign up with Google' : 'Continue with Google'}
+                <UiValue value={googleLoading ? 'Connecting to Google...' : isSignUp ? 'Sign up with Google' : 'Continue with Google'} />
               </button>
             </div>
 
@@ -777,14 +773,13 @@ export function MerchantAuth({
                 }}
                 className="text-primary hover:text-primary/80 font-medium transition-colors"
               >
-                {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+                <UiValue value={isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"} />
               </button>
             </div>
 
             <div className="mt-6 pt-6 border-t border-border/50">
               <p className="text-xs text-muted-foreground text-center">
-                By continuing, you agree to our Terms of Service and Privacy Policy
-              </p>
+                <UiText text={"By continuing, you agree to our Terms of Service and Privacy Policy"} />{" "}</p>
             </div>
           </div>
         </div>

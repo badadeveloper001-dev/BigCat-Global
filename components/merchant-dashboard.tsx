@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 // Force rebuild
 
@@ -356,7 +358,7 @@ export function MerchantDashboard() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-muted-foreground mb-2">No user session found</p>
+          <p className="text-muted-foreground mb-2"><UiText text={"No user session found"} /></p>
         </div>
       </div>
     )
@@ -1280,17 +1282,17 @@ export function MerchantDashboard() {
             <div className="w-14 h-14 mx-auto rounded-2xl bg-chart-4/10 flex items-center justify-center mb-3">
               <Coins className="w-7 h-7 text-chart-4" />
             </div>
-            <h2 className="text-xl font-bold text-foreground mb-1">Buy Tokens</h2>
-            <p className="text-sm text-muted-foreground">Boost your store visibility</p>
+            <h2 className="text-xl font-bold text-foreground mb-1"><UiText text={"Buy Tokens"} /></h2>
+            <p className="text-sm text-muted-foreground"><UiText text={"Boost your store visibility"} /></p>
           </div>
 
           <div className="mb-4 rounded-xl border border-border bg-secondary/30 px-3 py-2 text-xs text-muted-foreground">
-            <span className="font-medium text-foreground">Pay with:</span> Wallet ({formatNaira(walletBalance)})
+            <span className="font-medium text-foreground"><UiText text={"Pay with:"} /></span> {" "}<UiText text={"Wallet ("} />{formatNaira(walletBalance)})
           </div>
 
           {tokenDialogError && (
             <p className="text-xs text-destructive bg-destructive/10 rounded-lg px-3 py-2 mb-4 text-center">
-              {tokenDialogError}
+              <UiValue value={tokenDialogError} />
             </p>
           )}
 
@@ -1317,9 +1319,9 @@ export function MerchantDashboard() {
                   <div className="flex items-center gap-3">
                     <Coins className="w-5 h-5 text-chart-4" />
                     <div className="text-left">
-                      <span className="font-semibold text-foreground text-sm">{pack.tokens} Tokens</span>
+                      <span className="font-semibold text-foreground text-sm">{pack.tokens} {" "}<UiText text={"Tokens"} /></span>
                       {!canAfford && (
-                        <p className="text-[10px] text-destructive">Insufficient balance</p>
+                        <p className="text-[10px] text-destructive"><UiText text={"Insufficient balance"} /></p>
                       )}
                     </div>
                   </div>
@@ -1337,8 +1339,7 @@ export function MerchantDashboard() {
             disabled={tokenBuying}
             className="w-full py-3 bg-muted text-foreground rounded-xl font-medium disabled:opacity-60"
           >
-            Close
-          </button>
+            <UiText text={"Close"} />{" "}</button>
         </div>
       </div>
     )}
@@ -1348,15 +1349,15 @@ export function MerchantDashboard() {
         <div className="flex items-center justify-between gap-3">
           <BrandWordmark compact />
           <div className="flex items-center gap-1">
-            <button
+            <UiAttributes><button
               onClick={handleLogout}
               className="p-2 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Logout"
               title="Logout"
             >
               <LogOut className="w-5 h-5" />
-            </button>
-            <button
+            </button></UiAttributes>
+            <UiAttributes><button
               onClick={() => setShowNotifications(true)}
               className="relative p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Notifications"
@@ -1366,7 +1367,7 @@ export function MerchantDashboard() {
               {notificationCount > 0 && (
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
               )}
-            </button>
+            </button></UiAttributes>
           </div>
         </div>
       </header>
@@ -1379,8 +1380,7 @@ export function MerchantDashboard() {
             activeTab === "home" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          Overview
-        </button>
+          <UiText text={"Overview"} />{" "}</button>
         {!isServiceMerchant && (
           <button
             onClick={() => setActiveTab("products")}
@@ -1388,8 +1388,7 @@ export function MerchantDashboard() {
               activeTab === "products" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            Products
-          </button>
+            <UiText text={"Products"} />{" "}</button>
         )}
         {isServiceMerchant && (
           <button
@@ -1398,8 +1397,7 @@ export function MerchantDashboard() {
               activeTab === "services" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            Services
-          </button>
+            <UiText text={"Services"} />{" "}</button>
         )}
         <button
           onClick={() => setActiveTab("orders")}
@@ -1407,16 +1405,14 @@ export function MerchantDashboard() {
             activeTab === "orders" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          Orders
-        </button>
+          <UiText text={"Orders"} />{" "}</button>
         <button
           onClick={() => setActiveTab("messages")}
           className={`relative py-3 px-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
             activeTab === "messages" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          Messages
-          {unreadMessages > 0 && (
+          <UiText text={"Messages"} />{" "}{unreadMessages > 0 && (
             <span className="absolute -top-0.5 right-0 min-w-[16px] h-4 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none">
               {unreadMessages > 99 ? '99+' : unreadMessages}
             </span>
@@ -1431,7 +1427,7 @@ export function MerchantDashboard() {
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            {activeTab === "promotions" ? "Promotions" : activeTab === "store" ? "Store" : activeTab === "ai" ? "AI" : activeTab === "analytics" ? "Analytics" : "More"}
+            <UiValue value={activeTab === "promotions" ? "Promotions" : activeTab === "store" ? "Store" : activeTab === "ai" ? "AI" : activeTab === "analytics" ? "Analytics" : "More"} />
             <MoreHorizontal className="w-4 h-4" />
           </button>
           {showMoreMenu && (
@@ -1451,7 +1447,7 @@ export function MerchantDashboard() {
                       activeTab === id ? "text-primary font-semibold bg-primary/5" : "text-foreground hover:bg-muted"
                     }`}
                   >
-                    {label}
+                    <UiValue value={label} />
                   </button>
                 ))}
               </div>
@@ -1466,8 +1462,8 @@ export function MerchantDashboard() {
           <>
         {/* Welcome Section */}
         <div className="px-4 pt-5 pb-4">
-          <p className="text-sm text-muted-foreground">Welcome back,</p>
-          <h2 className="text-2xl font-bold text-foreground">{user?.merchantProfile?.business_name || user?.name || user?.email?.split('@')[0] || "Merchant"}</h2>
+          <p className="text-sm text-muted-foreground"><UiText text={"Welcome back,"} /></p>
+          <h2 className="text-2xl font-bold text-foreground"><UiValue value={user?.merchantProfile?.business_name || user?.name || user?.email?.split('@')[0] || "Merchant"} /></h2>
         </div>
 
         {/* Stats Cards */}
@@ -1479,7 +1475,7 @@ export function MerchantDashboard() {
           ) : stats.length === 0 ? (
             <div className="p-8 text-center">
               <NairaIcon className="w-12 h-12 text-muted-foreground mx-auto mb-3 flex items-center justify-center text-4xl" />
-              <p className="text-sm text-muted-foreground">No sales data yet</p>
+              <p className="text-sm text-muted-foreground"><UiText text={"No sales data yet"} /></p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
@@ -1495,11 +1491,11 @@ export function MerchantDashboard() {
                     </div>
                     <span className={`text-xs font-medium flex items-center gap-0.5 ${stat.trend === "up" ? "text-primary" : "text-destructive"}`}>
                       {stat.trend === "up" ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                      {stat.change}
+                      <UiValue value={stat.change} />
                     </span>
                   </div>
                   <p className={`text-xl font-bold ${stat.valueClass || 'text-foreground'}`}>{stat.value}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5"><UiValue value={stat.label} /></p>
                 </div>
               ))}
             </div>
@@ -1508,7 +1504,7 @@ export function MerchantDashboard() {
 
         {/* Quick Actions */}
         <section className="px-4 mb-6">
-          <h3 className="text-sm font-semibold text-foreground mb-3">Quick Actions</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-3"><UiText text={"Quick Actions"} /></h3>
           <div className="grid grid-cols-4 gap-2">
             {quickActions.map((action) => (
               <button
@@ -1523,7 +1519,7 @@ export function MerchantDashboard() {
                 }`}
               >
                 <action.icon className="w-5 h-5" />
-                <span className="text-[10px] font-medium leading-tight text-center">{action.label}</span>
+                <span className="text-[10px] font-medium leading-tight text-center"><UiValue value={action.label} /></span>
               </button>
             ))}
           </div>
@@ -1533,10 +1529,10 @@ export function MerchantDashboard() {
           <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
-                <h3 className="text-sm font-semibold text-foreground">Growth Onboarding Path</h3>
-                <p className="text-xs text-muted-foreground mt-1">Progressive setup based on your current business maturity.</p>
+                <h3 className="text-sm font-semibold text-foreground"><UiText text={"Growth Onboarding Path"} /></h3>
+                <p className="text-xs text-muted-foreground mt-1"><UiText text={"Progressive setup based on your current business maturity."} /></p>
               </div>
-              <span className="text-xs font-semibold px-2 py-1 rounded-full bg-primary/10 text-primary">{onboardingProgress}% complete</span>
+              <span className="text-xs font-semibold px-2 py-1 rounded-full bg-primary/10 text-primary">{onboardingProgress}<UiText text={"% complete"} /></span>
             </div>
             <div className="w-full h-2 bg-secondary rounded-full overflow-hidden mb-4">
               <div className="h-full bg-primary" style={{ width: `${onboardingProgress}%` }} />
@@ -1546,12 +1542,11 @@ export function MerchantDashboard() {
                 <div key={step.label} className="flex items-center justify-between gap-3 text-sm">
                   <div className="flex items-center gap-2 min-w-0">
                     <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${step.done ? 'bg-primary' : 'bg-border'}`} />
-                    <span className={step.done ? 'text-foreground' : 'text-muted-foreground'}>{step.label}</span>
+                    <span className={step.done ? 'text-foreground' : 'text-muted-foreground'}><UiValue value={step.label} /></span>
                   </div>
                   {!step.done && (
                     <button onClick={step.action} className="text-xs font-medium text-primary hover:underline shrink-0">
-                      Go
-                    </button>
+                      <UiText text={"Go"} />{" "}</button>
                   )}
                 </div>
               ))}
@@ -1560,44 +1555,44 @@ export function MerchantDashboard() {
               {isServiceMerchant ? (
                 <>
                   <div className="rounded-xl border border-border bg-secondary/40 p-3">
-                    <p className="text-xs text-muted-foreground">Active services</p>
+                    <p className="text-xs text-muted-foreground"><UiText text={"Active services"} /></p>
                     <p className="text-lg font-bold text-chart-4 mt-1">{allProducts.length}</p>
                   </div>
                   <div className="rounded-xl border border-border bg-secondary/40 p-3">
-                    <p className="text-xs text-muted-foreground">Unpriced services</p>
+                    <p className="text-xs text-muted-foreground"><UiText text={"Unpriced services"} /></p>
                     <p className="text-lg font-bold text-destructive mt-1">{allProducts.filter((item) => Number(item?.base_price || 0) <= 0).length}</p>
                   </div>
                   <div className="rounded-xl border border-border bg-secondary/40 p-3">
-                    <p className="text-xs text-muted-foreground">Catalog gaps</p>
+                    <p className="text-xs text-muted-foreground"><UiText text={"Catalog gaps"} /></p>
                     <p className="text-lg font-bold text-destructive mt-1">{allProducts.filter((item) => !String(item?.description || '').trim()).length}</p>
                   </div>
                 </>
               ) : (
                 <>
                   <div className="rounded-xl border border-border bg-secondary/40 p-3">
-                    <p className="text-xs text-muted-foreground">Low-stock alerts</p>
+                    <p className="text-xs text-muted-foreground"><UiText text={"Low-stock alerts"} /></p>
                     <p className="text-lg font-bold text-chart-4 mt-1">{lowStockCount}</p>
                   </div>
                   <div className="rounded-xl border border-border bg-secondary/40 p-3">
-                    <p className="text-xs text-muted-foreground">Out of stock</p>
+                    <p className="text-xs text-muted-foreground"><UiText text={"Out of stock"} /></p>
                     <p className="text-lg font-bold text-destructive mt-1">{outOfStockCount}</p>
                   </div>
                   <div className="rounded-xl border border-border bg-secondary/40 p-3">
-                    <p className="text-xs text-muted-foreground">Margin-risk SKUs</p>
+                    <p className="text-xs text-muted-foreground"><UiText text={"Margin-risk SKUs"} /></p>
                     <p className="text-lg font-bold text-destructive mt-1">{marginRiskCount}</p>
                   </div>
                 </>
               )}
               <div className="rounded-xl border border-border bg-secondary/40 p-3">
-                <p className="text-xs text-muted-foreground">Pending fulfillment</p>
+                <p className="text-xs text-muted-foreground"><UiText text={"Pending fulfillment"} /></p>
                 <p className="text-lg font-bold text-primary mt-1">{pendingFulfillmentCount}</p>
               </div>
               <div className="rounded-xl border border-border bg-secondary/40 p-3">
-                <p className="text-xs text-muted-foreground">Return/refund queue</p>
+                <p className="text-xs text-muted-foreground"><UiText text={"Return/refund queue"} /></p>
                 <p className="text-lg font-bold text-purple-600 mt-1">{returnOrDisputeQueueCount}</p>
               </div>
               <div className="rounded-xl border border-border bg-secondary/40 p-3">
-                <p className="text-xs text-muted-foreground">Stale pending checkout</p>
+                <p className="text-xs text-muted-foreground"><UiText text={"Stale pending checkout"} /></p>
                 <p className="text-lg font-bold text-amber-600 mt-1">{stalePendingCheckoutCount}</p>
               </div>
             </div>
@@ -1606,20 +1601,19 @@ export function MerchantDashboard() {
                 onClick={() => setActiveTab(isServiceMerchant ? 'services' : 'products')}
                 className="rounded-lg bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 text-left"
               >
-                {isServiceMerchant ? 'Refresh service catalog' : 'Launch low-stock campaign'}
+                <UiValue value={isServiceMerchant ? 'Refresh service catalog' : 'Launch low-stock campaign'} />
               </button>
               <button
                 onClick={() => setActiveTab(isServiceMerchant ? 'services' : 'products')}
                 className="rounded-lg bg-green-50 px-3 py-2 text-xs font-medium text-green-700 text-left"
               >
-                {isServiceMerchant ? 'Update service pricing' : 'Create bundle offer'}
+                <UiValue value={isServiceMerchant ? 'Update service pricing' : 'Create bundle offer'} />
               </button>
               <button
                 onClick={() => setActiveTab('orders')}
                 className="rounded-lg bg-purple-50 px-3 py-2 text-xs font-medium text-purple-700 text-left"
               >
-                Review return/refund queue
-              </button>
+                <UiText text={"Review return/refund queue"} />{" "}</button>
             </div>
           </div>
         </section>
@@ -1636,11 +1630,11 @@ export function MerchantDashboard() {
                   <Sparkles className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground text-sm">AI BizPilot</h3>
-                  <p className="text-[10px] text-muted-foreground">Your intelligent business assistant</p>
+                  <h3 className="font-semibold text-foreground text-sm"><UiText text={"AI BizPilot"} /></h3>
+                  <p className="text-[10px] text-muted-foreground"><UiText text={"Your intelligent business assistant"} /></p>
                 </div>
               </div>
-              <span className="text-xs text-primary font-medium">Open →</span>
+              <span className="text-xs text-primary font-medium"><UiText text={"Open →"} /></span>
             </div>
             
             {/* AI Insight Card */}
@@ -1660,7 +1654,7 @@ export function MerchantDashboard() {
                     />
                   ))}
                 </div>
-                <span className="text-[10px] text-muted-foreground">Tap to chat with BizPilot</span>
+                <span className="text-[10px] text-muted-foreground"><UiText text={"Tap to chat with BizPilot"} /></span>
               </div>
             </div>
           </button>
@@ -1678,7 +1672,7 @@ export function MerchantDashboard() {
                   <Coins className="w-5 h-5 text-chart-4" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Token Balance</p>
+                  <p className="text-xs text-muted-foreground"><UiText text={"Token Balance"} /></p>
                   <p className="text-xl font-bold text-foreground">{tokenBalance}</p>
                 </div>
               </div>
@@ -1686,12 +1680,10 @@ export function MerchantDashboard() {
                 onClick={openTokenDialog}
                 className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-xl shadow-sm shadow-primary/20"
               >
-                Buy Tokens
-              </button>
+                <UiText text={"Buy Tokens"} />{" "}</button>
             </div>
             <p className="text-xs text-muted-foreground bg-secondary/50 rounded-lg px-3 py-2">
-              More activity = higher visibility. Tokens boost your store ranking.
-            </p>
+              <UiText text={"More activity = higher visibility. Tokens boost your store ranking."} />{" "}</p>
           </div>
         </section>
 
@@ -1700,23 +1692,23 @@ export function MerchantDashboard() {
           <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
             <div className="flex items-start justify-between gap-3 mb-4">
               <div>
-                <h3 className="text-sm font-semibold text-foreground">To-Do & Reminders</h3>
-                <p className="text-xs text-muted-foreground">Plan tasks and get alerted when they are due.</p>
+                <h3 className="text-sm font-semibold text-foreground"><UiText text={"To-Do & Reminders"} /></h3>
+                <p className="text-xs text-muted-foreground"><UiText text={"Plan tasks and get alerted when they are due."} /></p>
               </div>
               <div className="text-right">
                 <p className="text-sm font-bold text-foreground">{merchantTodos.filter((todo) => !todo.completed).length}</p>
-                <p className="text-[10px] text-muted-foreground">Open tasks</p>
+                <p className="text-[10px] text-muted-foreground"><UiText text={"Open tasks"} /></p>
               </div>
             </div>
 
             <div className="space-y-2 mb-4">
-              <input
+              <UiAttributes><input
                 type="text"
                 value={todoForm.title}
                 onChange={(e) => setTodoForm((prev) => ({ ...prev, title: e.target.value }))}
                 placeholder="What do you want to do?"
                 className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
-              />
+              /></UiAttributes>
               <div className="grid grid-cols-2 gap-2">
                 <input
                   type="date"
@@ -1732,31 +1724,30 @@ export function MerchantDashboard() {
                 />
               </div>
               {todoError ? (
-                <p className="text-xs text-destructive">{todoError}</p>
+                <p className="text-xs text-destructive"><UiValue value={todoError} /></p>
               ) : (
                 <p className="text-[11px] text-muted-foreground">
-                  {notificationPermission === "granted"
+                  <UiValue value={notificationPermission === "granted"
                     ? "Browser alerts are enabled for reminders."
                     : notificationPermission === "denied"
                       ? "Browser alerts are blocked, but reminder notices will still appear in-app."
                       : notificationPermission === "unsupported"
                         ? "This browser does not support push alerts; in-app reminders still work."
-                        : "Allow browser notifications for instant reminder pop-ups."}
+                        : "Allow browser notifications for instant reminder pop-ups."} />
                 </p>
               )}
               <button
                 onClick={handleAddTodo}
                 className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-sm shadow-primary/20"
               >
-                Add Reminder
-              </button>
+                <UiText text={"Add Reminder"} />{" "}</button>
             </div>
 
             {merchantTodos.length === 0 ? (
               <div className="rounded-xl bg-secondary/40 px-4 py-5 text-center">
                 <Clock className="w-5 h-5 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-foreground font-medium">No tasks yet</p>
-                <p className="text-xs text-muted-foreground">Add your first reminder above.</p>
+                <p className="text-sm text-foreground font-medium"><UiText text={"No tasks yet"} /></p>
+                <p className="text-xs text-muted-foreground"><UiText text={"Add your first reminder above."} /></p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -1767,12 +1758,12 @@ export function MerchantDashboard() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <p className={`text-sm font-medium ${todo.completed ? "text-muted-foreground line-through" : "text-foreground"}`}>
-                            {todo.title}
+                            <UiValue value={todo.title} />
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">{formatReminderTime(todo.dueAt)}</p>
                         </div>
                         <span className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-semibold ${todo.completed ? "bg-primary/10 text-primary" : isOverdue ? "bg-destructive/10 text-destructive" : "bg-chart-4/10 text-chart-4"}`}>
-                          {todo.completed ? "Done" : isOverdue ? "Due now" : "Scheduled"}
+                          <UiValue value={todo.completed ? "Done" : isOverdue ? "Due now" : "Scheduled"} />
                         </span>
                       </div>
                       <div className="flex items-center gap-2 mt-3">
@@ -1781,15 +1772,14 @@ export function MerchantDashboard() {
                           className="inline-flex items-center gap-1 rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium text-foreground"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
-                          {todo.completed ? "Undo" : "Complete"}
+                          <UiValue value={todo.completed ? "Undo" : "Complete"} />
                         </button>
                         <button
                           onClick={() => deleteTodo(todo.id)}
                           className="inline-flex items-center gap-1 rounded-lg bg-destructive/10 px-3 py-1.5 text-xs font-medium text-destructive"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
-                          Delete
-                        </button>
+                          <UiText text={"Delete"} />{" "}</button>
                       </div>
                     </div>
                   )
@@ -1802,8 +1792,8 @@ export function MerchantDashboard() {
         {/* Catalog Management */}
         <section className="px-4 mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-foreground">{isServiceMerchant ? 'Services' : 'Products'}</h3>
-            <button onClick={() => setActiveTab(isServiceMerchant ? "services" : "products")} className="text-xs text-primary font-medium">View All</button>
+            <h3 className="text-sm font-semibold text-foreground"><UiValue value={isServiceMerchant ? 'Services' : 'Products'} /></h3>
+            <button onClick={() => setActiveTab(isServiceMerchant ? "services" : "products")} className="text-xs text-primary font-medium"><UiText text={"View All"} /></button>
           </div>
           {loadingProducts ? (
             <div className="flex items-center justify-center py-8">
@@ -1812,7 +1802,7 @@ export function MerchantDashboard() {
           ) : products.length === 0 ? (
             <div className="p-8 text-center">
               <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">{isServiceMerchant ? 'No services yet' : 'No products yet'}</p>
+              <p className="text-sm text-muted-foreground"><UiValue value={isServiceMerchant ? 'No services yet' : 'No products yet'} /></p>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
@@ -1826,33 +1816,33 @@ export function MerchantDashboard() {
                       <p className="font-medium text-foreground text-sm truncate">{product.name}</p>
                       <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                         <span className="text-sm font-semibold text-foreground">
-                          {isServiceMerchant ? 'Price' : 'Sell'}: {formatNaira(parseFloat(product.price || product.base_price || 0))}
+                          <UiValue value={isServiceMerchant ? 'Price' : 'Sell'} />: {formatNaira(parseFloat(product.price || product.base_price || 0))}
                         </span>
                         {isServiceMerchant ? (
-                          <span className="text-xs text-muted-foreground">Category: {product.category || 'Service'}</span>
+                          <span className="text-xs text-muted-foreground"><UiText text={"Category:"} />{" "}{product.category || 'Service'}</span>
                         ) : (
                           <>
-                            <span className="text-xs text-muted-foreground">Cost: {formatNaira(Number(product.cost_price || 0))}</span>
-                            <span className="text-xs text-muted-foreground">Stock: {Number(product.stock || 0)}</span>
+                            <span className="text-xs text-muted-foreground"><UiText text={"Cost:"} />{" "}{formatNaira(Number(product.cost_price || 0))}</span>
+                            <span className="text-xs text-muted-foreground"><UiText text={"Stock:"} />{" "}{Number(product.stock || 0)}</span>
                           </>
                         )}
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
-                      <button
+                      <UiAttributes><button
                         onClick={() => setActiveTab(isServiceMerchant ? "services" : "products")}
                         className="p-2 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
                         aria-label={isServiceMerchant ? "Edit service" : "Edit product"}
                       >
                         <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
+                      </button></UiAttributes>
+                      <UiAttributes><button
                         onClick={() => setActiveTab(isServiceMerchant ? "services" : "products")}
                         className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
                         aria-label={isServiceMerchant ? "Delete service" : "Delete product"}
                       >
                         <Trash2 className="w-4 h-4" />
-                      </button>
+                      </button></UiAttributes>
                     </div>
                   </div>
                 </div>
@@ -1864,8 +1854,8 @@ export function MerchantDashboard() {
         {/* Recent Orders */}
         <section className="px-4 mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-foreground">Recent Orders</h3>
-            <button onClick={() => setActiveTab("orders")} className="text-xs text-primary font-medium">View All</button>
+            <h3 className="text-sm font-semibold text-foreground"><UiText text={"Recent Orders"} /></h3>
+            <button onClick={() => setActiveTab("orders")} className="text-xs text-primary font-medium"><UiText text={"View All"} /></button>
           </div>
           {loadingOrders ? (
             <div className="flex items-center justify-center py-8">
@@ -1874,7 +1864,7 @@ export function MerchantDashboard() {
           ) : recentOrders.length === 0 ? (
             <div className="p-8 text-center">
               <ShoppingBag className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">No orders yet</p>
+              <p className="text-sm text-muted-foreground"><UiText text={"No orders yet"} /></p>
             </div>
           ) : (
             <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
@@ -1896,15 +1886,15 @@ export function MerchantDashboard() {
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-foreground text-sm">{order.id}</p>
-                        <span className="text-[10px] text-muted-foreground">Just now</span>
+                        <span className="text-[10px] text-muted-foreground"><UiText text={"Just now"} /></span>
                       </div>
-                      <p className="text-xs text-muted-foreground">{order.customer_name || "Customer"}</p>
+                      <p className="text-xs text-muted-foreground"><UiValue value={order.customer_name || "Customer"} /></p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-foreground text-sm">{formatNaira(cardTotal)}</p>
-                    <p className="text-xs font-semibold text-amber-700 bg-amber-100 rounded-full px-2 py-0.5 mt-1 inline-block">Escrow {formatNaira(cardEscrow)}</p>
-                    <p className="text-[10px] text-muted-foreground capitalize">{order.status}</p>
+                    <p className="text-xs font-semibold text-amber-700 bg-amber-100 rounded-full px-2 py-0.5 mt-1 inline-block"><UiText text={"Escrow"} />{" "}{formatNaira(cardEscrow)}</p>
+                    <p className="text-[10px] text-muted-foreground capitalize"><UiValue value={order.status} /></p>
                   </div>
                 </div>
               )})}
@@ -1940,28 +1930,28 @@ export function MerchantDashboard() {
               <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
                 <BarChart3 className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-xl font-bold text-foreground mb-2">Analytics Dashboard</h2>
-              <p className="text-sm text-muted-foreground">Track your business performance</p>
+              <h2 className="text-xl font-bold text-foreground mb-2"><UiText text={"Analytics Dashboard"} /></h2>
+              <p className="text-sm text-muted-foreground"><UiText text={"Track your business performance"} /></p>
             </div>
             
             {/* Sales Overview */}
             <div className="bg-card border border-border rounded-2xl p-4 mb-4">
-              <h3 className="font-semibold text-foreground mb-4">Sales Overview</h3>
+              <h3 className="font-semibold text-foreground mb-4"><UiText text={"Sales Overview"} /></h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 bg-primary/5 rounded-xl">
                   <p className="text-2xl font-bold text-primary">{formatNaira(analyticsData.weeklySales)}</p>
-                  <p className="text-xs text-muted-foreground">This Week</p>
+                  <p className="text-xs text-muted-foreground"><UiText text={"This Week"} /></p>
                 </div>
                 <div className="text-center p-3 bg-primary/5 rounded-xl">
                   <p className="text-2xl font-bold text-primary">{formatNaira(analyticsData.monthlySales)}</p>
-                  <p className="text-xs text-muted-foreground">This Month</p>
+                  <p className="text-xs text-muted-foreground"><UiText text={"This Month"} /></p>
                 </div>
               </div>
             </div>
 
             {/* Performance Metrics */}
             <div className="bg-card border border-border rounded-2xl p-4 mb-4">
-              <h3 className="font-semibold text-foreground mb-4">Performance Metrics</h3>
+              <h3 className="font-semibold text-foreground mb-4"><UiText text={"Performance Metrics"} /></h3>
               <div className="space-y-3">
                 {[
                   {
@@ -1974,7 +1964,7 @@ export function MerchantDashboard() {
                   { label: "Customer Retention", value: analyticsData.customerRetention, change: "Repeat buyers" },
                 ].map((metric) => (
                   <div key={metric.label} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                    <span className="text-sm text-muted-foreground">{metric.label}</span>
+                    <span className="text-sm text-muted-foreground"><UiValue value={metric.label} /></span>
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-foreground">{metric.value}</span>
                       <span className="text-xs text-muted-foreground">{metric.change}</span>
@@ -1985,10 +1975,10 @@ export function MerchantDashboard() {
             </div>
 
             <div className="bg-card border border-border rounded-2xl p-4 mb-4">
-              <h3 className="font-semibold text-foreground mb-2">Download Reports</h3>
-              <p className="text-xs text-muted-foreground mb-3">Export your monthly financial, sales, and catalog reports as CSV.</p>
+              <h3 className="font-semibold text-foreground mb-2"><UiText text={"Download Reports"} /></h3>
+              <p className="text-xs text-muted-foreground mb-3"><UiText text={"Export your monthly financial, sales, and catalog reports as CSV."} /></p>
               <div className="mb-4">
-                <label className="block text-xs text-muted-foreground mb-1">Report Month</label>
+                <label className="block text-xs text-muted-foreground mb-1"><UiText text={"Report Month"} /></label>
                 <input
                   type="month"
                   value={reportMonth}
@@ -2002,28 +1992,24 @@ export function MerchantDashboard() {
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground px-3 py-2 text-sm font-medium"
                 >
                   <Download className="w-4 h-4" />
-                  Financial Report
-                </button>
+                  <UiText text={"Financial Report"} />{" "}</button>
                 <button
                   onClick={downloadSalesReport}
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background text-foreground px-3 py-2 text-sm font-medium"
                 >
                   <Download className="w-4 h-4" />
-                  Sales Report
-                </button>
+                  <UiText text={"Sales Report"} />{" "}</button>
                 <button
                   onClick={downloadCatalogReport}
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background text-foreground px-3 py-2 text-sm font-medium"
                 >
                   <Download className="w-4 h-4" />
-                  Catalog Report
-                </button>
+                  <UiText text={"Catalog Report"} />{" "}</button>
               </div>
             </div>
 
             <p className="text-xs text-center text-muted-foreground">
-              Analytics are calculated from your live orders and listings.
-            </p>
+              <UiText text={"Analytics are calculated from your live orders and listings."} />{" "}</p>
           </div>
         ) : activeTab === "settings" ? (
           <div className="px-4 py-6">
@@ -2031,21 +2017,21 @@ export function MerchantDashboard() {
               <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
                 <Settings className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-xl font-bold text-foreground mb-2">Store Settings</h2>
-              <p className="text-sm text-muted-foreground">Manage your store preferences</p>
+              <h2 className="text-xl font-bold text-foreground mb-2"><UiText text={"Store Settings"} /></h2>
+              <p className="text-sm text-muted-foreground"><UiText text={"Manage your store preferences"} /></p>
             </div>
             
             {/* Profile & Store Settings */}
             <div className="bg-card border border-border rounded-2xl overflow-hidden mb-4">
-              <h3 className="font-semibold text-foreground p-4 border-b border-border">Profile & Store</h3>
+              <h3 className="font-semibold text-foreground p-4 border-b border-border"><UiText text={"Profile & Store"} /></h3>
               <div className="divide-y divide-border">
                 <button 
                   onClick={() => setShowProfile(true)}
                   className="w-full flex items-center justify-between p-4 hover:bg-secondary/50 transition-colors"
                 >
-                  <span className="text-sm text-muted-foreground">Edit Profile & Store</span>
+                  <span className="text-sm text-muted-foreground"><UiText text={"Edit Profile & Store"} /></span>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-primary">Edit</span>
+                    <span className="text-sm text-primary"><UiText text={"Edit"} /></span>
                     <ChevronRight className="w-4 h-4 text-muted-foreground" />
                   </div>
                 </button>
@@ -2053,9 +2039,9 @@ export function MerchantDashboard() {
                   onClick={() => setShowPaymentMethods(true)}
                   className="w-full flex items-center justify-between p-4 hover:bg-secondary/50 transition-colors"
                 >
-                  <span className="text-sm text-muted-foreground">Wallet</span>
+                  <span className="text-sm text-muted-foreground"><UiText text={"Wallet"} /></span>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-primary">Open</span>
+                    <span className="text-sm text-primary"><UiText text={"Open"} /></span>
                     <ChevronRight className="w-4 h-4 text-muted-foreground" />
                   </div>
                 </button>
@@ -2064,20 +2050,20 @@ export function MerchantDashboard() {
 
             {/* Account Actions */}
             <div className="bg-card border border-border rounded-2xl overflow-hidden">
-              <h3 className="font-semibold text-foreground p-4 border-b border-border">Account</h3>
+              <h3 className="font-semibold text-foreground p-4 border-b border-border"><UiText text={"Account"} /></h3>
               <div className="divide-y divide-border">
                 <button 
                   onClick={() => setShowSettings(true)}
                   className="w-full flex items-center justify-between p-4 hover:bg-secondary/50 transition-colors"
                 >
-                  <span className="text-sm text-muted-foreground">Security Settings</span>
+                  <span className="text-sm text-muted-foreground"><UiText text={"Security Settings"} /></span>
                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </button>
                 <button 
                   onClick={handleLogout}
                   className="w-full flex items-center justify-between p-4 hover:bg-destructive/10 transition-colors"
                 >
-                  <span className="text-sm text-destructive">Log Out</span>
+                  <span className="text-sm text-destructive"><UiText text={"Log Out"} /></span>
                   <LogOut className="w-4 h-4 text-destructive" />
                 </button>
               </div>
@@ -2097,7 +2083,7 @@ export function MerchantDashboard() {
             }`}
           >
             <Home className="w-5 h-5" />
-            <span className="text-[10px] font-medium">Home</span>
+            <span className="text-[10px] font-medium"><UiText text={"Home"} /></span>
           </button>
 
           {/* Orders */}
@@ -2108,7 +2094,7 @@ export function MerchantDashboard() {
             }`}
           >
             <ShoppingBag className="w-5 h-5" />
-            <span className="text-[10px] font-medium">Orders</span>
+            <span className="text-[10px] font-medium"><UiText text={"Orders"} /></span>
           </button>
 
           {/* Catalog */}
@@ -2119,7 +2105,7 @@ export function MerchantDashboard() {
             }`}
           >
             <Package className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{isServiceMerchant ? 'Services' : 'Products'}</span>
+            <span className="text-[10px] font-medium"><UiValue value={isServiceMerchant ? 'Services' : 'Products'} /></span>
           </button>
 
           {/* Profile */}
@@ -2130,7 +2116,7 @@ export function MerchantDashboard() {
             }`}
           >
             <User className="w-5 h-5" />
-            <span className="text-[10px] font-medium">Profile</span>
+            <span className="text-[10px] font-medium"><UiText text={"Profile"} /></span>
           </button>
 
           {/* Settings */}
@@ -2141,7 +2127,7 @@ export function MerchantDashboard() {
             }`}
           >
             <Settings className="w-5 h-5" />
-            <span className="text-[10px] font-medium">Settings</span>
+            <span className="text-[10px] font-medium"><UiText text={"Settings"} /></span>
           </button>
         </div>
       </nav>

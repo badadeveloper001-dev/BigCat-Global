@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect } from 'react'
 import { Mail, ArrowLeft, Loader2, CheckCircle2, RefreshCw } from 'lucide-react'
@@ -114,13 +116,13 @@ export function OTPVerification({
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/30 flex flex-col font-sans">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border px-4 py-3">
-        <button
+        <UiAttributes><button
           onClick={onBack}
           className="p-2 -ml-2 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all rounded-lg"
           aria-label="Go back"
         >
           <ArrowLeft className="w-5 h-5" />
-        </button>
+        </button></UiAttributes>
       </header>
 
       {/* Main Content */}
@@ -141,20 +143,20 @@ export function OTPVerification({
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/80 mb-5 shadow-lg shadow-primary/25">
                 <Mail className="w-8 h-8 text-primary-foreground" />
               </div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Verify Email</h1>
+              <h1 className="text-3xl font-bold text-foreground mb-2"><UiText text={"Verify Email"} /></h1>
               <p className="text-muted-foreground text-sm">
-                We&apos;ve sent a 6-digit code to<br />
+                <UiText text={"We&apos;ve sent a 6-digit code to"} /><br />
                 <span className="font-semibold text-foreground">{email}</span>
               </p>
               <p className="text-xs text-muted-foreground mt-3">
-                Code delivery: <span className="font-semibold text-foreground">{activeChannel}</span>
+                <UiText text={"Code delivery:"} />{" "}<span className="font-semibold text-foreground"><UiValue value={activeChannel} /></span>
               </p>
             </div>
 
             {/* Error Alert */}
             {error && (
               <div className="mb-6 p-4 bg-destructive/10 border border-destructive/30 rounded-xl">
-                <p className="text-sm text-destructive font-medium">{error}</p>
+                <p className="text-sm text-destructive font-medium"><UiValue value={error} /></p>
               </div>
             )}
 
@@ -168,7 +170,7 @@ export function OTPVerification({
             <form onSubmit={handleVerify} className="space-y-6">
               {/* OTP Input */}
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-foreground">Enter Code</label>
+                <label className="block text-sm font-semibold text-foreground"><UiText text={"Enter Code"} /></label>
                 <div className="flex justify-center gap-2">
                   <InputOTP
                     value={otp}
@@ -194,9 +196,9 @@ export function OTPVerification({
               <div className="flex items-center justify-between text-sm">
                 <div className="text-muted-foreground">
                   {canResend ? (
-                    <span className="text-destructive font-semibold">Code expired</span>
+                    <span className="text-destructive font-semibold"><UiText text={"Code expired"} /></span>
                   ) : (
-                    <>Expires in <span className="font-semibold text-foreground">{formatTime(timeLeft)}</span></>
+                    <><UiText text={"Expires in"} />{" "}<span className="font-semibold text-foreground">{formatTime(timeLeft)}</span></>
                   )}
                 </div>
                 <button
@@ -206,7 +208,7 @@ export function OTPVerification({
                   className="flex items-center gap-1.5 text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <RefreshCw className={`w-4 h-4 ${resendLoading ? 'animate-spin' : ''}`} />
-                  {resendLoading ? 'Sending...' : 'Resend'}
+                  <UiValue value={resendLoading ? 'Sending...' : 'Resend'} />
                 </button>
               </div>
 
@@ -217,7 +219,7 @@ export function OTPVerification({
                 className="w-full py-3 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground font-semibold rounded-xl hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                {loading ? 'Verifying...' : 'Verify Email'}
+                <UiValue value={loading ? 'Verifying...' : 'Verify Email'} />
               </button>
 
               {/* Back Button */}
@@ -226,15 +228,14 @@ export function OTPVerification({
                 onClick={onBack}
                 className="w-full py-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
               >
-                Back to Sign Up
-              </button>
+                <UiText text={"Back to Sign Up"} />{" "}</button>
             </form>
           </div>
 
           {/* Help Text */}
           <div className="mt-8 p-4 bg-card border border-border rounded-2xl text-center text-xs text-muted-foreground">
-            <p>Didn&apos;t receive the code?</p>
-            <p className="mt-2">Check your spam folder or request a new code using the button above</p>
+            <p><UiText text={"Didn&apos;t receive the code?"} /></p>
+            <p className="mt-2"><UiText text={"Check your spam folder or request a new code using the button above"} /></p>
           </div>
         </div>
       </main>

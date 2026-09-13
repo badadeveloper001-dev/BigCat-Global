@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
@@ -349,11 +351,10 @@ export default function MerchantMiniWebsitePage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="text-center max-w-md">
           <Store className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-          <h1 className="text-xl font-bold text-foreground mb-2">Storefront unavailable</h1>
-          <p className="text-muted-foreground mb-4">This merchant website could not be loaded right now.</p>
+          <h1 className="text-xl font-bold text-foreground mb-2"><UiText text={"Storefront unavailable"} /></h1>
+          <p className="text-muted-foreground mb-4"><UiText text={"This merchant website could not be loaded right now."} /></p>
           <Link href="/marketplace" className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">
-            Go to Marketplace
-          </Link>
+            <UiText text={"Go to Marketplace"} />{" "}</Link>
         </div>
       </div>
     )
@@ -371,7 +372,7 @@ export default function MerchantMiniWebsitePage() {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/80 mb-2">BigCat Mini Website</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/80 mb-2"><UiText text={"BigCat Mini Website"} /></p>
               <h1 className="text-3xl md:text-5xl font-bold mb-3">{profile.business_name || profile.full_name || 'Merchant Store'}</h1>
               <p className="max-w-2xl text-sm md:text-base text-white/85">
                 {profile.business_description || 'Trusted merchant on BigCat Global.'}
@@ -395,8 +396,7 @@ export default function MerchantMiniWebsitePage() {
             <div className="flex flex-col gap-2 min-w-[160px]">
               <button onClick={handleShare} className="rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur hover:bg-white/25 transition-colors flex items-center justify-center gap-2">
                 <Share2 className="w-4 h-4" />
-                Share
-              </button>
+                <UiText text={"Share"} />{" "}</button>
               <button
                 onClick={handleToggleFollow}
                 disabled={followLoading}
@@ -407,15 +407,15 @@ export default function MerchantMiniWebsitePage() {
                 }`}
               >
                 {followLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : isFollowing ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
-                {isFollowing ? 'Following' : 'Follow'}
+                <UiValue value={isFollowing ? 'Following' : 'Follow'} />
               </button>
               <span className="text-xs text-white/90 inline-flex items-center justify-center gap-1">
                 <Users className="w-3.5 h-3.5" />
-                {followerCount.toLocaleString('en-NG')} follower{followerCount === 1 ? '' : 's'}
+                {followerCount.toLocaleString('en-NG')} {" "}<UiText text={"follower"} />{followerCount === 1 ? '' : 's'}
               </span>
               <Link href={isServiceStore ? marketplaceServicesPath : '/marketplace'} className={`rounded-xl ${themeStyle.button} px-4 py-2 text-sm font-semibold text-center transition-colors flex items-center justify-center gap-2`}>
                 <ShoppingBag className="w-4 h-4" />
-                {isServiceStore ? 'Browse Services' : 'Shop on BigCat'}
+                <UiValue value={isServiceStore ? 'Browse Services' : 'Shop on BigCat'} />
               </Link>
             </div>
           </div>
@@ -475,11 +475,11 @@ export default function MerchantMiniWebsitePage() {
                 {/* Right/left side: Product image if side layout */}
                 {banner.productImageUrl && banner.productImageLayout !== 'full-bleed' && (
                   <div className={`w-full md:w-80 h-64 md:h-80 rounded-2xl overflow-hidden shadow-lg flex-shrink-0 ${banner.productImageLayout === 'left' ? 'md:order-1' : 'md:order-2'}`}>
-                    <img
+                    <UiAttributes><img
                       src={banner.productImageUrl}
                       alt="Promoted product"
                       className="w-full h-full object-cover"
-                    />
+                    /></UiAttributes>
                   </div>
                 )}
               </div>
@@ -502,15 +502,14 @@ export default function MerchantMiniWebsitePage() {
                 <ShoppingCart className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-foreground">Cart</p>
-                <p className="text-xs text-muted-foreground">{cartCount} item{cartCount !== 1 ? 's' : ''} ready for checkout</p>
+                <p className="text-sm font-semibold text-foreground"><UiText text={"Cart"} /></p>
+                <p className="text-xs text-muted-foreground">{cartCount} {" "}<UiText text={"item"} />{cartCount !== 1 ? 's' : ''} {" "}<UiText text={"ready for checkout"} /></p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <p className="text-sm font-bold text-primary">{formatNaira(cartTotal)}</p>
               <Link href={marketplaceCheckoutPath} className={`rounded-xl ${themeStyle.button} px-4 py-2 text-sm font-semibold text-white`}>
-                Checkout on Marketplace
-              </Link>
+                <UiText text={"Checkout on Marketplace"} />{" "}</Link>
             </div>
           </div>
         </div>
@@ -519,31 +518,29 @@ export default function MerchantMiniWebsitePage() {
         <div className={`rounded-2xl border p-4 ${themeStyle.soft}`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h2 className="text-lg font-bold text-foreground">About this store</h2>
+              <h2 className="text-lg font-bold text-foreground"><UiText text={"About this store"} /></h2>
               <p className="text-sm text-muted-foreground mt-1">
-                This mini website is auto-generated for the merchant and can be customized from their dashboard.
-              </p>
+                <UiText text={"This mini website is auto-generated for the merchant and can be customized from their dashboard."} />{" "}</p>
             </div>
             <a
               href={`mailto:${profile.email || 'support@bigcat.ng'}`}
               className={`rounded-xl ${themeStyle.button} px-4 py-2 text-sm font-semibold text-white inline-flex items-center justify-center gap-2`}
             >
-              Contact Store
-              <ExternalLink className="w-4 h-4" />
+              <UiText text={"Contact Store"} />{" "}<ExternalLink className="w-4 h-4" />
             </a>
           </div>
         </div>
 
         <div id="store-items">
           <div className="flex items-center justify-between mb-3">
-             <h2 className="text-xl font-bold text-foreground">Featured {isServiceStore ? 'services' : 'products'}</h2>
-            <span className="text-sm text-muted-foreground">{products.length} item{products.length !== 1 ? 's' : ''}</span>
+             <h2 className="text-xl font-bold text-foreground"><UiText text={"Featured"} />{" "}<UiValue value={isServiceStore ? 'services' : 'products'} /></h2>
+            <span className="text-sm text-muted-foreground">{products.length} {" "}<UiText text={"item"} />{products.length !== 1 ? 's' : ''}</span>
           </div>
 
           {products.length === 0 ? (
             <div className="rounded-2xl border border-border bg-card p-10 text-center">
               <Store className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-               <p className="text-sm text-muted-foreground">{isServiceStore ? 'Services will appear here as the merchant updates their storefront.' : 'Products will appear here as the merchant updates their storefront.'}</p>
+               <p className="text-sm text-muted-foreground"><UiValue value={isServiceStore ? 'Services will appear here as the merchant updates their storefront.' : 'Products will appear here as the merchant updates their storefront.'} /></p>
             </div>
           ) : isServiceStore ? (
             <div className={gridClass}>
@@ -578,8 +575,8 @@ export default function MerchantMiniWebsitePage() {
                     )}
 
                     <div className="mt-3 rounded-lg border border-primary/20 bg-primary/5 p-2">
-                      <p className="text-[11px] font-semibold text-primary">Pricing by agreement</p>
-                      <p className="text-[11px] text-muted-foreground">Discuss scope and price in chat, then pay safely in checkout.</p>
+                      <p className="text-[11px] font-semibold text-primary"><UiText text={"Pricing by agreement"} /></p>
+                      <p className="text-[11px] text-muted-foreground"><UiText text={"Discuss scope and price in chat, then pay safely in checkout."} /></p>
                     </div>
 
                     <div className="mt-3 grid grid-cols-2 gap-2">
@@ -587,14 +584,12 @@ export default function MerchantMiniWebsitePage() {
                         href={marketplaceServicesPath}
                         className={`block w-full rounded-xl ${themeStyle.button} py-2 text-center text-sm font-semibold text-white`}
                       >
-                        Open Services
-                      </Link>
+                        <UiText text={"Open Services"} />{" "}</Link>
                       <Link
                         href={marketplaceServicesPath}
                         className="block w-full rounded-xl border border-border bg-secondary py-2 text-center text-sm font-medium text-foreground"
                       >
-                        Request Quote
-                      </Link>
+                        <UiText text={"Request Quote"} />{" "}</Link>
                     </div>
                   </div>
                 )
@@ -610,15 +605,15 @@ export default function MerchantMiniWebsitePage() {
                 <div key={product.id} className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
                   <div className="aspect-[4/3] bg-secondary overflow-hidden">
                     {product.images?.[0] ? (
-                      <img src={product.images[0]} alt={product.name || product.title || 'Item'} className="w-full h-full object-cover" />
+                      <UiAttributes><img src={product.images[0]} alt={product.name || product.title || 'Item'} className="w-full h-full object-cover" /></UiAttributes>
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">No image</div>
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm"><UiText text={"No image"} /></div>
                     )}
                   </div>
                   <div className="p-3">
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-semibold text-sm text-foreground line-clamp-2">{product.name || product.title || 'Product'}</p>
-                      <button
+                      <UiAttributes><button
                         onClick={() =>
                           toggleItem({
                             id: String(product.id),
@@ -643,11 +638,11 @@ export default function MerchantMiniWebsitePage() {
                         aria-label={isInWishlist(String(product.id)) ? 'Remove from wishlist' : 'Add to wishlist'}
                       >
                         <Heart className={`w-4 h-4 ${isInWishlist(String(product.id)) ? 'fill-current' : ''}`} />
-                      </button>
+                      </button></UiAttributes>
                     </div>
                     <p className="text-primary font-bold mt-1">{formatNaira(Number(product.price || 0))}</p>
                     <p className={`mt-1 text-xs ${isOutOfStock ? 'text-destructive' : 'text-muted-foreground'}`}>
-                      {isOutOfStock ? 'Out of stock' : `${availableStock} available`}
+                      <UiValue value={isOutOfStock ? 'Out of stock' : `${availableStock} available`} />
                     </p>
                     <div className="mt-3 space-y-2">
                       <button
@@ -655,14 +650,13 @@ export default function MerchantMiniWebsitePage() {
                         disabled={isOutOfStock}
                         className={`w-full rounded-xl py-2 text-sm font-semibold text-white ${isOutOfStock ? 'bg-slate-300 cursor-not-allowed' : themeStyle.button}`}
                       >
-                        {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+                        <UiValue value={isOutOfStock ? 'Out of Stock' : 'Add to Cart'} />
                       </button>
                       <Link
                         href={marketplaceCheckoutPath}
                         className="block w-full rounded-xl border border-border bg-secondary py-2 text-center text-sm font-medium text-foreground"
                       >
-                        Checkout
-                      </Link>
+                        <UiText text={"Checkout"} />{" "}</Link>
                     </div>
                   </div>
                 </div>
@@ -678,17 +672,16 @@ export default function MerchantMiniWebsitePage() {
             <div className="flex items-start gap-3">
               <div className="w-16 h-16 rounded-xl bg-secondary overflow-hidden flex-shrink-0">
                 {addedProduct.images?.[0] ? (
-                  <img src={addedProduct.images[0]} alt={addedProduct.name} className="w-full h-full object-cover" />
+                  <UiAttributes><img src={addedProduct.images[0]} alt={addedProduct.name} className="w-full h-full object-cover" /></UiAttributes>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-                    Item
-                  </div>
+                    <UiText text={"Item"} />{" "}</div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <CheckCircle2 className="w-5 h-5 text-green-600" />
-                  <p className="font-semibold text-foreground">Added to cart</p>
+                  <p className="font-semibold text-foreground"><UiText text={"Added to cart"} /></p>
                 </div>
                 <p className="text-sm font-medium text-foreground line-clamp-2">{addedProduct.name}</p>
                 <p className="text-xs text-muted-foreground mt-1">{profile.business_name || 'Merchant store'}</p>
@@ -701,14 +694,12 @@ export default function MerchantMiniWebsitePage() {
                 onClick={() => setAddedProduct(null)}
                 className={`block w-full rounded-xl ${themeStyle.button} py-3 text-center text-sm font-semibold text-white`}
               >
-                Proceed to Marketplace Checkout
-              </Link>
+                <UiText text={"Proceed to Marketplace Checkout"} />{" "}</Link>
               <button
                 onClick={() => setAddedProduct(null)}
                 className="w-full rounded-xl bg-secondary py-3 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
               >
-                Continue Shopping
-              </button>
+                <UiText text={"Continue Shopping"} />{" "}</button>
             </div>
           </div>
         </div>

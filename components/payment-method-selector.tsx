@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { CreditCard, Wallet, Building2, Check } from 'lucide-react'
 
@@ -39,7 +41,7 @@ const paymentMethods = [
 export function PaymentMethodSelector({ selectedMethod, onSelect }: PaymentMethodSelectorProps) {
   return (
     <div className="space-y-4">
-      <h3 className="font-semibold text-foreground">Select Payment Method</h3>
+      <h3 className="font-semibold text-foreground"><UiText text={"Select Payment Method"} /></h3>
       <div className="grid gap-3">
         {paymentMethods.map((method) => (
           <button
@@ -58,14 +60,14 @@ export function PaymentMethodSelector({ selectedMethod, onSelect }: PaymentMetho
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="font-medium text-foreground">{method.label}</p>
+                    <p className="font-medium text-foreground"><UiValue value={method.label} /></p>
                     {method.badge && (
                       <span className="text-xs px-2 py-1 rounded-full bg-[#F3E8FF] text-[#6C2BD9] font-semibold">
                         {method.badge}
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-0.5">{method.description}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5"><UiValue value={method.description} /></p>
                 </div>
               </div>
               <div className="flex items-center justify-center w-6 h-6 rounded-full border-2 mt-1" 

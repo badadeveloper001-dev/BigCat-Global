@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useEffect, useState } from "react"
 import { ArrowLeft, Loader2, Wallet, Landmark, RefreshCw, ArrowDownLeft, ArrowUpRight, Plus, Trash2, CreditCard, ShoppingBag, Eye, EyeOff, Copy, Check, Building2, Send, X, Shield, Gift, BadgeCheck, Unlock, RotateCcw } from "lucide-react"
@@ -229,7 +231,7 @@ function BuyerWalletSection({ userId }: { userId: string }) {
     return (
       <div className="py-16 flex flex-col items-center gap-3 text-muted-foreground">
         <Loader2 className="w-6 h-6 animate-spin" />
-        <span className="text-sm">Loading wallet...</span>
+        <span className="text-sm"><UiText text={"Loading wallet..."} /></span>
       </div>
     )
   }
@@ -242,27 +244,27 @@ function BuyerWalletSection({ userId }: { userId: string }) {
         <div className="fixed inset-0 z-50 bg-black/50 overflow-y-auto flex items-center justify-center px-4 py-4 sm:py-6">
           <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-zinc-900 p-5 space-y-4 shadow-2xl my-auto">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-base">Fund Your Wallet</h3>
+              <h3 className="font-bold text-base"><UiText text={"Fund Your Wallet"} /></h3>
               <button onClick={() => setShowBankModal(false)} className="p-1.5 rounded-full hover:bg-muted transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 p-4 space-y-3">
-              <p className="text-xs text-emerald-700 dark:text-emerald-300 font-medium uppercase tracking-wide">Transfer to this account</p>
+              <p className="text-xs text-emerald-700 dark:text-emerald-300 font-medium uppercase tracking-wide"><UiText text={"Transfer to this account"} /></p>
 
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] text-muted-foreground">Bank Name</p>
-                    <p className="text-sm font-semibold">Wema Bank</p>
+                    <p className="text-[11px] text-muted-foreground"><UiText text={"Bank Name"} /></p>
+                    <p className="text-sm font-semibold"><UiText text={"Wema Bank"} /></p>
                   </div>
                   <Building2 className="w-5 h-5 text-emerald-600" />
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] text-muted-foreground">Account Number</p>
+                    <p className="text-[11px] text-muted-foreground"><UiText text={"Account Number"} /></p>
                     <p className="text-lg font-bold tracking-widest">{virtualAccount}</p>
                   </div>
                   <button
@@ -275,8 +277,8 @@ function BuyerWalletSection({ userId }: { userId: string }) {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] text-muted-foreground">Account Name</p>
-                    <p className="text-sm font-semibold">BIGCAT MARKETPLACE / {userId.slice(0, 8).toUpperCase()}</p>
+                    <p className="text-[11px] text-muted-foreground"><UiText text={"Account Name"} /></p>
+                    <p className="text-sm font-semibold"><UiText text={"BIGCAT MARKETPLACE /"} />{" "}{userId.slice(0, 8).toUpperCase()}</p>
                   </div>
                 </div>
 
@@ -284,7 +286,7 @@ function BuyerWalletSection({ userId }: { userId: string }) {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] text-muted-foreground">Payment Reference</p>
+                    <p className="text-[11px] text-muted-foreground"><UiText text={"Payment Reference"} /></p>
                     <p className="text-sm font-bold text-emerald-700 dark:text-emerald-300">{fundRef}</p>
                   </div>
                   <button
@@ -298,12 +300,11 @@ function BuyerWalletSection({ userId }: { userId: string }) {
             </div>
 
             <p className="text-xs text-muted-foreground">
-              Transfer any amount to the account above. Your wallet will be credited within <strong>5 minutes</strong> of receiving the transfer. Always use your payment reference so we can identify your payment.
-            </p>
+              <UiText text={"Transfer any amount to the account above. Your wallet will be credited within"} />{" "}<strong><UiText text={"5 minutes"} /></strong> {" "}<UiText text={"of receiving the transfer. Always use your payment reference so we can identify your payment."} />{" "}</p>
 
             {/* Quick manual top-up for demo / testing */}
             <div className="space-y-2 border-t border-border pt-3">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Quick top-up (demo)</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide"><UiText text={"Quick top-up (demo)"} /></p>
               <div className="grid grid-cols-5 gap-1.5">
                 {QUICK_AMOUNTS.map(amt => (
                   <button
@@ -322,13 +323,13 @@ function BuyerWalletSection({ userId }: { userId: string }) {
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">₦</span>
-                  <input
+                  <UiAttributes><input
                     type="number" min="100" max="1000000"
                     value={fundAmount}
                     onChange={e => setFundAmount(e.target.value)}
                     className="w-full rounded-xl border border-border bg-background pl-8 pr-3 py-2.5 text-sm outline-none focus:border-emerald-500"
                     placeholder="Custom amount"
-                  />
+                  /></UiAttributes>
                 </div>
                 <button
                   onClick={async () => { await handleFundWallet(); setShowBankModal(false) }}
@@ -338,8 +339,8 @@ function BuyerWalletSection({ userId }: { userId: string }) {
                   {funding ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Add'}
                 </button>
               </div>
-              {fundError && <p className="text-xs text-red-600">{fundError}</p>}
-              {fundSuccess && <p className="text-xs text-emerald-600 font-medium">{fundSuccess}</p>}
+              {fundError && <p className="text-xs text-red-600"><UiValue value={fundError} /></p>}
+              {fundSuccess && <p className="text-xs text-emerald-600 font-medium"><UiValue value={fundSuccess} /></p>}
             </div>
           </div>
         </div>
@@ -357,46 +358,46 @@ function BuyerWalletSection({ userId }: { userId: string }) {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Wallet className="w-5 h-5 text-emerald-100" />
-              <span className="text-sm font-semibold text-emerald-100 tracking-wide uppercase">BigCat Wallet</span>
+              <span className="text-sm font-semibold text-emerald-100 tracking-wide uppercase"><UiText text={"BigCat Wallet"} /></span>
             </div>
             <div className="flex items-center gap-2">
-              <button
+              <UiAttributes><button
                 onClick={() => setBalanceVisible(v => !v)}
                 className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
                 aria-label={balanceVisible ? 'Hide balance' : 'Show balance'}
               >
                 {balanceVisible ? <EyeOff className="w-3.5 h-3.5 text-white" /> : <Eye className="w-3.5 h-3.5 text-white" />}
-              </button>
-              <button
+              </button></UiAttributes>
+              <UiAttributes><button
                 onClick={loadData}
                 className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
                 aria-label="Refresh wallet"
               >
                 <RefreshCw className="w-3.5 h-3.5 text-white" />
-              </button>
+              </button></UiAttributes>
             </div>
           </div>
 
-          <p className="text-xs text-emerald-200 mb-1">Available Balance</p>
+          <p className="text-xs text-emerald-200 mb-1"><UiText text={"Available Balance"} /></p>
           <h2 className="text-4xl font-extrabold tracking-tight">
             {balanceVisible ? formatNaira(walletBalance) : '₦ ••••••'}
           </h2>
           <div className="flex items-center gap-2 mt-1">
-            <p className="text-[11px] text-emerald-300">{virtualAccount.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3')} · Wema Bank</p>
+            <p className="text-[11px] text-emerald-300">{virtualAccount.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3')} {" "}<UiText text={"· Wema Bank"} /></p>
             {lastRefreshed && (
               <p className="text-[10px] text-emerald-400/80 ml-auto">
-                Updated {lastRefreshed.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' })}
+                <UiText text={"Updated"} />{" "}{lastRefreshed.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' })}
               </p>
             )}
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-2 text-center">
             <div className="rounded-2xl bg-white/15 py-2 px-3">
-              <p className="text-[11px] text-emerald-200 uppercase tracking-wide">Money In</p>
+              <p className="text-[11px] text-emerald-200 uppercase tracking-wide"><UiText text={"Money In"} /></p>
               <p className="text-sm font-bold">{balanceVisible ? formatNaira(totalIn) : '••••'}</p>
             </div>
             <div className="rounded-2xl bg-white/15 py-2 px-3">
-              <p className="text-[11px] text-emerald-200 uppercase tracking-wide">Money Out</p>
+              <p className="text-[11px] text-emerald-200 uppercase tracking-wide"><UiText text={"Money Out"} /></p>
               <p className="text-sm font-bold">{balanceVisible ? formatNaira(totalOut) : '••••'}</p>
             </div>
           </div>
@@ -406,15 +407,15 @@ function BuyerWalletSection({ userId }: { userId: string }) {
       {/* ── Quick stats ── */}
       <section className="grid grid-cols-3 gap-3">
         <div className="rounded-2xl border border-border bg-card p-3 flex flex-col gap-1">
-          <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Total Spent</p>
+          <p className="text-[11px] text-muted-foreground uppercase tracking-wide"><UiText text={"Total Spent"} /></p>
           <p className="text-base font-bold text-foreground">{formatNaira(totalSpent)}</p>
         </div>
         <div className="rounded-2xl border border-border bg-card p-3 flex flex-col gap-1">
-          <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Orders</p>
+          <p className="text-[11px] text-muted-foreground uppercase tracking-wide"><UiText text={"Orders"} /></p>
           <p className="text-base font-bold text-foreground">{orders.length}</p>
         </div>
         <div className="rounded-2xl border border-border bg-card p-3 flex flex-col gap-1">
-          <p className="text-[11px] text-muted-foreground uppercase tracking-wide">In Escrow</p>
+          <p className="text-[11px] text-muted-foreground uppercase tracking-wide"><UiText text={"In Escrow"} /></p>
           <p className="text-base font-bold text-amber-600">{formatNaira(escrowHeld)}</p>
         </div>
       </section>
@@ -428,9 +429,9 @@ function BuyerWalletSection({ userId }: { userId: string }) {
           <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center">
             <ArrowDownLeft className="w-5 h-5 text-white" />
           </div>
-          <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">Add Money</span>
+          <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300"><UiText text={"Add Money"} /></span>
         </button>
-        <button
+        <UiAttributes><button
           onClick={() => {}}
           className="flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-muted/40 p-4 hover:bg-muted transition-colors opacity-50 cursor-not-allowed"
           title="Coming soon"
@@ -438,25 +439,25 @@ function BuyerWalletSection({ userId }: { userId: string }) {
           <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
             <Send className="w-5 h-5 text-muted-foreground" />
           </div>
-          <span className="text-xs font-semibold text-muted-foreground">Send Money</span>
-        </button>
+          <span className="text-xs font-semibold text-muted-foreground"><UiText text={"Send Money"} /></span>
+        </button></UiAttributes>
       </section>
 
       {/* ── Fund wallet (legacy inline — hidden, replaced by modal) ── */}
       <section className="hidden rounded-2xl border border-border bg-card p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold flex items-center gap-2"><ArrowDownLeft className="w-4 h-4 text-emerald-600" /> Add Money</h3>
+          <h3 className="font-semibold flex items-center gap-2"><ArrowDownLeft className="w-4 h-4 text-emerald-600" /> {" "}<UiText text={"Add Money"} /></h3>
           <button
             onClick={() => { setShowFundWallet(v => !v); setFundError(""); setFundSuccess("") }}
             className="text-xs font-semibold text-primary hover:underline"
           >
-            {showFundWallet ? 'Cancel' : 'Top Up'}
+            <UiValue value={showFundWallet ? 'Cancel' : 'Top Up'} />
           </button>
         </div>
 
         {fundSuccess && (
           <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm text-emerald-700 font-medium">
-            {fundSuccess}
+            <UiValue value={fundSuccess} />
           </div>
         )}
 
@@ -480,7 +481,7 @@ function BuyerWalletSection({ userId }: { userId: string }) {
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">₦</span>
-                <input
+                <UiAttributes><input
                   type="number"
                   min="100"
                   max="1000000"
@@ -488,7 +489,7 @@ function BuyerWalletSection({ userId }: { userId: string }) {
                   onChange={e => setFundAmount(e.target.value)}
                   className="w-full rounded-xl border border-border bg-background pl-8 pr-3 py-2.5 text-sm outline-none focus:border-emerald-500"
                   placeholder="Custom amount"
-                />
+                /></UiAttributes>
               </div>
               <button
                 onClick={handleFundWallet}
@@ -498,11 +499,10 @@ function BuyerWalletSection({ userId }: { userId: string }) {
                 {funding ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Add'}
               </button>
             </div>
-            {fundError && <p className="text-xs text-red-600">{fundError}</p>}
+            {fundError && <p className="text-xs text-red-600"><UiValue value={fundError} /></p>}
             <p className="text-[11px] text-muted-foreground flex items-center gap-1">
               <Landmark className="w-3 h-3" />
-              Funds are available instantly for checkout payments and refunds.
-            </p>
+              <UiText text={"Funds are available instantly for checkout payments and refunds."} />{" "}</p>
           </div>
         )}
       </section>
@@ -510,23 +510,23 @@ function BuyerWalletSection({ userId }: { userId: string }) {
       {/* ── Transaction history ── */}
       <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold">Transaction History</h3>
+          <h3 className="font-semibold"><UiText text={"Transaction History"} /></h3>
           {walletTransactions.length > 5 && (
             <button onClick={() => setShowAllTx(v => !v)} className="text-xs font-semibold text-primary hover:underline">
-              {showAllTx ? 'Show less' : `See all (${walletTransactions.length})`}
+              <UiValue value={showAllTx ? 'Show less' : `See all (${walletTransactions.length})`} />
             </button>
           )}
         </div>
 
         {walletError && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{walletError}</div>
+          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"><UiValue value={walletError} /></div>
         )}
 
         {walletTransactions.length === 0 ? (
           <div className="rounded-xl bg-muted/50 border border-border p-4 text-sm text-muted-foreground text-center">
             <Wallet className="w-8 h-8 mx-auto mb-2 opacity-30" />
-            <p>No transactions yet.</p>
-            <p className="text-xs mt-1">Top up your wallet or place an order to get started.</p>
+            <p><UiText text={"No transactions yet."} /></p>
+            <p className="text-xs mt-1"><UiText text={"Top up your wallet or place an order to get started."} /></p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -567,7 +567,7 @@ function BuyerWalletSection({ userId }: { userId: string }) {
                     {txIcon}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{label}</p>
+                    <p className="text-sm font-medium truncate"><UiValue value={label} /></p>
                     <p className="text-xs text-muted-foreground">
                       {txDate ? txDate.toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
                       {tx.order_id ? ` · #${String(tx.order_id).slice(0, 8).toUpperCase()}` : ''}
@@ -590,21 +590,19 @@ function BuyerWalletSection({ userId }: { userId: string }) {
         {refundRows.length > 0 && (
           <p className="text-xs text-emerald-700 flex items-center gap-1">
             <ArrowDownLeft className="w-3 h-3" />
-            {refundRows.length} refund credit{refundRows.length !== 1 ? 's' : ''} received
-          </p>
+            {refundRows.length} {" "}<UiText text={"refund credit"} />{refundRows.length !== 1 ? 's' : ''} {" "}<UiText text={"received"} />{" "}</p>
         )}
       </section>
 
       {/* ── Saved payment methods ── */}
       <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold flex items-center gap-2"><CreditCard className="w-4 h-4" /> Saved Payment Methods</h3>
+          <h3 className="font-semibold flex items-center gap-2"><CreditCard className="w-4 h-4" /> {" "}<UiText text={"Saved Payment Methods"} /></h3>
           <button
             onClick={() => setShowAddCard(v => !v)}
             className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
           >
-            <Plus className="w-3.5 h-3.5" /> Add
-          </button>
+            <Plus className="w-3.5 h-3.5" /> {" "}<UiText text={"Add"} />{" "}</button>
         </div>
 
         {showAddCard && (
@@ -614,36 +612,35 @@ function BuyerWalletSection({ userId }: { userId: string }) {
               onChange={e => setNewMethodType(e.target.value)}
               className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
             >
-              <option value="card">Debit / Credit Card</option>
-              <option value="bank_transfer">Bank Transfer</option>
-              <option value="orchid">Orchid</option>
-              <option value="opay">OPay</option>
+              <option value="card"><UiText text={"Debit / Credit Card"} /></option>
+              <option value="bank_transfer"><UiText text={"Bank Transfer"} /></option>
+              <option value="orchid"><UiText text={"Orchid"} /></option>
+              <option value="opay"><UiText text={"OPay"} /></option>
             </select>
-            <input
+            <UiAttributes><input
               type="text"
               placeholder={newMethodType === 'card' ? 'Card nickname (e.g. GTB Visa ****1234)' : 'Account label'}
               value={newMethodDetails}
               onChange={e => setNewMethodDetails(e.target.value)}
               className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
-            />
-            {pmError && <p className="text-xs text-red-600">{pmError}</p>}
+            /></UiAttributes>
+            {pmError && <p className="text-xs text-red-600"><UiValue value={pmError} /></p>}
             <div className="flex gap-2">
               <button
                 onClick={handleAddMethod}
                 disabled={addingMethod}
                 className="flex-1 rounded-lg bg-primary text-primary-foreground text-sm font-semibold py-2 hover:opacity-90 disabled:opacity-60"
               >
-                {addingMethod ? 'Saving...' : 'Save Method'}
+                <UiValue value={addingMethod ? 'Saving...' : 'Save Method'} />
               </button>
-              <button onClick={() => setShowAddCard(false)} className="px-4 rounded-lg border border-border text-sm hover:bg-muted">Cancel</button>
+              <button onClick={() => setShowAddCard(false)} className="px-4 rounded-lg border border-border text-sm hover:bg-muted"><UiText text={"Cancel"} /></button>
             </div>
           </div>
         )}
 
         {paymentMethods.length === 0 ? (
           <div className="rounded-xl bg-muted/50 border border-border p-3 text-sm text-muted-foreground">
-            No saved payment methods yet.
-          </div>
+            <UiText text={"No saved payment methods yet."} />{" "}</div>
         ) : (
           <div className="space-y-2">
             {paymentMethods.map(pm => (
@@ -653,14 +650,14 @@ function BuyerWalletSection({ userId }: { userId: string }) {
                   <p className="text-xs text-muted-foreground">{pm.details?.label || pm.details?.account_number || JSON.stringify(pm.details || {})}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0 ml-2">
-                  {pm.is_default && <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-700 rounded-full px-2 py-0.5">Default</span>}
+                  {pm.is_default && <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-700 rounded-full px-2 py-0.5"><UiText text={"Default"} /></span>}
                   {!pm.is_default && (
                     <button
                       onClick={() => handleSetDefaultMethod(pm.id)}
                       disabled={settingDefaultId === pm.id}
                       className="text-[11px] font-semibold text-primary hover:underline disabled:opacity-60"
                     >
-                      {settingDefaultId === pm.id ? 'Saving...' : 'Set default'}
+                      <UiValue value={settingDefaultId === pm.id ? 'Saving...' : 'Set default'} />
                     </button>
                   )}
                   <button
@@ -681,10 +678,10 @@ function BuyerWalletSection({ userId }: { userId: string }) {
       <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
         <div className="flex items-center gap-2">
           <ShoppingBag className="w-4 h-4" />
-          <h3 className="font-semibold">Order History</h3>
+          <h3 className="font-semibold"><UiText text={"Order History"} /></h3>
         </div>
         {orders.length === 0 ? (
-          <div className="rounded-xl bg-muted/50 border border-border p-3 text-sm text-muted-foreground">No orders yet.</div>
+          <div className="rounded-xl bg-muted/50 border border-border p-3 text-sm text-muted-foreground"><UiText text={"No orders yet."} /></div>
         ) : (
           <div className="space-y-2">
             {orders.slice(0, 10).map(order => {
@@ -697,7 +694,7 @@ function BuyerWalletSection({ userId }: { userId: string }) {
               return (
                 <div key={order.id} className="rounded-xl border border-border bg-background px-3 py-2.5 flex items-center justify-between">
                   <div className="min-w-0 pr-3">
-                    <p className="text-sm font-medium truncate">Order #{order.id.substring(0,8).toUpperCase()}</p>
+                    <p className="text-sm font-medium truncate"><UiText text={"Order #"} />{order.id.substring(0,8).toUpperCase()}</p>
                     <p className="text-xs text-muted-foreground">{new Date(order.created_at || '').toLocaleDateString()}</p>
                   </div>
                   <div className="text-right shrink-0">
@@ -868,14 +865,14 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur px-4 py-3">
         <div className="mx-auto max-w-xl flex items-center justify-between">
-          <button
+          <UiAttributes><button
             onClick={onBack}
             className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5" />
-          </button>
-          <h1 className="font-semibold">Wallet & Payments</h1>
+          </button></UiAttributes>
+          <h1 className="font-semibold"><UiText text={"Wallet & Payments"} /></h1>
           <div className="w-9" />
         </div>
       </header>
@@ -888,14 +885,12 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
                 onClick={() => setWalletView('multi')}
                 className={`rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${walletView === 'multi' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-secondary'}`}
               >
-                Multi-Currency Wallet
-              </button>
+                <UiText text={"Multi-Currency Wallet"} />{" "}</button>
               <button
                 onClick={() => setWalletView('details')}
                 className={`rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${walletView === 'details' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-secondary'}`}
               >
-                Account Details
-              </button>
+                <UiText text={"Account Details"} />{" "}</button>
             </div>
           </section>
         ) : null}
@@ -913,27 +908,27 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
               <div className="fixed inset-0 z-50 bg-black/50 overflow-y-auto flex items-center justify-center px-4 py-4 sm:py-6">
                 <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-zinc-900 p-5 space-y-4 shadow-2xl my-auto">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-base">Fund Your Wallet</h3>
+                    <h3 className="font-bold text-base"><UiText text={"Fund Your Wallet"} /></h3>
                     <button onClick={() => setShowBankModal(false)} className="p-1.5 rounded-full hover:bg-muted transition-colors">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
 
                   <div className="rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 space-y-3">
-                    <p className="text-xs text-slate-600 dark:text-slate-300 font-medium uppercase tracking-wide">Transfer to this account</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 font-medium uppercase tracking-wide"><UiText text={"Transfer to this account"} /></p>
 
                     <div className="space-y-2.5">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-[11px] text-muted-foreground">Bank Name</p>
-                          <p className="text-sm font-semibold">Wema Bank</p>
+                          <p className="text-[11px] text-muted-foreground"><UiText text={"Bank Name"} /></p>
+                          <p className="text-sm font-semibold"><UiText text={"Wema Bank"} /></p>
                         </div>
                         <Building2 className="w-5 h-5 text-slate-500" />
                       </div>
 
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-[11px] text-muted-foreground">Account Number</p>
+                          <p className="text-[11px] text-muted-foreground"><UiText text={"Account Number"} /></p>
                           <p className="text-lg font-bold tracking-widest">{virtualAccount}</p>
                         </div>
                         <button
@@ -946,8 +941,8 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
 
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-[11px] text-muted-foreground">Account Name</p>
-                          <p className="text-sm font-semibold">BIGCAT MARKETPLACE / {merchantId.slice(0, 8).toUpperCase()}</p>
+                          <p className="text-[11px] text-muted-foreground"><UiText text={"Account Name"} /></p>
+                          <p className="text-sm font-semibold"><UiText text={"BIGCAT MARKETPLACE /"} />{" "}{merchantId.slice(0, 8).toUpperCase()}</p>
                         </div>
                       </div>
 
@@ -955,7 +950,7 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
 
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-[11px] text-muted-foreground">Payment Reference</p>
+                          <p className="text-[11px] text-muted-foreground"><UiText text={"Payment Reference"} /></p>
                           <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{fundRef}</p>
                         </div>
                         <button
@@ -969,12 +964,11 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
                   </div>
 
                   <p className="text-xs text-muted-foreground">
-                    Transfer any amount to the account above. Your wallet will be credited within <strong>5 minutes</strong>. Always include your payment reference so we can identify your payment.
-                  </p>
+                    <UiText text={"Transfer any amount to the account above. Your wallet will be credited within"} />{" "}<strong><UiText text={"5 minutes"} /></strong><UiText text={". Always include your payment reference so we can identify your payment."} />{" "}</p>
 
                   {/* Quick manual top-up for demo / testing */}
                   <div className="space-y-2 border-t border-border pt-3">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Quick top-up (demo)</p>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide"><UiText text={"Quick top-up (demo)"} /></p>
                     <div className="grid grid-cols-5 gap-1.5">
                       {QUICK_AMOUNTS.map(amt => (
                         <button
@@ -993,13 +987,13 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
                     <div className="flex gap-2">
                       <div className="relative flex-1">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">₦</span>
-                        <input
+                        <UiAttributes><input
                           type="number" min="100" max="1000000"
                           value={fundAmount}
                           onChange={e => setFundAmount(e.target.value)}
                           className="w-full rounded-xl border border-border bg-background pl-8 pr-3 py-2.5 text-sm outline-none focus:border-slate-500"
                           placeholder="Custom amount"
-                        />
+                        /></UiAttributes>
                       </div>
                       <button
                         onClick={async () => { await handleFundWallet(); if (!error) setShowBankModal(false) }}
@@ -1009,8 +1003,8 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
                         {funding ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Add'}
                       </button>
                     </div>
-                    {error && <p className="text-xs text-red-600">{error}</p>}
-                    {fundSuccess && <p className="text-xs text-emerald-600 font-medium">{fundSuccess}</p>}
+                    {error && <p className="text-xs text-red-600"><UiValue value={error} /></p>}
+                    {fundSuccess && <p className="text-xs text-emerald-600 font-medium"><UiValue value={fundSuccess} /></p>}
                   </div>
                 </div>
               </div>
@@ -1028,46 +1022,46 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <Wallet className="w-5 h-5 text-slate-300" />
-                    <span className="text-sm font-semibold text-slate-300 tracking-wide uppercase">Merchant Wallet</span>
+                    <span className="text-sm font-semibold text-slate-300 tracking-wide uppercase"><UiText text={"Merchant Wallet"} /></span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
+                    <UiAttributes><button
                       onClick={() => setBalanceVisible(v => !v)}
                       className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
                       aria-label={balanceVisible ? 'Hide balance' : 'Show balance'}
                     >
                       {balanceVisible ? <EyeOff className="w-3.5 h-3.5 text-white" /> : <Eye className="w-3.5 h-3.5 text-white" />}
-                    </button>
-                    <button
+                    </button></UiAttributes>
+                    <UiAttributes><button
                       onClick={loadMerchantWallet}
                       className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
                       aria-label="Refresh wallet"
                     >
                       <RefreshCw className="w-3.5 h-3.5 text-white" />
-                    </button>
+                    </button></UiAttributes>
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-400 mb-1">Available Balance</p>
+                <p className="text-xs text-slate-400 mb-1"><UiText text={"Available Balance"} /></p>
                 {loading ? (
                   <div className="py-2 flex items-center gap-2">
                     <Loader2 className="w-5 h-5 animate-spin text-slate-300" />
-                    <span className="text-sm text-slate-300">Loading...</span>
+                    <span className="text-sm text-slate-300"><UiText text={"Loading..."} /></span>
                   </div>
                 ) : (
                   <h2 className="text-4xl font-extrabold tracking-tight">
                     {balanceVisible ? formatNaira(balance) : '₦ ••••••'}
                   </h2>
                 )}
-                <p className="text-[11px] text-slate-400 mt-1">{virtualAccount.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3')} · Wema Bank</p>
+                <p className="text-[11px] text-slate-400 mt-1">{virtualAccount.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3')} {" "}<UiText text={"· Wema Bank"} /></p>
 
                 <div className="mt-4 grid grid-cols-2 gap-2 text-center">
                   <div className="rounded-2xl bg-white/15 py-2 px-3">
-                    <p className="text-[11px] text-slate-300 uppercase tracking-wide">Total In</p>
+                    <p className="text-[11px] text-slate-300 uppercase tracking-wide"><UiText text={"Total In"} /></p>
                     <p className="text-sm font-bold">{balanceVisible ? formatNaira(totalIn) : '••••'}</p>
                   </div>
                   <div className="rounded-2xl bg-white/15 py-2 px-3">
-                    <p className="text-[11px] text-slate-300 uppercase tracking-wide">Withdrawn</p>
+                    <p className="text-[11px] text-slate-300 uppercase tracking-wide"><UiText text={"Withdrawn"} /></p>
                     <p className="text-sm font-bold">{balanceVisible ? formatNaira(totalOut) : '••••'}</p>
                   </div>
                 </div>
@@ -1076,13 +1070,13 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
 
             {error && !showBankModal && (
               <div className="rounded-2xl px-4 py-3 text-sm bg-red-50 text-red-700 border border-red-200">
-                {error}
+                <UiValue value={error} />
               </div>
             )}
 
             {fundSuccess && !showBankModal && (
               <div className="rounded-2xl px-4 py-3 text-sm bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
-                {fundSuccess}
+                <UiValue value={fundSuccess} />
               </div>
             )}
 
@@ -1095,7 +1089,7 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
                 <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center">
                   <ArrowDownLeft className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Add Money</span>
+                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300"><UiText text={"Add Money"} /></span>
               </button>
               <button
                 onClick={() => setShowWithdraw(true)}
@@ -1104,21 +1098,21 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
                 <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
                   <ArrowUpRight className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <span className="text-xs font-semibold text-foreground">Withdraw</span>
+                <span className="text-xs font-semibold text-foreground"><UiText text={"Withdraw"} /></span>
               </button>
             </section>
 
             {lastLoaded && (
-              <p className="text-[11px] text-muted-foreground text-center">Last updated {new Date(lastLoaded).toLocaleString()}</p>
+              <p className="text-[11px] text-muted-foreground text-center"><UiText text={"Last updated"} />{" "}{new Date(lastLoaded).toLocaleString()}</p>
             )}
 
             {/* ── Transaction history ── */}
             <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold">Transaction History</h3>
+                <h3 className="font-semibold"><UiText text={"Transaction History"} /></h3>
                 {transactions.length > 5 && (
                   <button onClick={() => setShowAllTx(v => !v)} className="text-xs font-semibold text-primary hover:underline">
-                    {showAllTx ? 'Show less' : `See all (${transactions.length})`}
+                    <UiValue value={showAllTx ? 'Show less' : `See all (${transactions.length})`} />
                   </button>
                 )}
               </div>
@@ -1126,8 +1120,8 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
               {transactions.length === 0 ? (
                 <div className="rounded-xl bg-muted/50 border border-border p-4 text-sm text-muted-foreground text-center">
                   <Wallet className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                  <p>No wallet activity yet.</p>
-                  <p className="text-xs mt-1">Fund your wallet or receive escrow settlements to get started.</p>
+                  <p><UiText text={"No wallet activity yet."} /></p>
+                  <p className="text-xs mt-1"><UiText text={"Fund your wallet or receive escrow settlements to get started."} /></p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -1164,7 +1158,7 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
                           {txIcon}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{label}</p>
+                          <p className="text-sm font-medium truncate"><UiValue value={label} /></p>
                           <p className="text-xs text-muted-foreground">
                             {txDate ? txDate.toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
                             {tx.order_id ? ` · #${String(tx.order_id).slice(0, 8).toUpperCase()}` : ''}

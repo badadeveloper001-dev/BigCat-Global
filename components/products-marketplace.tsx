@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { distanceForSort } from '@/lib/discovery-utils'
 import { useState, useEffect } from 'react'
@@ -264,25 +266,25 @@ export function ProductsMarketplace({
         <header className="sticky top-0 z-50 bg-card border-b border-border px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
-              <button
+              <UiAttributes><button
                 onClick={onBack}
                 className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Go back"
               >
                 <ArrowLeft className="w-5 h-5" />
-              </button>
+              </button></UiAttributes>
               <BrandWordmark compact />
             </div>
             <div className="flex items-center gap-2">
-              <h1 className="font-semibold text-foreground">Products</h1>
-              <button
+              <h1 className="font-semibold text-foreground"><UiText text={"Products"} /></h1>
+              <UiAttributes><button
                 onClick={() => onOpenCart?.()}
                 className="relative flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-2 text-foreground hover:bg-secondary/80 transition-colors"
                 aria-label="Open cart"
               >
                 <ShoppingCart className="w-4 h-4" />
                 <span className="text-sm font-semibold">{cartCount}</span>
-              </button>
+              </button></UiAttributes>
             </div>
           </div>
         </header>
@@ -293,13 +295,13 @@ export function ProductsMarketplace({
         <div className="flex gap-3">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-            <input
+            <UiAttributes><input
               type="text"
               placeholder="Search products or SME/Merchants..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
-            />
+            /></UiAttributes>
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
@@ -310,7 +312,7 @@ export function ProductsMarketplace({
             }`}
           >
             <Filter className="w-4 h-4" />
-            <span className="text-sm font-medium">Filters</span>
+            <span className="text-sm font-medium"><UiText text={"Filters"} /></span>
           </button>
         </div>
 
@@ -319,7 +321,7 @@ export function ProductsMarketplace({
           <div className="flex items-center gap-2 mt-3 flex-wrap">
             {searchQuery && (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm">
-                <span>Search: {searchQuery}</span>
+                <span><UiText text={"Search:"} />{" "}{searchQuery}</span>
                 <button
                   onClick={() => setSearchQuery('')}
                   className="hover:bg-primary/20 rounded p-0.5 transition-colors"
@@ -344,8 +346,7 @@ export function ProductsMarketplace({
                 onClick={handleClearFilters}
                 className="text-xs text-muted-foreground hover:text-foreground transition-colors underline"
               >
-                Clear all
-              </button>
+                <UiText text={"Clear all"} />{" "}</button>
             )}
           </div>
         )}
@@ -355,7 +356,7 @@ export function ProductsMarketplace({
       {showFilters && (
         <div className="px-4 pb-4 border-b border-border">
           <div className="bg-card border border-border rounded-lg p-4">
-            <h3 className="font-semibold text-foreground mb-4">Filter by Category</h3>
+            <h3 className="font-semibold text-foreground mb-4"><UiText text={"Filter by Category"} /></h3>
             <div className="space-y-2 max-h-80 overflow-y-auto">
               {CATEGORIES.map((category) => (
                 <label key={category} className="flex items-center gap-3 cursor-pointer group">
@@ -368,7 +369,7 @@ export function ProductsMarketplace({
                     className="w-4 h-4"
                   />
                   <span className="text-sm text-foreground group-hover:text-primary transition-colors">
-                    {category}
+                    <UiValue value={category} />
                   </span>
                 </label>
               ))}
@@ -382,41 +383,40 @@ export function ProductsMarketplace({
                   className="w-4 h-4"
                 />
                 <span className="text-sm text-foreground group-hover:text-primary transition-colors">
-                  All Categories
-                </span>
+                  <UiText text={"All Categories"} />{" "}</span>
               </label>
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Max price (NGN)</label>
-                <input
+                <label className="block text-xs text-muted-foreground mb-1"><UiText text={"Max price (NGN)"} /></label>
+                <UiAttributes><input
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
                   placeholder="e.g. 50000"
                   className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground"
-                />
+                /></UiAttributes>
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Max distance (km)</label>
-                <input
+                <label className="block text-xs text-muted-foreground mb-1"><UiText text={"Max distance (km)"} /></label>
+                <UiAttributes><input
                   value={distanceLimit}
                   onChange={(e) => setDistanceLimit(e.target.value)}
                   placeholder="e.g. 25"
                   className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground"
-                />
+                /></UiAttributes>
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground mb-1">Sort</label>
+                <label className="block text-xs text-muted-foreground mb-1"><UiText text={"Sort"} /></label>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
                   className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground"
                 >
-                  <option value="relevance">Relevance</option>
-                  <option value="nearest">Nearest</option>
-                  <option value="priceAsc">Price: Low to High</option>
-                  <option value="priceDesc">Price: High to Low</option>
+                  <option value="relevance"><UiText text={"Relevance"} /></option>
+                  <option value="nearest"><UiText text={"Nearest"} /></option>
+                  <option value="priceAsc"><UiText text={"Price: Low to High"} /></option>
+                  <option value="priceDesc"><UiText text={"Price: High to Low"} /></option>
                 </select>
               </div>
             </div>
@@ -428,27 +428,26 @@ export function ProductsMarketplace({
       <div className="px-4 space-y-3">
         {(isOffline || loadError) && (
           <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            <p>{isOffline ? 'You are offline. Showing cached results where available.' : loadError}</p>
+            <p><UiValue value={isOffline ? 'You are offline. Showing cached results where available.' : loadError} /></p>
             <button onClick={loadProducts} className="mt-2 rounded-lg border border-amber-400 px-3 py-1 text-xs font-medium hover:bg-amber-100">
-              Retry
-            </button>
+              <UiText text={"Retry"} />{" "}</button>
           </div>
         )}
         {(buyerLocationLabel || locationStatus === 'detecting' || locationStatus === 'denied') && (
           <div className={`rounded-xl border px-4 py-3 text-sm ${locationStatus === 'ready' || locationStatus === 'fallback' ? 'border-primary/20 bg-primary/5 text-foreground' : 'border-border bg-card text-muted-foreground'}`}>
-            {locationStatus === 'detecting'
+            <UiValue value={locationStatus === 'detecting'
               ? 'Detecting your live location to show the nearest merchants...'
               : locationStatus === 'fallback' && buyerLocationLabel
                 ? `Using your saved location (${buyerLocationLabel}). Allow live location for more accurate nearby results.`
               : buyerLocationLabel
                 ? `Showing merchants closest to ${buyerLocationLabel}.`
-                : 'Allow location access to see merchants nearest to you.'}
+                : 'Allow location access to see merchants nearest to you.'} />
           </div>
         )}
         <p className="text-sm text-muted-foreground">
-          {loading
+          <UiValue value={loading
             ? 'Loading products...'
-            : `${filteredProducts.length} product${filteredProducts.length !== 1 ? 's' : ''} found`}
+            : `${filteredProducts.length} product${filteredProducts.length !== 1 ? 's' : ''} found`} />
         </p>
         <button
           onClick={() => onOpenCart?.()}
@@ -459,8 +458,8 @@ export function ProductsMarketplace({
               <ShoppingCart className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground">Cart</p>
-              <p className="text-xs text-muted-foreground">{cartCount} item{cartCount !== 1 ? 's' : ''} in cart</p>
+              <p className="text-sm font-semibold text-foreground"><UiText text={"Cart"} /></p>
+              <p className="text-xs text-muted-foreground">{cartCount} {" "}<UiText text={"item"} />{cartCount !== 1 ? 's' : ''} {" "}<UiText text={"in cart"} /></p>
             </div>
           </div>
           <p className="text-sm font-bold text-primary">{formatNaira(cartTotal)}</p>
@@ -504,8 +503,7 @@ export function ProductsMarketplace({
             disabled={currentPage === 1}
             className="px-4 py-2 border border-border rounded-lg text-sm font-medium text-foreground hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Previous
-          </button>
+            <UiText text={"Previous"} />{" "}</button>
           
           <div className="flex items-center gap-1">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
@@ -541,16 +539,14 @@ export function ProductsMarketplace({
             disabled={currentPage === totalPages}
             className="px-4 py-2 border border-border rounded-lg text-sm font-medium text-foreground hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Next
-          </button>
+            <UiText text={"Next"} />{" "}</button>
         </div>
       )}
 
       {/* Results info */}
       {!loading && filteredProducts.length > 0 && (
         <div className="px-4 pb-4 text-center text-sm text-muted-foreground">
-          Showing {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, filteredProducts.length)} of {filteredProducts.length} products
-        </div>
+          <UiText text={"Showing"} />{" "}{startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, filteredProducts.length)} {" "}<UiText text={"of"} />{" "}{filteredProducts.length} {" "}<UiText text={"products"} />{" "}</div>
       )}
 
       {addedProduct && (
@@ -559,7 +555,7 @@ export function ProductsMarketplace({
             <div className="flex items-start gap-3">
               <div className="w-16 h-16 rounded-xl bg-secondary overflow-hidden flex-shrink-0">
                 {addedProduct.image ? (
-                  <img src={addedProduct.image} alt={addedProduct.name} width={64} height={64} className="w-full h-full object-cover" />
+                  <UiAttributes><img src={addedProduct.image} alt={addedProduct.name} width={64} height={64} className="w-full h-full object-cover" /></UiAttributes>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground px-2 text-center">
                     {addedProduct.category}
@@ -569,7 +565,7 @@ export function ProductsMarketplace({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <CheckCircle2 className="w-5 h-5 text-green-600" />
-                  <p className="font-semibold text-foreground">Added to cart</p>
+                  <p className="font-semibold text-foreground"><UiText text={"Added to cart"} /></p>
                 </div>
                 <p className="text-sm font-medium text-foreground line-clamp-2">{addedProduct.name}</p>
                 <p className="text-xs text-muted-foreground mt-1">{addedProduct.merchant.business_name}</p>
@@ -588,14 +584,12 @@ export function ProductsMarketplace({
                 }}
                 className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
               >
-                Proceed to Checkout
-              </button>
+                <UiText text={"Proceed to Checkout"} />{" "}</button>
               <button
                 onClick={() => setAddedProduct(null)}
                 className="w-full rounded-xl bg-secondary py-3 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
               >
-                Continue Shopping
-              </button>
+                <UiText text={"Continue Shopping"} />{" "}</button>
             </div>
           </div>
         </div>

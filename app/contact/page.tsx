@@ -1,6 +1,9 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useRef } from 'react'
+import { LocalizedText } from '@/components/localized-text'
 import Link from 'next/link'
 import { Mail, Phone, Clock, MessageSquare, Send, CheckCircle } from 'lucide-react'
 
@@ -51,8 +54,8 @@ export default function ContactPage() {
               <MessageSquare className="w-6 h-6 text-white" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold mb-2">Contact Us</h1>
-          <p className="text-white/80 text-sm">We&rsquo;re here to help. Reach out and we&rsquo;ll get back to you as soon as possible.</p>
+          <h1 className="text-2xl font-bold mb-2"><UiText text={"Contact Us"} /></h1>
+          <p className="text-white/80 text-sm"><UiText text={"We&rsquo;re here to help. Reach out and we&rsquo;ll get back to you as soon as possible."} /></p>
         </div>
       </div>
 
@@ -66,9 +69,9 @@ export default function ContactPage() {
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-2">
               <Mail className="w-5 h-5 text-primary" />
             </div>
-            <p className="text-sm font-semibold text-foreground">Email</p>
-            <p className="text-xs text-muted-foreground mt-0.5">support@bigcat.ng</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Reply within 24h</p>
+            <p className="text-sm font-semibold text-foreground"><UiText text={"Email"} /></p>
+            <p className="text-xs text-muted-foreground mt-0.5"><UiText text={"support@bigcat.ng"} /></p>
+            <p className="text-xs text-muted-foreground mt-0.5"><UiText text={"Reply within 24h"} /></p>
           </a>
 
           <a
@@ -80,96 +83,95 @@ export default function ContactPage() {
             <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center mb-2">
               <Phone className="w-5 h-5 text-green-500" />
             </div>
-            <p className="text-sm font-semibold text-foreground">WhatsApp</p>
+            <p className="text-sm font-semibold text-foreground"><UiText text={"WhatsApp"} /></p>
             <p className="text-xs text-muted-foreground mt-0.5">+234 800 000 0000</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Mon–Sat, 8am–8pm</p>
+            <p className="text-xs text-muted-foreground mt-0.5"><UiText text={"Mon–Sat, 8am–8pm"} /></p>
           </a>
 
           <div className="bg-card border border-border rounded-2xl p-4 flex flex-col items-center text-center">
             <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center mb-2">
               <Clock className="w-5 h-5 text-orange-500" />
             </div>
-            <p className="text-sm font-semibold text-foreground">Support Hours</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Mon – Sat</p>
-            <p className="text-xs text-muted-foreground mt-0.5">8:00am – 8:00pm WAT</p>
+            <p className="text-sm font-semibold text-foreground"><UiText text={"Support Hours"} /></p>
+            <p className="text-xs text-muted-foreground mt-0.5"><UiText text={"Mon – Sat"} /></p>
+            <p className="text-xs text-muted-foreground mt-0.5"><UiText text={"8:00am – 8:00pm WAT"} /></p>
           </div>
         </div>
 
         {/* Contact form */}
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <div className="p-4 border-b border-border bg-secondary/30">
-            <h2 className="font-semibold text-foreground text-sm">Send Us a Message</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">Pilot feedback is saved here when signed in. Other support topics open your email app.</p>
+            <h2 className="font-semibold text-foreground text-sm"><UiText text={"Send Us a Message"} /></h2>
+            <p className="text-xs text-muted-foreground mt-0.5"><UiText text={"Pilot feedback is saved here when signed in. Other support topics open your email app."} /></p>
           </div>
           {submitted ? (
             <div className="p-8 flex flex-col items-center text-center gap-3">
               <CheckCircle className="w-10 h-10 text-green-500" />
-              <p className="font-semibold text-foreground">{reference ? 'Feedback saved: ' + reference : 'Your email app should have opened!'}</p>
-              <p className="text-sm text-muted-foreground">{reference ? "Keep this reference for follow-up. For urgent help, " : "If it did not open, "} email us directly at <a href="mailto:support@bigcat.ng" className="text-primary underline">support@bigcat.ng</a></p>
+              <p className="font-semibold text-foreground"><UiValue value={reference ? 'Feedback saved: ' + reference : 'Your email app should have opened!'} /></p>
+              <p className="text-sm text-muted-foreground"><UiValue value={reference ? "Keep this reference for follow-up. For urgent help, " : "If it did not open, "} /> {" "}<UiText text={"email us directly at"} />{" "}<a href="mailto:support@bigcat.ng" className="text-primary underline"><UiText text={"support@bigcat.ng"} /></a></p>
               <button
                 onClick={() => setSubmitted(false)}
                 className="mt-2 text-sm text-primary underline"
               >
-                Send another message
-              </button>
+                <UiText text={"Send another message"} />{" "}</button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="p-4 space-y-4">
-              {feedbackError && <p role="alert" className="text-sm text-destructive">{feedbackError}</p>}
+              {feedbackError && <p role="alert" className="text-sm text-destructive"><UiValue value={feedbackError} /></p>}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-foreground mb-1">Your Name</label>
-                  <input
+                  <label className="block text-xs font-medium text-foreground mb-1"><UiText text={"Your Name"} /></label>
+                  <UiAttributes><input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Amaka Obi"
                     className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
-                  />
+                  /></UiAttributes>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-foreground mb-1">Email Address</label>
-                  <input
+                  <label className="block text-xs font-medium text-foreground mb-1"><UiText text={"Email Address"} /></label>
+                  <UiAttributes><input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
-                  />
+                  /></UiAttributes>
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-foreground mb-1">Subject</label>
+                <label className="block text-xs font-medium text-foreground mb-1"><UiText text={"Subject"} /></label>
                 <select
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground outline-none focus:border-primary transition-colors"
                 >
-                  <option value="">Select a topic…</option>
-                  <option value="Order Issue">Order Issue</option>
-                  <option value="Payment or Refund">Payment or Refund</option>
-                  <option value="Merchant Verification">Merchant Verification</option>
-                  <option value="Account Access">Account Access</option>
-                  <option value="Dispute Resolution">Dispute Resolution</option>
-                  <option value="Report a User">Report a User</option>
-                  <option value="bug">Pilot: Bug / 错误</option>
-                  <option value="confusion">Pilot: Confusion / 使用困惑</option>
-                  <option value="suggestion">Pilot: Suggestion / 建议</option>
-                  <option value="Other">Other</option>
+                  <option value=""><UiText text={"Select a topic…"} /></option>
+                  <option value="Order Issue"><UiText text={"Order Issue"} /></option>
+                  <option value="Payment or Refund"><UiText text={"Payment or Refund"} /></option>
+                  <option value="Merchant Verification"><UiText text={"Merchant Verification"} /></option>
+                  <option value="Account Access"><UiText text={"Account Access"} /></option>
+                  <option value="Dispute Resolution"><UiText text={"Dispute Resolution"} /></option>
+                  <option value="Report a User"><UiText text={"Report a User"} /></option>
+                  <option value="bug"><LocalizedText en="Pilot: Bug" zh="试点：错误" /></option>
+                  <option value="confusion"><LocalizedText en="Pilot: Confusion" zh="试点：使用困惑" /></option>
+                  <option value="suggestion"><LocalizedText en="Pilot: Suggestion" zh="试点：建议" /></option>
+                  <option value="Other"><UiText text={"Other"} /></option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-foreground mb-1">Message</label>
-                <textarea
+                <label className="block text-xs font-medium text-foreground mb-1"><UiText text={"Message"} /></label>
+                <UiAttributes><textarea
                   required
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Describe your issue in detail. Include your order number or username if relevant."
                   rows={5}
                   className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-colors resize-none"
-                />
+                /></UiAttributes>
               </div>
               <button
                 type="submit"
@@ -177,20 +179,20 @@ export default function ContactPage() {
                 className="w-full flex items-center justify-center gap-2 bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary/90 transition-colors text-sm"
               >
                 <Send className="w-4 h-4" />
-                {saving ? 'Saving…' : 'Send Message'}
+                <UiValue value={saving ? 'Saving…' : 'Send Message'} />
               </button>
             </form>
           )}
         </div>
 
         <div className="text-center text-xs text-muted-foreground pb-6 flex items-center justify-center gap-4 flex-wrap">
-          <Link href="/" className="hover:text-foreground transition-colors">← Back to BigCat</Link>
+          <Link href="/" className="hover:text-foreground transition-colors"><UiText text={"← Back to BigCat"} /></Link>
           <span>·</span>
-          <Link href="/help" className="hover:text-foreground transition-colors">Help Center</Link>
+          <Link href="/help" className="hover:text-foreground transition-colors"><UiText text={"Help Center"} /></Link>
           <span>·</span>
-          <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
+          <Link href="/terms" className="hover:text-foreground transition-colors"><UiText text={"Terms of Service"} /></Link>
           <span>·</span>
-          <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+          <Link href="/privacy" className="hover:text-foreground transition-colors"><UiText text={"Privacy Policy"} /></Link>
         </div>
       </div>
     </div>

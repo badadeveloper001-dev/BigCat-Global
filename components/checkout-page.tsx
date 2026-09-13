@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { track } from "@vercel/analytics"
 import { useState, useEffect } from "react"
@@ -641,14 +643,13 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
         <Package className="w-16 h-16 text-muted-foreground mb-4" />
-        <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-        <p className="text-muted-foreground mb-4">Add some products to checkout</p>
+        <h2 className="text-xl font-semibold mb-2"><UiText text={"Your cart is empty"} /></h2>
+        <p className="text-muted-foreground mb-4"><UiText text={"Add some products to checkout"} /></p>
         <button
           onClick={onBack}
           className="px-6 py-2 bg-primary text-primary-foreground rounded-lg"
         >
-          Continue Shopping
-        </button>
+          <UiText text={"Continue Shopping"} />{" "}</button>
       </div>
     )
   }
@@ -664,32 +665,32 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="font-semibold text-foreground">Checkout</h1>
+          <h1 className="font-semibold text-foreground"><UiText text={"Checkout"} /></h1>
         </div>
       </header>
 
       <main className="flex-1 overflow-auto pb-32">
         {/* Order/Service Booking Summary */}
         <section className="p-4 border-b border-border">
-          <h2 className="font-semibold text-foreground mb-3">{isServiceBillCheckout ? 'Service Bill' : serviceBooking ? 'Service Booking' : 'Order Summary'}</h2>
+          <h2 className="font-semibold text-foreground mb-3"><UiValue value={isServiceBillCheckout ? 'Service Bill' : serviceBooking ? 'Service Booking' : 'Order Summary'} /></h2>
           <div className="space-y-3">
             {isServiceCheckout ? (
               <>
                 <div className="flex justify-between items-center p-3 bg-primary/5 rounded-lg">
                   <div className="flex-1">
                     <p className="font-medium text-foreground">{isServiceBillCheckout ? (serviceBillPayment.scopeSummary || 'Service bill') : serviceBooking.serviceTitle}</p>
-                    <p className="text-sm text-muted-foreground">{isServiceBillCheckout ? (serviceBillPayment.merchantName || 'Merchant') : serviceBooking.merchantName}</p>
+                    <p className="text-sm text-muted-foreground"><UiValue value={isServiceBillCheckout ? (serviceBillPayment.merchantName || 'Merchant') : serviceBooking.merchantName} /></p>
                   </div>
                   <p className="font-medium text-foreground">{formatCheckoutAmount(serviceTotal)}</p>
                 </div>
                 {isServiceBillCheckout && serviceBillPayment.timeline && (
                   <div className="text-sm text-muted-foreground">
-                    <p>Timeline: {serviceBillPayment.timeline}</p>
+                    <p><UiText text={"Timeline:"} />{" "}{serviceBillPayment.timeline}</p>
                   </div>
                 )}
                 {!isServiceBillCheckout && serviceBooking.scheduledAt && (
                   <div className="text-sm text-muted-foreground">
-                    <p>Scheduled: {new Date(serviceBooking.scheduledAt).toLocaleString()}</p>
+                    <p><UiText text={"Scheduled:"} />{" "}{new Date(serviceBooking.scheduledAt).toLocaleString()}</p>
                   </div>
                 )}
               </>
@@ -698,7 +699,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                 <div key={item.productId} className="flex justify-between items-center">
                   <div className="flex-1">
                     <p className="font-medium text-foreground">{item.name}</p>
-                    <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                    <p className="text-sm text-muted-foreground"><UiText text={"Qty:"} />{" "}{item.quantity}</p>
                   </div>
                   <p className="font-medium text-foreground">
                     {formatCheckoutAmount(item.price * item.quantity)}
@@ -712,7 +713,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
         {/* Delivery Options - Only for products */}
         {!isServiceCheckout && (
         <section className="p-4 border-b border-border space-y-4">
-          <h2 className="font-semibold text-foreground">Delivery Options</h2>
+          <h2 className="font-semibold text-foreground"><UiText text={"Delivery Options"} /></h2>
 
           <div className="grid gap-3">
             <button
@@ -727,8 +728,8 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                 <Truck className={`w-5 h-5 ${fulfillmentMethod === 'doorstep' ? 'text-primary' : 'text-muted-foreground'}`} />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium text-foreground">Doorstep Delivery</p>
-                <p className="text-sm text-muted-foreground">Get your order delivered to your address</p>
+                <p className="font-medium text-foreground"><UiText text={"Doorstep Delivery"} /></p>
+                <p className="text-sm text-muted-foreground"><UiText text={"Get your order delivered to your address"} /></p>
               </div>
               {fulfillmentMethod === 'doorstep' && <CheckCircle2 className="w-5 h-5 text-primary" />}
             </button>
@@ -745,8 +746,8 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                 <MapPin className={`w-5 h-5 ${fulfillmentMethod === 'pickup' ? 'text-primary' : 'text-muted-foreground'}`} />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium text-foreground">Pickup at Drop-off Point</p>
-                <p className="text-sm text-muted-foreground">Collect your order from a nearby drop-off point</p>
+                <p className="font-medium text-foreground"><UiText text={"Pickup at Drop-off Point"} /></p>
+                <p className="text-sm text-muted-foreground"><UiText text={"Collect your order from a nearby drop-off point"} /></p>
               </div>
               {fulfillmentMethod === 'pickup' && <CheckCircle2 className="w-5 h-5 text-primary" />}
             </button>
@@ -766,8 +767,8 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                   <Truck className={`w-5 h-5 ${deliveryType === 'normal' ? 'text-primary' : 'text-muted-foreground'}`} />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="font-medium text-foreground">Normal Delivery</p>
-                  <p className="text-sm text-muted-foreground">3-5 business days</p>
+                  <p className="font-medium text-foreground"><UiText text={"Normal Delivery"} /></p>
+                  <p className="text-sm text-muted-foreground"><UiText text={"3-5 business days"} /></p>
                 </div>
                 {deliveryType === 'normal' && <CheckCircle2 className="w-5 h-5 text-primary" />}
               </button>
@@ -784,8 +785,8 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                   <Zap className={`w-5 h-5 ${deliveryType === 'express' ? 'text-primary' : 'text-muted-foreground'}`} />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="font-medium text-foreground">Express Delivery</p>
-                  <p className="text-sm text-muted-foreground">1-2 business days</p>
+                  <p className="font-medium text-foreground"><UiText text={"Express Delivery"} /></p>
+                  <p className="text-sm text-muted-foreground"><UiText text={"1-2 business days"} /></p>
                 </div>
                 {deliveryType === 'express' && <CheckCircle2 className="w-5 h-5 text-primary" />}
               </button>
@@ -797,26 +798,26 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
         {/* Service Address - Only for services */}
         {isServiceCheckout && (
         <section className="p-4 border-b border-border">
-          <h2 className="font-semibold text-foreground mb-3">Service Details</h2>
+          <h2 className="font-semibold text-foreground mb-3"><UiText text={"Service Details"} /></h2>
           <div className="space-y-3">
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Service Address</p>
-              <textarea
+              <p className="text-sm text-muted-foreground mb-1"><UiText text={"Service Address"} /></p>
+              <UiAttributes><textarea
                 value={deliveryAddress}
                 onChange={(e) => setDeliveryAddress(e.target.value)}
                 placeholder="Enter your service address"
                 className="w-full rounded-xl border border-border bg-muted px-3 py-2 text-sm text-foreground min-h-20"
-              />
+              /></UiAttributes>
             </div>
             {!isServiceBillCheckout && serviceBooking?.scheduledAt && (
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Scheduled Date & Time</p>
+                <p className="text-sm text-muted-foreground mb-1"><UiText text={"Scheduled Date & Time"} /></p>
                 <p className="font-medium text-foreground">{new Date(serviceBooking.scheduledAt).toLocaleString()}</p>
               </div>
             )}
             {(isServiceBillCheckout ? serviceBillPayment?.notes : serviceBooking?.buyerNote) && (
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Notes</p>
+                <p className="text-sm text-muted-foreground mb-1"><UiText text={"Notes"} /></p>
                 <p className="font-medium text-foreground">{isServiceBillCheckout ? serviceBillPayment.notes : serviceBooking.buyerNote}</p>
               </div>
             )}
@@ -828,11 +829,11 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
         {!isServiceCheckout && (
         <section className="p-4 border-b border-border">
           <h2 className="font-semibold text-foreground mb-3">
-            {fulfillmentMethod === 'pickup' ? 'Preferred Drop-off Point' : 'Delivery Address'}
+            <UiValue value={fulfillmentMethod === 'pickup' ? 'Preferred Drop-off Point' : 'Delivery Address'} />
           </h2>
           <div className="relative">
             <MapPin className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
-            <textarea
+            <UiAttributes><textarea
               value={deliveryAddress}
               onChange={(e) => setDeliveryAddress(e.target.value)}
               placeholder={
@@ -841,11 +842,11 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                   : 'Enter your full delivery address...'
               }
               className="w-full pl-10 pr-4 py-3 bg-muted rounded-xl text-foreground placeholder:text-muted-foreground resize-none h-24"
-            />
+            /></UiAttributes>
           </div>
           {savedLocation && (
             <p className="mt-2 text-xs text-muted-foreground">
-              Prefilled from your account location: {savedLocation}
+              <UiText text={"Prefilled from your account location:"} />{" "}{savedLocation}
             </p>
           )}
           {savedAddresses.length > 0 && (
@@ -856,7 +857,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                   onClick={() => setDeliveryAddress(entry.address)}
                   className="rounded-full border border-border px-3 py-1 text-xs text-foreground hover:bg-secondary"
                 >
-                  {entry.label}
+                  <UiValue value={entry.label} />
                 </button>
               ))}
             </div>
@@ -866,17 +867,16 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
             disabled={!deliveryAddress.trim()}
             className="mt-3 rounded-lg border border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-secondary disabled:opacity-50"
           >
-            Save this address
-          </button>
+            <UiText text={"Save this address"} />{" "}</button>
         </section>
         )}
 
         {/* Pricing Summary */}
         <section className="p-4 border-b border-border space-y-4">
-          <p className="text-sm text-muted-foreground" role="note">Displayed totals use your selected currency at a demo rate: USD 1 = NGN 1,600 = CNY 7.20. Order records remain in NGN. 显示金额按演示汇率换算，订单仍以 NGN 记账。 Test pilot / 测试试点: payments and wallet balances are simulated. Do not send real money. 请勿转入真实资金。</p>
+          <p className="text-sm text-muted-foreground" role="note"><UiValue value={preferences.language === 'zh' ? '显示金额按您选择的货币和演示汇率换算：USD 1 = NGN 1,600 = CNY 7.20。订单以 NGN 记账。测试试点的付款和钱包余额均为模拟，请勿转入真实资金。' : 'Displayed totals use your selected currency at a demo rate: USD 1 = NGN 1,600 = CNY 7.20. Order records remain in NGN. Test pilot: payments and wallet balances are simulated. Do not send real money.'} /></p>
           <label className="flex items-start gap-2 text-sm text-muted-foreground">
             <input type="checkbox" checked={pilotAcknowledged} onChange={e => setPilotAcknowledged(e.target.checked)} />
-            <span>I understand this is a simulated transaction with no real payment. 我了解这是一笔模拟交易，不涉及真实付款。 <a href="/pilot" target="_blank" rel="noreferrer" className="underline">Pilot rules</a></span>
+            <span><UiValue value={preferences.language === 'zh' ? '我了解这是一笔模拟交易，不涉及真实付款。' : 'I understand this is a simulated transaction with no real payment.'} /> <a href="/pilot" target="_blank" rel="noreferrer" className="underline"><UiValue value={preferences.language === 'zh' ? '试点规则' : 'Pilot rules'} /></a></span>
           </label>
           <PaymentMethodSelector selectedMethod={paymentMethod} onSelect={setPaymentMethod} />
 
@@ -897,11 +897,10 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
 
         {suspended && (
           <section className="mx-4 rounded-xl border border-red-200 bg-red-50 p-4">
-            <p className="text-sm font-semibold text-red-700">Account Suspended</p>
+            <p className="text-sm font-semibold text-red-700"><UiText text={"Account Suspended"} /></p>
             <p className="text-xs text-red-700 mt-1">
-              Your account has been temporarily suspended for violating platform policies.
-            </p>
-            <p className="text-xs text-red-600 mt-1">Strikes: {strikeCount}</p>
+              <UiText text={"Your account has been temporarily suspended for violating platform policies."} />{" "}</p>
+            <p className="text-xs text-red-600 mt-1"><UiText text={"Strikes:"} />{" "}{strikeCount}</p>
             <button
               onClick={() => {
                 resetSafetyState(user?.userId)
@@ -911,26 +910,25 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
               }}
               className="mt-3 px-3 py-2 rounded-lg border border-red-200 bg-white text-red-700 text-xs font-medium"
             >
-              Reset Strikes (Demo)
-            </button>
+              <UiText text={"Reset Strikes (Demo)"} />{" "}</button>
           </section>
         )}
 
         {/* Price Breakdown */}
         <section className="p-4">
-          <h2 className="font-semibold text-foreground mb-3">Price Details</h2>
+          <h2 className="font-semibold text-foreground mb-3"><UiText text={"Price Details"} /></h2>
           {!isServiceCheckout && (
             <div className="mb-4 rounded-xl border border-border bg-card p-3 space-y-2">
-              <p className="text-xs font-medium text-muted-foreground">Coupon Code</p>
+              <p className="text-xs font-medium text-muted-foreground"><UiText text={"Coupon Code"} /></p>
               {!appliedCoupon ? (
                 <div className="flex gap-2">
-                  <input
+                  <UiAttributes><input
                     type="text"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                     placeholder="Enter coupon"
                     className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                  />
+                  /></UiAttributes>
                   <button
                     type="button"
                     disabled={validatingCoupon || !couponCode.trim() || !user?.userId}
@@ -968,12 +966,12 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                     }}
                     className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
                   >
-                    {validatingCoupon ? 'Checking...' : 'Apply'}
+                    <UiValue value={validatingCoupon ? 'Checking...' : 'Apply'} />
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
-                  <p className="text-sm font-semibold text-emerald-700">{appliedCoupon.code} applied</p>
+                  <p className="text-sm font-semibold text-emerald-700">{appliedCoupon.code} {" "}<UiText text={"applied"} /></p>
                   <button
                     type="button"
                     onClick={() => {
@@ -982,8 +980,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                     }}
                     className="text-xs font-medium text-emerald-700"
                   >
-                    Remove
-                  </button>
+                    <UiText text={"Remove"} />{" "}</button>
                 </div>
               )}
             </div>
@@ -992,52 +989,52 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
             {isServiceCheckout ? (
               <>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Service Amount</span>
+                  <span className="text-muted-foreground"><UiText text={"Service Amount"} /></span>
                   <span className="font-medium text-foreground">{formatCheckoutAmount(serviceTotal)}</span>
                 </div>
                 {gitFeeAmount > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">GIT Fee (1.5%)</span>
+                    <span className="text-muted-foreground"><UiText text={"GIT Fee (1.5%)"} /></span>
                     <span className="font-medium text-foreground">{formatCheckoutAmount(gitFeeAmount)}</span>
                   </div>
                 )}
                 <div className="h-px bg-border my-2" />
                 <div className="flex justify-between">
-                  <span className="font-semibold text-foreground">Total Amount</span>
+                  <span className="font-semibold text-foreground"><UiText text={"Total Amount"} /></span>
                   <span className="font-bold text-primary text-lg">{formatCheckoutAmount(grandTotal)}</span>
                 </div>
               </>
             ) : (
               <>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Product Total</span>
+                  <span className="text-muted-foreground"><UiText text={"Product Total"} /></span>
                   <span className="font-medium text-foreground">{formatCheckoutAmount(productTotal)}</span>
                 </div>
                 {effectivePromotionDiscount > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-emerald-700">Promotion Discount{promotionNames.length ? ` (${promotionNames[0]}${promotionNames.length > 1 ? ' +' + (promotionNames.length - 1) : ''})` : ''}</span>
+                    <span className="text-emerald-700"><UiText text={"Promotion Discount"} />{promotionNames.length ? ` (${promotionNames[0]}${promotionNames.length > 1 ? ' +' + (promotionNames.length - 1) : ''})` : ''}</span>
                     <span className="font-medium text-emerald-700">-{formatCheckoutAmount(effectivePromotionDiscount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">{fulfillmentMethod === 'pickup' ? 'Pickup Fee' : 'Delivery Fee'}</span>
+                  <span className="text-muted-foreground"><UiValue value={fulfillmentMethod === 'pickup' ? 'Pickup Fee' : 'Delivery Fee'} /></span>
                   <span className="font-medium text-foreground">
                     {deliveryAddress.trim() ? formatCheckoutAmount(deliveryFee) : '--'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">GIT Fee (1.5%)</span>
+                  <span className="text-muted-foreground"><UiText text={"GIT Fee (1.5%)"} /></span>
                   <span className="font-medium text-foreground">{formatCheckoutAmount(gitFeeAmount)}</span>
                 </div>
                 {effectiveCouponDiscount > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-emerald-700">Coupon Discount ({appliedCoupon?.code})</span>
+                    <span className="text-emerald-700"><UiText text={"Coupon Discount ("} />{appliedCoupon?.code})</span>
                     <span className="font-medium text-emerald-700">-{formatCheckoutAmount(effectiveCouponDiscount)}</span>
                   </div>
                 )}
                 <div className="h-px bg-border my-2" />
                 <div className="flex justify-between">
-                  <span className="font-semibold text-foreground">Grand Total</span>
+                  <span className="font-semibold text-foreground"><UiText text={"Grand Total"} /></span>
                   <span className="font-bold text-primary text-lg">
                     {deliveryAddress.trim() ? formatCheckoutAmount(grandTotal) : '--'}
                   </span>
@@ -1048,25 +1045,25 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
 
           <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 space-y-1">
             <p className="font-semibold flex items-center gap-2">
-              <span>🛡️ What is the GIT Fee?</span>
+              <span><UiText text={"🛡️ What is the GIT Fee?"} /></span>
             </p>
-            <p>The 1.5% Goods in Transit (GIT) fee covers only goods that are damaged while in transit. It does not cover return delivery, seller misdescription, or other non-transit issues.</p>
+            <p><UiText text={"The 1.5% Goods in Transit (GIT) fee covers only goods that are damaged while in transit. It does not cover return delivery, seller misdescription, or other non-transit issues."} /></p>
           </div>
 
           <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs text-foreground space-y-1">
-            <p className="font-semibold">Why checkout is safe</p>
+            <p className="font-semibold"><UiText text={"Why checkout is safe"} /></p>
             {isServiceCheckout ? (
               <>
-                <p>Pilot simulation only. No real funds are held; service completion is being tested.</p>
-                <p>You can release funds or dispute the service from your bookings.</p>
+                <p><UiText text={"Pilot simulation only. No real funds are held; service completion is being tested."} /></p>
+                <p><UiText text={"You can release funds or dispute the service from your bookings."} /></p>
               </>
             ) : (
               <>
-                <p>Pilot simulation only. No real funds are held; delivery confirmation is being tested.</p>
+                <p><UiText text={"Pilot simulation only. No real funds are held; delivery confirmation is being tested."} /></p>
                 <p>
-                  Expected delivery window: {fulfillmentMethod === 'pickup' ? 'Same day pickup arrangement' : deliveryType === 'express' ? '1-2 business days' : '3-5 business days'}.
+                  <UiText text={"Expected delivery window:"} />{" "}<UiValue value={fulfillmentMethod === 'pickup' ? 'Same day pickup arrangement' : deliveryType === 'express' ? '1-2 business days' : '3-5 business days'} />.
                 </p>
-                <p>Eligible issues can be escalated from your order details for quick resolution.</p>
+                <p><UiText text={"Eligible issues can be escalated from your order details for quick resolution."} /></p>
               </>
             )}
           </div>
@@ -1074,13 +1071,13 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
 
         {error && (
           <div className="mx-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-            <p className="text-sm text-destructive">{error}</p>
+            <p className="text-sm text-destructive"><UiValue value={error} /></p>
           </div>
         )}
 
         {success && (
           <div className="mx-4 mt-3 p-3 bg-[#F3E8FF] border border-[#E8D7FF] rounded-lg">
-            <p className="text-sm text-[#6C2BD9] font-medium">{success}</p>
+            <p className="text-sm text-[#6C2BD9] font-medium"><UiValue value={success} /></p>
           </div>
         )}
       </main>
@@ -1089,7 +1086,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
       <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 space-y-3">
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-sm text-muted-foreground">Total to pay</p>
+            <p className="text-sm text-muted-foreground"><UiText text={"Total to pay"} /></p>
             <p className="text-xl font-bold text-foreground">
               {deliveryAddress.trim() || isServiceCheckout ? formatCheckoutAmount(grandTotal) : '--'}
             </p>
@@ -1104,13 +1101,13 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
             }`}
           >
             <CreditCard className="w-5 h-5" />
-            {isSubmitting
+            <UiValue value={isSubmitting
               ? 'Processing...'
               : isWalletPayment
                 ? 'Pay with Wallet'
                 : paymentMethod === 'bank'
                   ? 'Pay via Transfer'
-                  : 'Pay with Card'}
+                  : 'Pay with Card'} />
           </button>
         </div>
       </div>

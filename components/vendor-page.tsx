@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect } from "react"
 import { useRole } from "@/lib/role-context"
@@ -305,17 +307,17 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
       <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <button
+            <UiAttributes><button
               onClick={onBack}
               className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Go back"
             >
               <ArrowLeft className="w-5 h-5" />
-            </button>
+            </button></UiAttributes>
             <BrandWordmark compact />
           </div>
           <div className="flex items-center gap-1">
-            <button
+            <UiAttributes><button
               onClick={() => onOpenCart?.()}
               className="relative p-2 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Cart"
@@ -326,15 +328,15 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                   {cartCount}
                 </span>
               )}
-            </button>
-            <button
+            </button></UiAttributes>
+            <UiAttributes><button
               onClick={handleShareVendor}
               className="p-2 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Share"
             >
               <Share2 className="w-5 h-5" />
-            </button>
-            <button
+            </button></UiAttributes>
+            <UiAttributes><button
               onClick={() => {
                 setSaved((prev) => !prev)
                 setPolicyNotice(saved ? 'Vendor removed from saved list.' : 'Vendor saved to your favorites.')
@@ -343,7 +345,7 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
               aria-label="Save"
             >
               <Heart className={`w-5 h-5 ${saved ? 'fill-rose-500 text-rose-500' : ''}`} />
-            </button>
+            </button></UiAttributes>
           </div>
         </div>
       </header>
@@ -353,7 +355,7 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
         {policyNotice && (
           <div className="px-4 pt-4">
             <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-              {policyNotice}
+              <UiValue value={policyNotice} />
             </div>
           </div>
         )}
@@ -364,7 +366,7 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
           <div className="flex justify-center mb-5">
             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border ${aiRec.color} text-sm font-medium shadow-sm`}>
               <aiRec.icon className="w-4 h-4" />
-              {aiRec.text}
+              <UiValue value={aiRec.text} />
             </div>
           </div>
 
@@ -374,13 +376,13 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
               {/* Avatar */}
               <div className={`w-20 h-20 rounded-2xl ${vendor.bgColor} flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden`}>
                 {vendorImage ? (
-                  <Image
+                  <UiAttributes><Image
                     src={vendorImage}
                     alt={vendor.name}
                     width={80}
                     height={80}
                     className="w-full h-full object-cover"
-                  />
+                  /></UiAttributes>
                 ) : (
                   <span className={`font-bold text-2xl ${vendor.iconColor}`}>{vendor.initials}</span>
                 )}
@@ -392,8 +394,7 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                   <h1 className="font-bold text-xl text-foreground">{vendor.name}</h1>
                   <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
                     <CheckCircle2 className="w-3 h-3" />
-                    Verified
-                  </div>
+                    <UiText text={"Verified"} />{" "}</div>
                 </div>
                 <p className="text-muted-foreground text-sm mb-3">{vendor.category}</p>
                 
@@ -403,7 +404,7 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                     <div className="flex items-center gap-1.5">
                       <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                       <span className="font-semibold text-foreground">{vendor.rating.toFixed(1)}</span>
-                      <span className="text-muted-foreground text-sm">({vendor.reviews || 0} reviews)</span>
+                      <span className="text-muted-foreground text-sm">({vendor.reviews || 0} {" "}<UiText text={"reviews)"} /></span>
                     </div>
                   )}
                   <div className="flex items-center gap-1.5">
@@ -422,8 +423,7 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 <Globe className="w-4 h-4" />
-                Visit Website
-                <ExternalLink className="w-3.5 h-3.5" />
+                <UiText text={"Visit Website"} />{" "}<ExternalLink className="w-3.5 h-3.5" />
               </a>
               <button
                 onClick={handleToggleFollow}
@@ -441,11 +441,11 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                 ) : (
                   <UserPlus className="w-4 h-4" />
                 )}
-                {isFollowing ? 'Following' : 'Follow'}
+                <UiValue value={isFollowing ? 'Following' : 'Follow'} />
               </button>
               <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                 <Users className="w-3.5 h-3.5" />
-                {followerCount.toLocaleString('en-NG')} follower{followerCount === 1 ? '' : 's'}
+                {followerCount.toLocaleString('en-NG')} {" "}<UiText text={"follower"} />{followerCount === 1 ? '' : 's'}
               </span>
             </div>
 
@@ -456,19 +456,19 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-1">
                     <Shield className="w-5 h-5 text-primary" />
                   </div>
-                  <span className="text-xs text-muted-foreground">Secure</span>
+                  <span className="text-xs text-muted-foreground"><UiText text={"Secure"} /></span>
                 </div>
                 <div className="flex flex-col items-center">
                   <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-1">
                     <Clock className="w-5 h-5 text-green-600" />
                   </div>
-                  <span className="text-xs text-muted-foreground">Fast Reply</span>
+                  <span className="text-xs text-muted-foreground"><UiText text={"Fast Reply"} /></span>
                 </div>
                 <div className="flex flex-col items-center">
                   <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center mb-1">
                     <TrendingUp className="w-5 h-5 text-amber-600" />
                   </div>
-                  <span className="text-xs text-muted-foreground">Trending</span>
+                  <span className="text-xs text-muted-foreground"><UiText text={"Trending"} /></span>
                 </div>
               </div>
             </div>
@@ -477,7 +477,7 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
 
         {/* About Section */}
         <section className="px-4 mb-6">
-          <h2 className="font-semibold text-foreground text-lg mb-3">About</h2>
+          <h2 className="font-semibold text-foreground text-lg mb-3"><UiText text={"About"} /></h2>
           <div className="bg-card border border-border rounded-2xl p-4">
             <p className="text-muted-foreground leading-relaxed">{vendor.description}</p>
           </div>
@@ -494,8 +494,8 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                 <ShoppingCart className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-foreground">Cart</p>
-                <p className="text-xs text-muted-foreground">{cartCount} item{cartCount !== 1 ? 's' : ''} in cart</p>
+                <p className="text-sm font-semibold text-foreground"><UiText text={"Cart"} /></p>
+                <p className="text-xs text-muted-foreground">{cartCount} {" "}<UiText text={"item"} />{cartCount !== 1 ? 's' : ''} {" "}<UiText text={"in cart"} /></p>
               </div>
             </div>
             <p className="text-sm font-bold text-primary">{formatNaira(cartTotal)}</p>
@@ -505,12 +505,12 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
         {/* Products/Services */}
         <section className="px-4 mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-foreground text-lg">Products & Services</h2>
+            <h2 className="font-semibold text-foreground text-lg"><UiText text={"Products & Services"} /></h2>
             <button 
               onClick={onBrowseMore}
               className="text-sm text-primary font-medium flex items-center gap-0.5"
             >
-              See all <ChevronRight className="w-4 h-4" />
+              <UiText text={"See all"} />{" "}<ChevronRight className="w-4 h-4" />
             </button>
           </div>
           
@@ -521,7 +521,7 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
           ) : products.length === 0 ? (
             <div className="p-8 text-center">
               <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">No products yet</p>
+              <p className="text-sm text-muted-foreground"><UiText text={"No products yet"} /></p>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
@@ -533,13 +533,13 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                   <div className="flex gap-4">
                     <div className="w-20 h-20 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {product.images && product.images[0] ? (
-                        <Image
+                        <UiAttributes><Image
                           src={product.images[0]}
                           alt={product.name}
                           width={80}
                           height={80}
                           className="w-full h-full object-cover"
-                        />
+                        /></UiAttributes>
                       ) : (
                         <ImageIcon className="w-8 h-8 text-muted-foreground" />
                       )}
@@ -550,21 +550,21 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                       <p className="text-sm text-muted-foreground mb-2 line-clamp-1">{product.description}</p>
                       
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs text-muted-foreground">Minimum {product.minimum_order_quantity ?? 1} units · Price per unit</span>
+                        <span className="text-xs text-muted-foreground"><UiText text={"Minimum"} />{" "}{product.minimum_order_quantity ?? 1} {" "}<UiText text={"units · Price per unit"} /></span>
                         <span className="font-bold text-foreground">{formatCurrency(product.listing_price ?? product.price, product.listing_currency || 'NGN')}
-                          {(product.listing_currency || 'NGN') !== preferences.currency && <small className="block text-muted-foreground">≈ {formatCurrency(convertCurrency(product.listing_price ?? product.price, product.listing_currency || 'NGN', preferences.currency), preferences.currency)} · Demo rate</small>}
+                          {(product.listing_currency || 'NGN') !== preferences.currency && <small className="block text-muted-foreground">≈ {formatCurrency(convertCurrency(product.listing_price ?? product.price, product.listing_currency || 'NGN', preferences.currency), preferences.currency)} {" "}<UiText text={"· Demo rate"} /></small>}
                         </span>
                       </div>
                       
                       <div className="flex items-center gap-3 text-sm">
                         <span className={`${Number(product.stock || 0) > 0 ? 'text-muted-foreground' : 'text-destructive'}`}>
-                          {Number(product.stock || 0) > 0 ? `${Number(product.stock || 0)} in stock` : 'Out of stock'}
+                          <UiValue value={Number(product.stock || 0) > 0 ? `${Number(product.stock || 0)} in stock` : 'Out of stock'} />
                         </span>
                       </div>
                     </div>
 
                     <div className="flex flex-col items-end gap-2">
-                      <button
+                      <UiAttributes><button
                         onClick={() =>
                           toggleItem({
                             id: String(product.id),
@@ -589,7 +589,7 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                         aria-label={isInWishlist(String(product.id)) ? 'Remove from wishlist' : 'Add to wishlist'}
                       >
                         <Heart className={`w-4 h-4 ${isInWishlist(String(product.id)) ? 'fill-current' : ''}`} />
-                      </button>
+                      </button></UiAttributes>
                       <button
                         onClick={() => handleAddToCart(product)}
                         disabled={Number(product.stock || 0) < Number(product.minimum_order_quantity ?? 1)}
@@ -601,7 +601,7 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                               : "bg-primary text-primary-foreground hover:bg-primary/90"
                         }`}
                       >
-                        {Number(product.stock || 0) < Number(product.minimum_order_quantity ?? 1) ? "Insufficient stock for minimum order" : addedToCart === product.id ? "Added ✓" : "Add to Cart"}
+                        <UiValue value={Number(product.stock || 0) < Number(product.minimum_order_quantity ?? 1) ? "Insufficient stock for minimum order" : addedToCart === product.id ? "Added ✓" : "Add to Cart"} />
                       </button>
                     </div>
                   </div>
@@ -616,7 +616,7 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
       {popupProduct && (
         <div className="fixed inset-0 z-[60] bg-black/40 flex items-end sm:items-center justify-center p-4">
           <div className="w-full max-w-md rounded-2xl border border-border bg-card p-4 shadow-2xl">
-            <p className="font-semibold text-foreground mb-1">Added to cart</p>
+            <p className="font-semibold text-foreground mb-1"><UiText text={"Added to cart"} /></p>
             <p className="text-sm font-medium text-foreground line-clamp-2">{popupProduct.name}</p>
             <p className="text-xs text-muted-foreground mt-1">{vendor.name}</p>
             <p className="text-sm font-bold text-primary mt-2">{formatNaira(parseFloat(popupProduct.price || 0))}</p>
@@ -632,14 +632,12 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
                 }}
                 className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
               >
-                Proceed to Checkout
-              </button>
+                <UiText text={"Proceed to Checkout"} />{" "}</button>
               <button
                 onClick={() => setPopupProduct(null)}
                 className="w-full rounded-xl bg-secondary py-3 text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
               >
-                Continue Shopping
-              </button>
+                <UiText text={"Continue Shopping"} />{" "}</button>
             </div>
           </div>
         </div>
@@ -656,13 +654,11 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
             {chatLoading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Starting...
-              </>
+                <UiText text={"Starting..."} />{" "}</>
             ) : (
               <>
                 <MessageCircle className="w-5 h-5" />
-                Chat Vendor
-              </>
+                <UiText text={"Chat Vendor"} />{" "}</>
             )}
           </button>
           <button 
@@ -670,8 +666,7 @@ export function VendorPage({ vendor, onBack, onChatVendor, onBrowseMore, onViewP
             className="flex-1 flex items-center justify-center gap-2 py-4 px-6 bg-primary text-primary-foreground font-semibold rounded-2xl hover:bg-primary/90 transition-colors shadow-md shadow-primary/20"
           >
             <ShoppingBag className="w-5 h-5" />
-            Browse More
-          </button>
+            <UiText text={"Browse More"} />{" "}</button>
         </div>
       </div>
 

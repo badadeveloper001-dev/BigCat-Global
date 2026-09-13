@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { WEBSITE_THEMES, WEBSITE_LAYOUTS, type WebsiteTheme, type WebsiteLayout } from '@/lib/merchant-website'
 
@@ -19,10 +21,9 @@ export function MerchantThemeLayoutPicker({
     <div className="space-y-8 rounded-lg border border-gray-200 p-6 bg-white">
       {/* Theme Section */}
       <div>
-        <h3 className="font-semibold text-gray-900 mb-1">Store Theme</h3>
+        <h3 className="font-semibold text-gray-900 mb-1"><UiText text={"Store Theme"} /></h3>
         <p className="text-sm text-gray-600 mb-4">
-          Choose a color scheme that reflects your brand. Each theme is optimized for readability and conversion.
-        </p>
+          <UiText text={"Choose a color scheme that reflects your brand. Each theme is optimized for readability and conversion."} />{" "}</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {WEBSITE_THEMES.map((theme) => (
             <button
@@ -36,8 +37,8 @@ export function MerchantThemeLayoutPicker({
             >
               {/* Theme color preview */}
               <div className={`w-full h-12 rounded mb-2 bg-gradient-to-r ${getThemeGradient(theme.id)} shadow-sm`} />
-              <p className="text-xs font-semibold text-gray-900">{theme.label}</p>
-              <p className="text-xs text-gray-600 mt-1">{theme.description}</p>
+              <p className="text-xs font-semibold text-gray-900"><UiValue value={theme.label} /></p>
+              <p className="text-xs text-gray-600 mt-1"><UiValue value={theme.description} /></p>
             </button>
           ))}
         </div>
@@ -45,10 +46,9 @@ export function MerchantThemeLayoutPicker({
 
       {/* Layout Section */}
       <div className="border-t border-gray-200 pt-6">
-        <h3 className="font-semibold text-gray-900 mb-1">Store Layout</h3>
+        <h3 className="font-semibold text-gray-900 mb-1"><UiText text={"Store Layout"} /></h3>
         <p className="text-sm text-gray-600 mb-4">
-          Select how products and content are arranged. Find a layout that matches your store's style.
-        </p>
+          <UiText text={"Select how products and content are arranged. Find a layout that matches your store's style."} />{" "}</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {WEBSITE_LAYOUTS.map((layout) => (
             <button
@@ -64,8 +64,8 @@ export function MerchantThemeLayoutPicker({
               <div className="w-full h-12 rounded mb-2 bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-400">
                 {getLayoutPreviewIcon(layout.id)}
               </div>
-              <p className="text-xs font-semibold text-gray-900">{layout.label}</p>
-              <p className="text-xs text-gray-600 mt-1">{layout.description}</p>
+              <p className="text-xs font-semibold text-gray-900"><UiValue value={layout.label} /></p>
+              <p className="text-xs text-gray-600 mt-1"><UiValue value={layout.description} /></p>
             </button>
           ))}
         </div>
@@ -74,8 +74,7 @@ export function MerchantThemeLayoutPicker({
       {/* Info section */}
       <div className="border-t border-gray-200 pt-6 bg-emerald-50 p-4 rounded-lg">
         <p className="text-sm text-emerald-900">
-          <strong>💡 Pro tip:</strong> Choose a theme that matches your brand colors. Combine with a layout that highlights your best products.
-        </p>
+          <strong><UiText text={"💡 Pro tip:"} /></strong> {" "}<UiText text={"Choose a theme that matches your brand colors. Combine with a layout that highlights your best products."} />{" "}</p>
       </div>
     </div>
   )

@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useRole } from "@/lib/role-context"
 import {
@@ -202,7 +204,7 @@ export function AdminDashboard() {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="font-semibold text-foreground">Admin Dashboard</h1>
+          <h1 className="font-semibold text-foreground"><UiText text={"Admin Dashboard"} /></h1>
           <button 
             onClick={() => setShowNotifications(true)}
             className="relative p-2 -mr-2 text-muted-foreground hover:text-foreground"
@@ -227,8 +229,8 @@ export function AdminDashboard() {
                 <Shield className="w-5 h-5 text-primary-foreground" />
               </div>
               <div>
-                <p className="text-sm text-primary-foreground/80">Administrator</p>
-                <h2 className="font-bold text-primary-foreground">System Overview</h2>
+                <p className="text-sm text-primary-foreground/80"><UiText text={"Administrator"} /></p>
+                <h2 className="font-bold text-primary-foreground"><UiText text={"System Overview"} /></h2>
               </div>
             </div>
           </div>
@@ -254,12 +256,12 @@ export function AdminDashboard() {
                     {stat.change && (
                       <span className="text-xs text-primary flex items-center gap-1">
                         <TrendingUp className="w-3 h-3" />
-                        {stat.change}
+                        <UiValue value={stat.change} />
                       </span>
                     )}
                   </div>
                   <p className="text-xl font-bold text-foreground">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
+                  <p className="text-xs text-muted-foreground"><UiValue value={stat.label} /></p>
                 </div>
               ))}
             </div>
@@ -271,9 +273,8 @@ export function AdminDashboard() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold text-foreground flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-chart-4" />
-              Pending Approvals
-            </h2>
-            <span className="text-xs px-2 py-1 bg-chart-4/20 text-chart-4 rounded-full">{pendingApprovals.length} pending</span>
+              <UiText text={"Pending Approvals"} />{" "}</h2>
+            <span className="text-xs px-2 py-1 bg-chart-4/20 text-chart-4 rounded-full">{pendingApprovals.length} {" "}<UiText text={"pending"} /></span>
           </div>
           {loadingApprovals ? (
             <div className="flex items-center justify-center py-8">
@@ -282,7 +283,7 @@ export function AdminDashboard() {
           ) : pendingApprovals.length === 0 ? (
             <div className="p-8 text-center">
               <CheckCircle className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">No pending approvals</p>
+              <p className="text-sm text-muted-foreground"><UiText text={"No pending approvals"} /></p>
             </div>
           ) : (
             <div className="bg-card border border-border rounded-xl overflow-hidden">
@@ -330,8 +331,8 @@ export function AdminDashboard() {
         {/* Recent Activity */}
         <section className="px-4 mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-foreground">Recent Activity</h2>
-            <button onClick={() => setActiveTab("users")} className="text-sm text-primary">View all</button>
+            <h2 className="font-semibold text-foreground"><UiText text={"Recent Activity"} /></h2>
+            <button onClick={() => setActiveTab("users")} className="text-sm text-primary"><UiText text={"View all"} /></button>
           </div>
           <div className="flex flex-col gap-3">
             {(recentActivity.length > 0 ? recentActivity : defaultRecentActivity).map((activity) => (
@@ -364,7 +365,7 @@ export function AdminDashboard() {
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-foreground">{activity.action}</p>
-                  <p className="text-sm text-muted-foreground">{activity.detail}</p>
+                  <p className="text-sm text-muted-foreground"><UiValue value={activity.detail} /></p>
                 </div>
                 <p className="text-xs text-muted-foreground">{activity.time}</p>
               </div>
@@ -374,7 +375,7 @@ export function AdminDashboard() {
           </>
         ) : activeTab === "users" ? (
           <div className="px-4 py-6">
-            <h2 className="text-xl font-bold text-foreground mb-4">User Management</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4"><UiText text={"User Management"} /></h2>
             {loadingUsers ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
@@ -382,7 +383,7 @@ export function AdminDashboard() {
             ) : users.length === 0 ? (
               <div className="p-8 text-center">
                 <Users className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground">No users found</p>
+                <p className="text-sm text-muted-foreground"><UiText text={"No users found"} /></p>
               </div>
             ) : (
               <div className="bg-card border border-border rounded-xl overflow-hidden">
@@ -416,7 +417,7 @@ export function AdminDashboard() {
           </div>
         ) : activeTab === "merchants" ? (
           <div className="px-4 py-6">
-            <h2 className="text-xl font-bold text-foreground mb-4">Merchant Management</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4"><UiText text={"Merchant Management"} /></h2>
             {loadingMerchants ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
@@ -424,7 +425,7 @@ export function AdminDashboard() {
             ) : allMerchants.length === 0 ? (
               <div className="p-8 text-center">
                 <Store className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground">No merchants found</p>
+                <p className="text-sm text-muted-foreground"><UiText text={"No merchants found"} /></p>
               </div>
             ) : (
               <div className="bg-card border border-border rounded-xl overflow-hidden">
@@ -441,13 +442,13 @@ export function AdminDashboard() {
                       </div>
                       <div>
                         <p className="font-medium text-foreground">{merchant.business_name || merchant.full_name || "Unnamed"}</p>
-                        <p className="text-sm text-muted-foreground">{merchant.business_category || "General"}</p>
+                        <p className="text-sm text-muted-foreground"><UiValue value={merchant.business_category || "General"} /></p>
                       </div>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full ${
                       merchant.setup_completed ? "bg-primary/20 text-primary" : "bg-chart-4/20 text-chart-4"
                     }`}>
-                      {merchant.setup_completed ? "Active" : "Pending"}
+                      <UiValue value={merchant.setup_completed ? "Active" : "Pending"} />
                     </span>
                   </div>
                 ))}
@@ -460,12 +461,12 @@ export function AdminDashboard() {
               <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
                 <Shield className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-xl font-bold text-foreground mb-2">Security Center</h2>
-              <p className="text-sm text-muted-foreground">Monitor platform security</p>
+              <h2 className="text-xl font-bold text-foreground mb-2"><UiText text={"Security Center"} /></h2>
+              <p className="text-sm text-muted-foreground"><UiText text={"Monitor platform security"} /></p>
             </div>
             
             <div className="bg-card border border-border rounded-2xl p-4 mb-4">
-              <h3 className="font-semibold text-foreground mb-4">Security Status</h3>
+              <h3 className="font-semibold text-foreground mb-4"><UiText text={"Security Status"} /></h3>
               <div className="space-y-3">
                 {[
                   { label: "SSL Certificate", status: "Active", ok: true },
@@ -474,10 +475,10 @@ export function AdminDashboard() {
                   { label: "Last Security Scan", status: "Today", ok: true },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                    <span className="text-sm text-muted-foreground">{item.label}</span>
+                    <span className="text-sm text-muted-foreground"><UiValue value={item.label} /></span>
                     <div className="flex items-center gap-2">
                       <CheckCircle className={`w-4 h-4 ${item.ok ? "text-primary" : "text-destructive"}`} />
-                      <span className="text-sm font-medium text-foreground">{item.status}</span>
+                      <span className="text-sm font-medium text-foreground"><UiValue value={item.status} /></span>
                     </div>
                   </div>
                 ))}
@@ -490,12 +491,12 @@ export function AdminDashboard() {
               <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
                 <Settings className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-xl font-bold text-foreground mb-2">Platform Settings</h2>
-              <p className="text-sm text-muted-foreground">Configure system preferences</p>
+              <h2 className="text-xl font-bold text-foreground mb-2"><UiText text={"Platform Settings"} /></h2>
+              <p className="text-sm text-muted-foreground"><UiText text={"Configure system preferences"} /></p>
             </div>
             
             <div className="bg-card border border-border rounded-2xl overflow-hidden mb-4">
-              <h3 className="font-semibold text-foreground p-4 border-b border-border">General</h3>
+              <h3 className="font-semibold text-foreground p-4 border-b border-border"><UiText text={"General"} /></h3>
               <div className="divide-y divide-border">
                 {[
                   { label: "Platform Name", value: "BigCat Global" },
@@ -503,7 +504,7 @@ export function AdminDashboard() {
                   { label: "Currency", value: "NGN (₦)" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center justify-between p-4">
-                    <span className="text-sm text-muted-foreground">{item.label}</span>
+                    <span className="text-sm text-muted-foreground"><UiValue value={item.label} /></span>
                     <span className="text-sm text-foreground">{item.value}</span>
                   </div>
                 ))}
@@ -511,20 +512,20 @@ export function AdminDashboard() {
             </div>
 
             <div className="bg-card border border-border rounded-2xl overflow-hidden">
-              <h3 className="font-semibold text-foreground p-4 border-b border-border">Actions</h3>
+              <h3 className="font-semibold text-foreground p-4 border-b border-border"><UiText text={"Actions"} /></h3>
               <div className="divide-y divide-border">
                 <button
                   onClick={exportPlatformData}
                   className="w-full flex items-center justify-between p-4 hover:bg-secondary/50 transition-colors"
                 >
-                  <span className="text-sm text-muted-foreground">Export Data</span>
-                  <span className="text-sm text-primary">Download</span>
+                  <span className="text-sm text-muted-foreground"><UiText text={"Export Data"} /></span>
+                  <span className="text-sm text-primary"><UiText text={"Download"} /></span>
                 </button>
                 <button 
                   onClick={() => setRole(null)}
                   className="w-full flex items-center justify-between p-4 hover:bg-destructive/10 transition-colors"
                 >
-                  <span className="text-sm text-destructive">Exit Admin Mode</span>
+                  <span className="text-sm text-destructive"><UiText text={"Exit Admin Mode"} /></span>
                   <ArrowLeft className="w-4 h-4 text-destructive" />
                 </button>
               </div>
@@ -551,7 +552,7 @@ export function AdminDashboard() {
               }`}
             >
               <item.icon className="w-5 h-5" />
-              <span className="text-xs">{item.label}</span>
+              <span className="text-xs"><UiValue value={item.label} /></span>
             </button>
           ))}
         </div>

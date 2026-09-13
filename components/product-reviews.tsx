@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect } from "react"
 import { Star, CheckCircle2, Loader2, Send } from "lucide-react"
@@ -125,7 +127,7 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
               {renderStars(Math.round(averageRating), false, "w-5 h-5")}
             </div>
             <p className="text-sm text-muted-foreground mt-1">
-              Based on {totalReviews} {totalReviews === 1 ? "review" : "reviews"}
+              <UiText text={"Based on"} />{" "}{totalReviews} <UiValue value={totalReviews === 1 ? "review" : "reviews"} />
             </p>
           </div>
           
@@ -134,15 +136,13 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
               onClick={() => setShowReviewForm(true)}
               className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
             >
-              Write a Review
-            </button>
+              <UiText text={"Write a Review"} />{" "}</button>
           )}
           
           {hasReviewed && (
             <span className="text-sm text-muted-foreground flex items-center gap-1">
               <CheckCircle2 className="w-4 h-4 text-green-500" />
-              You reviewed this
-            </span>
+              <UiText text={"You reviewed this"} />{" "}</span>
           )}
         </div>
       </div>
@@ -150,22 +150,22 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
       {/* Review Form */}
       {showReviewForm && (
         <form onSubmit={handleSubmitReview} className="bg-card border border-border rounded-xl p-4 space-y-4">
-          <h3 className="font-semibold text-foreground">Review {productName}</h3>
+          <h3 className="font-semibold text-foreground"><UiText text={"Review"} />{" "}{productName}</h3>
           
           <div>
-            <label className="block text-sm text-muted-foreground mb-2">Your Rating</label>
+            <label className="block text-sm text-muted-foreground mb-2"><UiText text={"Your Rating"} /></label>
             {renderStars(newRating, true, "w-8 h-8")}
           </div>
 
           <div>
-            <label className="block text-sm text-muted-foreground mb-2">Your Review</label>
-            <textarea
+            <label className="block text-sm text-muted-foreground mb-2"><UiText text={"Your Review"} /></label>
+            <UiAttributes><textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Share your experience with this product..."
               className="w-full px-4 py-3 bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 min-h-[100px] resize-none"
               required
-            />
+            /></UiAttributes>
           </div>
 
           <div className="flex gap-3">
@@ -174,8 +174,7 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
               onClick={() => setShowReviewForm(false)}
               className="flex-1 py-2.5 border border-border rounded-lg text-foreground font-medium hover:bg-secondary transition-colors"
             >
-              Cancel
-            </button>
+              <UiText text={"Cancel"} />{" "}</button>
             <button
               type="submit"
               disabled={submitting || !newComment.trim()}
@@ -186,8 +185,7 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  Submit Review
-                </>
+                  <UiText text={"Submit Review"} />{" "}</>
               )}
             </button>
           </div>
@@ -198,10 +196,9 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
       <div className="space-y-3">
         {reviews.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">No reviews yet</p>
+            <p className="text-muted-foreground"><UiText text={"No reviews yet"} /></p>
             <p className="text-sm text-muted-foreground mt-1">
-              Be the first to review this product!
-            </p>
+              <UiText text={"Be the first to review this product!"} />{" "}</p>
           </div>
         ) : (
           reviews.map((review) => (

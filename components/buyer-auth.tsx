@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState } from "react"
 import { useRole } from "@/lib/role-context"
@@ -323,13 +325,13 @@ export function BuyerAuth({
             {isModal && (
               <div className="flex items-center justify-between mb-4">
                 <BrandWordmark compact />
-                <button
+                <UiAttributes><button
                   onClick={onBack}
                   className="p-2 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all rounded-lg"
                   aria-label="Close"
                 >
                   <X className="w-5 h-5" />
-                </button>
+                </button></UiAttributes>
               </div>
             )}
 
@@ -338,16 +340,16 @@ export function BuyerAuth({
                 <ShoppingBag className={`${isModal ? "w-7 h-7" : "w-8 h-8"} text-primary-foreground`} />
               </div>
               <h1 className={`${isModal ? "text-xl" : "text-2xl"} font-bold text-foreground mb-2`}>
-                {isSignUp ? "Create Buyer Account" : isModal ? "Login to continue" : "Welcome Back"}
+                <UiValue value={isSignUp ? "Create Buyer Account" : isModal ? "Login to continue" : "Welcome Back"} />
               </h1>
               <p className="text-muted-foreground text-sm">
-                {isSignUp ? "Start shopping on our marketplace" : isModal ? "Continue your checkout without leaving this page" : "Sign in to your account"}
+                <UiValue value={isSignUp ? "Start shopping on our marketplace" : isModal ? "Continue your checkout without leaving this page" : "Sign in to your account"} />
               </p>
             </div>
 
             {error && (
               <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
-                <p className="text-destructive text-sm font-medium">{error}</p>
+                <p className="text-destructive text-sm font-medium"><UiValue value={error} /></p>
               </div>
             )}
 
@@ -368,10 +370,10 @@ export function BuyerAuth({
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Email Address</label>
+                <label className="text-sm font-medium text-foreground"><UiText text={"Email Address"} /></label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <input
+                  <UiAttributes><input
                     type="email"
                     name="email"
                     placeholder="Enter your email"
@@ -379,16 +381,16 @@ export function BuyerAuth({
                     onChange={handleChange}
                     className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
                     required
-                  />
+                  /></UiAttributes>
                 </div>
               </div>
 
               {isSignUp && (
                 <>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Full Name</label>
+                    <label className="text-sm font-medium text-foreground"><UiText text={"Full Name"} /></label>
                     <div className="relative">
-                      <input
+                      <UiAttributes><input
                         type="text"
                         name="name"
                         placeholder="Enter your full name"
@@ -396,15 +398,15 @@ export function BuyerAuth({
                         onChange={handleChange}
                         className="w-full pl-4 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
                         required
-                      />
+                      /></UiAttributes>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Phone Number</label>
+                    <label className="text-sm font-medium text-foreground"><UiText text={"Phone Number"} /></label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                      <input
+                      <UiAttributes><input
                         type="tel"
                         name="phone"
                         placeholder="Enter your phone number"
@@ -412,34 +414,33 @@ export function BuyerAuth({
                         onChange={handleChange}
                         className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
                         required
-                      />
+                      /></UiAttributes>
                     </div>
                   </div>
 
                   <div className="rounded-xl border border-border/60 bg-secondary/30 p-4 space-y-3">
                     <div>
-                      <p className="text-sm font-medium text-foreground">Your Location</p>
+                      <p className="text-sm font-medium text-foreground"><UiText text={"Your Location"} /></p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        This helps delivery and logistics know your city and state automatically.
-                      </p>
+                        <UiText text={"This helps delivery and logistics know your city and state automatically."} />{" "}</p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">State / Province / Region</label>
+                        <label className="text-sm font-medium text-foreground"><UiText text={"State / Province / Region"} /></label>
                         <div className="relative">
                           <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
-                          <input name="state" value={formData.state} onChange={handleChange}
+                          <UiAttributes><input name="state" value={formData.state} onChange={handleChange}
                             placeholder="Enter your state, province or region"
-                            className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground" required />
+                            className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground" required /></UiAttributes>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">City</label>
+                        <label className="text-sm font-medium text-foreground"><UiText text={"City"} /></label>
                         <div className="relative">
                           <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                          <input
+                          <UiAttributes><input
                             type="text"
                             name="city"
                             placeholder="Enter your city"
@@ -447,7 +448,7 @@ export function BuyerAuth({
                             onChange={handleChange}
                             className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
                             required
-                          />
+                          /></UiAttributes>
                         </div>
                       </div>
                     </div>
@@ -456,10 +457,10 @@ export function BuyerAuth({
               )}
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Password</label>
+                <label className="text-sm font-medium text-foreground"><UiText text={"Password"} /></label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <input
+                  <UiAttributes><input
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="Enter your password"
@@ -467,7 +468,7 @@ export function BuyerAuth({
                     onChange={handleChange}
                     className="w-full pl-11 pr-12 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
                     required
-                  />
+                  /></UiAttributes>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -486,10 +487,10 @@ export function BuyerAuth({
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    {isSignUp ? "Creating account..." : "Signing In..."}
+                    <UiValue value={isSignUp ? "Creating account..." : "Signing In..."} />
                   </>
                 ) : (
-                  <>{isSignUp ? "Create Account" : "Sign In"}</>
+                  <><UiValue value={isSignUp ? "Create Account" : "Sign In"} /></>
                 )}
               </button>
             </form>
@@ -501,7 +502,7 @@ export function BuyerAuth({
                 disabled={googleLoading || loading}
                 className="w-full py-3 px-4 bg-white border border-border text-foreground font-semibold rounded-xl hover:bg-muted/50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {googleLoading ? 'Connecting to Google...' : isSignUp ? 'Sign up with Google' : 'Login with Google'}
+                <UiValue value={googleLoading ? 'Connecting to Google...' : isSignUp ? 'Sign up with Google' : 'Login with Google'} />
               </button>
             </div>
 
@@ -519,15 +520,15 @@ export function BuyerAuth({
                 }}
                 className="text-primary hover:text-primary/80 font-medium transition-colors"
               >
-                {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+                <UiValue value={isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"} />
               </button>
             </div>
 
             <div className="mt-6 pt-6 border-t border-border/50">
               <p className="text-xs text-muted-foreground text-center">
-                By continuing, you agree to our{' '}
-                <a href="/terms" className="underline hover:text-foreground">Terms of Service</a>{' '}and{' '}
-                <a href="/privacy" className="underline hover:text-foreground">Privacy Policy</a>
+                <UiText text={"By continuing, you agree to our"} />{' '}
+                <a href="/terms" className="underline hover:text-foreground"><UiText text={"Terms of Service"} /></a>{' '}<UiText text={"and"} />{' '}
+                <a href="/privacy" className="underline hover:text-foreground"><UiText text={"Privacy Policy"} /></a>
               </p>
             </div>
           </div>

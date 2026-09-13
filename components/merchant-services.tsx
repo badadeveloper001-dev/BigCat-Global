@@ -1,4 +1,7 @@
 "use client"
+import { translateBrowserUiText } from "@/lib/ui-translation"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useEffect, useState } from 'react'
 import { ChevronDown, ChevronUp, Edit2, FileText, Loader2, Plus, Power, Trash2, Wrench } from 'lucide-react'
@@ -208,7 +211,7 @@ export function MerchantServices({ merchantId }: { merchantId: string }) {
   }
 
   const deleteService = async (serviceId: string) => {
-    if (!window.confirm('Delete this service listing? This cannot be undone.')) return
+    if (!window.confirm(translateBrowserUiText('Delete this service listing? This cannot be undone.'))) return
     setDeletingId(serviceId)
     try {
       const response = await fetch('/api/services', {
@@ -267,8 +270,8 @@ export function MerchantServices({ merchantId }: { merchantId: string }) {
     <div className="px-4 py-4 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-foreground">Services</h2>
-          <p className="text-sm text-muted-foreground">Create and manage service listings and bookings.</p>
+          <h2 className="text-xl font-bold text-foreground"><UiText text={"Services"} /></h2>
+          <p className="text-sm text-muted-foreground"><UiText text={"Create and manage service listings and bookings."} /></p>
         </div>
         <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
           <Wrench className="w-5 h-5" />
@@ -276,7 +279,7 @@ export function MerchantServices({ merchantId }: { merchantId: string }) {
       </div>
 
       {error && (
-        <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</div>
+        <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"><UiValue value={error} /></div>
       )}
 
       {/* Add new service toggle */}
@@ -284,93 +287,93 @@ export function MerchantServices({ merchantId }: { merchantId: string }) {
         onClick={() => setShowAddForm((v) => !v)}
         className="w-full flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3"
       >
-        <span className="text-sm font-semibold text-foreground flex items-center gap-2"><Plus className="w-4 h-4" /> Add New Service</span>
+        <span className="text-sm font-semibold text-foreground flex items-center gap-2"><Plus className="w-4 h-4" /> {" "}<UiText text={"Add New Service"} /></span>
         {showAddForm ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
       </button>
 
       {showAddForm && (
         <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
-          <p className="text-xs text-muted-foreground">Fill each box with the suggested content below.</p>
+          <p className="text-xs text-muted-foreground"><UiText text={"Fill each box with the suggested content below."} /></p>
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Service title: short clear name. Example: Home Plumbing Repair.</p>
-            <input value={form.title} onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))} placeholder="Service title" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+            <p className="text-xs text-muted-foreground"><UiText text={"Service title: short clear name. Example: Home Plumbing Repair."} /></p>
+            <UiAttributes><input value={form.title} onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))} placeholder="Service title" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" /></UiAttributes>
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Description: what is included and any limits.</p>
-            <textarea value={form.description} onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))} placeholder="Describe what is included" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm min-h-20" />
+            <p className="text-xs text-muted-foreground"><UiText text={"Description: what is included and any limits."} /></p>
+            <UiAttributes><textarea value={form.description} onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))} placeholder="Describe what is included" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm min-h-20" /></UiAttributes>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Category</p>
+              <p className="text-xs text-muted-foreground"><UiText text={"Category"} /></p>
               <select value={form.category} onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))} className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm">
-                <option value="">Select category</option>
-                {SERVICE_CATEGORY_OPTIONS.map((option) => (<option key={option} value={option}>{option}</option>))}
+                <option value=""><UiText text={"Select category"} /></option>
+                {SERVICE_CATEGORY_OPTIONS.map((option) => (<option key={option} value={option}><UiValue value={option} /></option>))}
               </select>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Base price (₦)</p>
-              <input value={form.basePrice} onChange={(e) => setForm((prev) => ({ ...prev, basePrice: e.target.value }))} placeholder="Base price" type="number" min={0} className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+              <p className="text-xs text-muted-foreground"><UiText text={"Base price (₦)"} /></p>
+              <UiAttributes><input value={form.basePrice} onChange={(e) => setForm((prev) => ({ ...prev, basePrice: e.target.value }))} placeholder="Base price" type="number" min={0} className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" /></UiAttributes>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">City</p>
-              <input value={form.serviceCity} onChange={(e) => setForm((prev) => ({ ...prev, serviceCity: e.target.value }))} placeholder="City" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+              <p className="text-xs text-muted-foreground"><UiText text={"City"} /></p>
+              <UiAttributes><input value={form.serviceCity} onChange={(e) => setForm((prev) => ({ ...prev, serviceCity: e.target.value }))} placeholder="City" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" /></UiAttributes>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">State</p>
-              <input value={form.serviceState} onChange={(e) => setForm((prev) => ({ ...prev, serviceState: e.target.value }))} placeholder="State" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+              <p className="text-xs text-muted-foreground"><UiText text={"State"} /></p>
+              <UiAttributes><input value={form.serviceState} onChange={(e) => setForm((prev) => ({ ...prev, serviceState: e.target.value }))} placeholder="State" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" /></UiAttributes>
             </div>
             <div className="space-y-1 col-span-2">
-              <p className="text-xs text-muted-foreground">Working days</p>
+              <p className="text-xs text-muted-foreground"><UiText text={"Working days"} /></p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 rounded-xl border border-border bg-background p-3">
                 {WEEK_DAYS.map((day) => {
                   const checked = form.workingDays.includes(day)
                   return (
                     <label key={day} className="inline-flex items-center gap-2 text-xs text-foreground">
                       <input type="checkbox" checked={checked} onChange={() => setForm((prev) => ({ ...prev, workingDays: checked ? prev.workingDays.filter((d) => d !== day) : [...prev.workingDays, day] }))} />
-                      {day}
+                      <UiValue value={day} />
                     </label>
                   )
                 })}
               </div>
             </div>
             <div className="space-y-1 col-span-2">
-              <p className="text-xs text-muted-foreground">Working hours. Example: 8:00 AM - 6:00 PM</p>
-              <input value={form.workingHours} onChange={(e) => setForm((prev) => ({ ...prev, workingHours: e.target.value }))} placeholder="8:00 AM - 6:00 PM" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+              <p className="text-xs text-muted-foreground"><UiText text={"Working hours. Example: 8:00 AM - 6:00 PM"} /></p>
+              <UiAttributes><input value={form.workingHours} onChange={(e) => setForm((prev) => ({ ...prev, workingHours: e.target.value }))} placeholder="8:00 AM - 6:00 PM" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" /></UiAttributes>
             </div>
           </div>
           <button onClick={createListing} disabled={saving} className="w-full rounded-xl bg-primary text-primary-foreground px-4 py-2.5 text-sm font-medium disabled:opacity-60">
-            {saving ? 'Creating...' : 'Create Service Listing'}
+            <UiValue value={saving ? 'Creating...' : 'Create Service Listing'} />
           </button>
         </section>
       )}
 
       <section>
-        <h3 className="text-sm font-semibold text-foreground mb-2">Your Service Listings</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-2"><UiText text={"Your Service Listings"} /></h3>
         {loading ? (
-          <div className="py-10 flex items-center justify-center text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin mr-2" />Loading...</div>
+          <div className="py-10 flex items-center justify-center text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin mr-2" /><UiText text={"Loading..."} /></div>
         ) : services.length === 0 ? (
-          <div className="rounded-2xl border border-border bg-card p-5 text-center text-sm text-muted-foreground">You have not added services yet.</div>
+          <div className="rounded-2xl border border-border bg-card p-5 text-center text-sm text-muted-foreground"><UiText text={"You have not added services yet."} /></div>
         ) : (
           <div className="space-y-3">
             {services.map((service) => (
               <div key={service.id} className={`rounded-2xl border bg-card p-4 ${service.is_active ? 'border-border' : 'border-border/50 opacity-60'}`}>
                 {editingId === service.id ? (
                   <div className="space-y-2">
-                    <input value={editForm.title} onChange={(e) => setEditForm((p: any) => ({ ...p, title: e.target.value }))} className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" placeholder="Title" />
-                    <textarea value={editForm.description} onChange={(e) => setEditForm((p: any) => ({ ...p, description: e.target.value }))} className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm min-h-16" placeholder="Description" />
+                    <UiAttributes><input value={editForm.title} onChange={(e) => setEditForm((p: any) => ({ ...p, title: e.target.value }))} className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" placeholder="Title" /></UiAttributes>
+                    <UiAttributes><textarea value={editForm.description} onChange={(e) => setEditForm((p: any) => ({ ...p, description: e.target.value }))} className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm min-h-16" placeholder="Description" /></UiAttributes>
                     <div className="grid grid-cols-2 gap-2">
                       <select value={editForm.category} onChange={(e) => setEditForm((p: any) => ({ ...p, category: e.target.value }))} className="rounded-xl border border-border bg-background px-3 py-2 text-sm">
-                        <option value="">Category</option>
-                        {SERVICE_CATEGORY_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+                        <option value=""><UiText text={"Category"} /></option>
+                        {SERVICE_CATEGORY_OPTIONS.map((o) => <option key={o} value={o}><UiValue value={o} /></option>)}
                       </select>
-                      <input value={editForm.basePrice} onChange={(e) => setEditForm((p: any) => ({ ...p, basePrice: e.target.value }))} type="number" placeholder="Price" className="rounded-xl border border-border bg-background px-3 py-2 text-sm" />
-                      <input value={editForm.serviceCity} onChange={(e) => setEditForm((p: any) => ({ ...p, serviceCity: e.target.value }))} placeholder="City" className="rounded-xl border border-border bg-background px-3 py-2 text-sm" />
-                      <input value={editForm.serviceState} onChange={(e) => setEditForm((p: any) => ({ ...p, serviceState: e.target.value }))} placeholder="State" className="rounded-xl border border-border bg-background px-3 py-2 text-sm" />
-                      <input value={editForm.workingHours} onChange={(e) => setEditForm((p: any) => ({ ...p, workingHours: e.target.value }))} placeholder="Working hours" className="col-span-2 rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+                      <UiAttributes><input value={editForm.basePrice} onChange={(e) => setEditForm((p: any) => ({ ...p, basePrice: e.target.value }))} type="number" placeholder="Price" className="rounded-xl border border-border bg-background px-3 py-2 text-sm" /></UiAttributes>
+                      <UiAttributes><input value={editForm.serviceCity} onChange={(e) => setEditForm((p: any) => ({ ...p, serviceCity: e.target.value }))} placeholder="City" className="rounded-xl border border-border bg-background px-3 py-2 text-sm" /></UiAttributes>
+                      <UiAttributes><input value={editForm.serviceState} onChange={(e) => setEditForm((p: any) => ({ ...p, serviceState: e.target.value }))} placeholder="State" className="rounded-xl border border-border bg-background px-3 py-2 text-sm" /></UiAttributes>
+                      <UiAttributes><input value={editForm.workingHours} onChange={(e) => setEditForm((p: any) => ({ ...p, workingHours: e.target.value }))} placeholder="Working hours" className="col-span-2 rounded-xl border border-border bg-background px-3 py-2 text-sm" /></UiAttributes>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => saveEdit(service.id)} disabled={saving} className="flex-1 rounded-lg bg-primary text-primary-foreground py-2 text-xs font-medium disabled:opacity-60">{saving ? 'Saving...' : 'Save'}</button>
-                      <button onClick={() => setEditingId(null)} className="flex-1 rounded-lg border border-border bg-background text-foreground py-2 text-xs font-medium">Cancel</button>
+                      <button onClick={() => saveEdit(service.id)} disabled={saving} className="flex-1 rounded-lg bg-primary text-primary-foreground py-2 text-xs font-medium disabled:opacity-60"><UiValue value={saving ? 'Saving...' : 'Save'} /></button>
+                      <button onClick={() => setEditingId(null)} className="flex-1 rounded-lg border border-border bg-background text-foreground py-2 text-xs font-medium"><UiText text={"Cancel"} /></button>
                     </div>
                   </div>
                 ) : (
@@ -380,15 +383,15 @@ export function MerchantServices({ merchantId }: { merchantId: string }) {
                         <div className="flex items-center gap-2">
                           <p className="font-semibold text-foreground text-sm">{service.title}</p>
                           {service.is_active ? (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">Active</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium"><UiText text={"Active"} /></span>
                           ) : (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-secondary text-muted-foreground font-medium">Inactive</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-secondary text-muted-foreground font-medium"><UiText text={"Inactive"} /></span>
                           )}
                         </div>
                         {service.category && <p className="text-xs text-muted-foreground mt-0.5">{service.category}</p>}
                         {service.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{service.description}</p>}
                         <p className="text-xs text-muted-foreground mt-1">
-                          {Array.isArray(service.working_days) && service.working_days.length > 0 ? service.working_days.join(', ') : 'Days not set'}
+                          <UiValue value={Array.isArray(service.working_days) && service.working_days.length > 0 ? service.working_days.join(', ') : 'Days not set'} />
                           {service.working_hours ? ` • ${service.working_hours}` : ''}
                         </p>
                         {(service.service_city || service.service_state) && (
@@ -399,10 +402,9 @@ export function MerchantServices({ merchantId }: { merchantId: string }) {
                     </div>
                     <div className="flex gap-2 mt-3">
                       <button onClick={() => startEdit(service)} className="flex-1 rounded-lg border border-border bg-background text-foreground py-2 text-xs font-medium flex items-center justify-center gap-1">
-                        <Edit2 className="w-3 h-3" /> Edit
-                      </button>
+                        <Edit2 className="w-3 h-3" /> {" "}<UiText text={"Edit"} />{" "}</button>
                       <button onClick={() => toggleActive(service)} disabled={togglingId === service.id} className="flex-1 rounded-lg border border-border bg-background text-foreground py-2 text-xs font-medium flex items-center justify-center gap-1 disabled:opacity-60">
-                        <Power className="w-3 h-3" /> {togglingId === service.id ? '...' : service.is_active ? 'Deactivate' : 'Activate'}
+                        <Power className="w-3 h-3" /> <UiValue value={togglingId === service.id ? '...' : service.is_active ? 'Deactivate' : 'Activate'} />
                       </button>
                       <button onClick={() => deleteService(service.id)} disabled={deletingId === service.id} className="rounded-lg border border-destructive/30 bg-destructive/10 text-destructive py-2 px-3 text-xs font-medium flex items-center justify-center gap-1 disabled:opacity-60">
                         <Trash2 className="w-3 h-3" />
@@ -418,16 +420,15 @@ export function MerchantServices({ merchantId }: { merchantId: string }) {
 
       {/* Billing Section */}
       <section>
-        <h3 className="text-sm font-semibold text-foreground mb-2">Service Bills</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-2"><UiText text={"Service Bills"} /></h3>
         <div className="rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 mb-3 flex items-start gap-2">
           <FileText className="w-4 h-4 text-primary shrink-0 mt-0.5" />
           <p className="text-xs text-primary leading-relaxed">
-            To send a bill, go to <span className="font-semibold">Messages</span>, open the buyer's chat, and tap <span className="font-semibold">Send Bill to Buyer</span>. The bill auto-links to that buyer.
-          </p>
+            <UiText text={"To send a bill, go to"} />{" "}<span className="font-semibold"><UiText text={"Messages"} /></span><UiText text={", open the buyer's chat, and tap"} />{" "}<span className="font-semibold"><UiText text={"Send Bill to Buyer"} /></span><UiText text={". The bill auto-links to that buyer."} />{" "}</p>
         </div>
 
         {bills.length === 0 ? (
-          <div className="rounded-2xl border border-border bg-card p-5 text-center text-sm text-muted-foreground">No bills sent yet.</div>
+          <div className="rounded-2xl border border-border bg-card p-5 text-center text-sm text-muted-foreground"><UiText text={"No bills sent yet."} /></div>
         ) : (
           <div className="space-y-2">
             {bills.map((bill) => (
@@ -435,8 +436,8 @@ export function MerchantServices({ merchantId }: { merchantId: string }) {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-semibold text-sm text-foreground">{bill.scope_summary || 'Service bill'}</p>
-                    <p className="text-xs text-muted-foreground">Buyer: {bill.buyer_name || bill.buyer_id?.slice(0, 12) || 'Buyer'}</p>
-                    {bill.timeline && <p className="text-xs text-muted-foreground">Timeline: {bill.timeline}</p>}
+                    <p className="text-xs text-muted-foreground"><UiText text={"Buyer:"} />{" "}<UiValue value={bill.buyer_name || bill.buyer_id?.slice(0, 12) || 'Buyer'} /></p>
+                    {bill.timeline && <p className="text-xs text-muted-foreground"><UiText text={"Timeline:"} />{" "}{bill.timeline}</p>}
                     <p className="text-xs text-muted-foreground">{new Date(bill.created_at).toLocaleDateString('en-NG')}</p>
                   </div>
                   <div className="text-right shrink-0">
@@ -446,11 +447,11 @@ export function MerchantServices({ merchantId }: { merchantId: string }) {
                       bill.status === 'sent' ? 'bg-amber-100 text-amber-700' :
                       bill.status === 'cancelled' ? 'bg-destructive/10 text-destructive' :
                       'bg-secondary text-foreground'
-                    }`}>{bill.status}</span>
+                    }`}><UiValue value={bill.status} /></span>
                   </div>
                 </div>
                 {['draft', 'sent'].includes(bill.status) && (
-                  <button onClick={() => cancelBill(bill.id)} className="mt-2 text-xs text-destructive border border-destructive/30 rounded-lg px-3 py-1.5">Cancel Bill</button>
+                  <button onClick={() => cancelBill(bill.id)} className="mt-2 text-xs text-destructive border border-destructive/30 rounded-lg px-3 py-1.5"><UiText text={"Cancel Bill"} /></button>
                 )}
               </div>
             ))}
@@ -459,9 +460,9 @@ export function MerchantServices({ merchantId }: { merchantId: string }) {
       </section>
 
       <section>
-        <h3 className="text-sm font-semibold text-foreground mb-2">Incoming Service Bookings</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-2"><UiText text={"Incoming Service Bookings"} /></h3>
         {bookings.length === 0 ? (
-          <div className="rounded-2xl border border-border bg-card p-5 text-center text-sm text-muted-foreground">No bookings yet.</div>
+          <div className="rounded-2xl border border-border bg-card p-5 text-center text-sm text-muted-foreground"><UiText text={"No bookings yet."} /></div>
         ) : (
           <div className="space-y-2">
             {bookings.map((booking) => (
@@ -469,9 +470,9 @@ export function MerchantServices({ merchantId }: { merchantId: string }) {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-semibold text-sm text-foreground">{booking.service?.title || 'Service booking'}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Buyer: {booking.buyer_name || 'Buyer'}</p>
-                    {booking.service_address && <p className="text-xs text-muted-foreground">Address: {booking.service_address}</p>}
-                    {booking.scheduled_at && <p className="text-xs text-muted-foreground">Scheduled: {new Date(booking.scheduled_at).toLocaleString('en-NG', { dateStyle: 'medium', timeStyle: 'short' })}</p>}
+                    <p className="text-xs text-muted-foreground mt-1"><UiText text={"Buyer:"} />{" "}<UiValue value={booking.buyer_name || 'Buyer'} /></p>
+                    {booking.service_address && <p className="text-xs text-muted-foreground"><UiText text={"Address:"} />{" "}{booking.service_address}</p>}
+                    {booking.scheduled_at && <p className="text-xs text-muted-foreground"><UiText text={"Scheduled:"} />{" "}{new Date(booking.scheduled_at).toLocaleString('en-NG', { dateStyle: 'medium', timeStyle: 'short' })}</p>}
                     {booking.buyer_note && <p className="text-xs text-muted-foreground italic">"{booking.buyer_note}"</p>}
                   </div>
                   <div className="text-right shrink-0">
@@ -483,19 +484,19 @@ export function MerchantServices({ merchantId }: { merchantId: string }) {
                 </div>
                 <div className="flex flex-wrap gap-2 mt-3">
                   {booking.status === 'requested' && (
-                    <button onClick={() => updateBookingStatus(booking.id, 'accepted')} className="rounded-lg bg-primary text-primary-foreground py-2 px-3 text-xs font-medium">Accept</button>
+                    <button onClick={() => updateBookingStatus(booking.id, 'accepted')} className="rounded-lg bg-primary text-primary-foreground py-2 px-3 text-xs font-medium"><UiText text={"Accept"} /></button>
                   )}
                   {['requested', 'accepted'].includes(booking.status) && (
-                    <button onClick={() => updateBookingStatus(booking.id, 'scheduled')} className="rounded-lg bg-secondary text-foreground py-2 px-3 text-xs font-medium">Mark Scheduled</button>
+                    <button onClick={() => updateBookingStatus(booking.id, 'scheduled')} className="rounded-lg bg-secondary text-foreground py-2 px-3 text-xs font-medium"><UiText text={"Mark Scheduled"} /></button>
                   )}
                   {['scheduled', 'accepted'].includes(booking.status) && (
-                    <button onClick={() => updateBookingStatus(booking.id, 'in_progress')} className="rounded-lg bg-secondary text-foreground py-2 px-3 text-xs font-medium">Start Job</button>
+                    <button onClick={() => updateBookingStatus(booking.id, 'in_progress')} className="rounded-lg bg-secondary text-foreground py-2 px-3 text-xs font-medium"><UiText text={"Start Job"} /></button>
                   )}
                   {booking.status === 'in_progress' && (
-                    <button onClick={() => updateBookingStatus(booking.id, 'completed')} className="rounded-lg bg-primary text-primary-foreground py-2 px-3 text-xs font-medium">Mark Completed</button>
+                    <button onClick={() => updateBookingStatus(booking.id, 'completed')} className="rounded-lg bg-primary text-primary-foreground py-2 px-3 text-xs font-medium"><UiText text={"Mark Completed"} /></button>
                   )}
                   {!['completed', 'released', 'disputed', 'cancelled'].includes(String(booking.status || '')) && (
-                    <button onClick={() => updateBookingStatus(booking.id, 'cancelled')} className="rounded-lg bg-destructive/10 text-destructive py-2 px-3 text-xs font-medium">Cancel</button>
+                    <button onClick={() => updateBookingStatus(booking.id, 'cancelled')} className="rounded-lg bg-destructive/10 text-destructive py-2 px-3 text-xs font-medium"><UiText text={"Cancel"} /></button>
                   )}
                 </div>
               </div>

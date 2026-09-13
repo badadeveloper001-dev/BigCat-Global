@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect } from 'react'
 import { ArrowLeft, AlertCircle, CheckCircle2, Loader2, Wallet, Landmark, ShieldCheck } from 'lucide-react'
@@ -219,11 +221,10 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
       <div className="fixed inset-0 z-50 bg-black/50 px-4 py-6 flex items-start justify-center overflow-y-auto">
         <div className="bg-background rounded-2xl p-8 text-center max-w-sm w-full">
           <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-4" />
-          <h3 className="font-bold text-foreground mb-2">Withdrawal Initiated</h3>
+          <h3 className="font-bold text-foreground mb-2"><UiText text={"Withdrawal Initiated"} /></h3>
           <p className="text-sm text-muted-foreground mb-4">
-            {formatNaira(netAmount)} will be transferred to your account within 24 hours.
-          </p>
-          <p className="text-xs text-muted-foreground">Processing fee: {formatNaira(fee)}</p>
+            {formatNaira(netAmount)} {" "}<UiText text={"will be transferred to your account within 24 hours."} />{" "}</p>
+          <p className="text-xs text-muted-foreground"><UiText text={"Processing fee:"} />{" "}{formatNaira(fee)}</p>
         </div>
       </div>
     )
@@ -233,7 +234,7 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
     <div className="fixed inset-0 z-50 bg-black/50 px-4 py-6 flex items-start justify-center overflow-y-auto">
       <div className="bg-background rounded-2xl p-6 max-w-md w-full border border-border shadow-xl">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-bold text-foreground">Withdraw Funds</h2>
+          <h2 className="font-bold text-foreground"><UiText text={"Withdraw Funds"} /></h2>
           <button onClick={onBack} className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -242,9 +243,9 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
         <div className="mb-5 rounded-2xl bg-gradient-to-br from-primary/15 via-primary/5 to-transparent border border-primary/20 p-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Wallet Balance</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground"><UiText text={"Wallet Balance"} /></p>
               <p className="text-2xl font-bold text-foreground mt-1">{formatNaira(liveWalletBalance)}</p>
-              <p className="text-xs text-muted-foreground mt-1">Withdrawable now</p>
+              <p className="text-xs text-muted-foreground mt-1"><UiText text={"Withdrawable now"} /></p>
             </div>
             <div className="h-10 w-10 rounded-xl bg-primary/15 text-primary flex items-center justify-center">
               <Wallet className="w-5 h-5" />
@@ -264,7 +265,7 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
                 key={item.id}
                 className={`rounded-xl px-3 py-2 text-center text-xs font-medium border ${active ? 'bg-primary text-white border-primary' : 'bg-muted/50 text-muted-foreground border-border'}`}
               >
-                {item.label}
+                <UiValue value={item.label} />
               </div>
             )
           })}
@@ -274,56 +275,56 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
         {step === 'account' && (
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-foreground mb-1">Account Name</label>
-              <input
+              <label className="block text-xs font-medium text-foreground mb-1"><UiText text={"Account Name"} /></label>
+              <UiAttributes><input
                 type="text"
                 value={accountName}
                 onChange={(e) => setAccountName(e.target.value)}
                 placeholder="e.g., Amaka Obi"
                 className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm outline-none focus:border-primary"
-              />
+              /></UiAttributes>
             </div>
             <div>
-              <label className="block text-xs font-medium text-foreground mb-1">Bank Name</label>
+              <label className="block text-xs font-medium text-foreground mb-1"><UiText text={"Bank Name"} /></label>
               <select
                 value={bankName}
                 onChange={(e) => setBankName(e.target.value)}
                 className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm outline-none focus:border-primary"
               >
-                <option value="">Select a bank…</option>
-                <option value="Access Bank">Access Bank</option>
-                <option value="GTBank">GTBank</option>
-                <option value="First Bank">First Bank</option>
-                <option value="UBA">UBA</option>
-                <option value="Zenith Bank">Zenith Bank</option>
-                <option value="FCMB">FCMB</option>
-                <option value="Stanbic IBTC">Stanbic IBTC</option>
-                <option value="Standard Chartered">Standard Chartered</option>
-                <option value="Ecobank">Ecobank</option>
-                <option value="Other">Other</option>
+                <option value=""><UiText text={"Select a bank…"} /></option>
+                <option value="Access Bank"><UiText text={"Access Bank"} /></option>
+                <option value="GTBank"><UiText text={"GTBank"} /></option>
+                <option value="First Bank"><UiText text={"First Bank"} /></option>
+                <option value="UBA"><UiText text={"UBA"} /></option>
+                <option value="Zenith Bank"><UiText text={"Zenith Bank"} /></option>
+                <option value="FCMB"><UiText text={"FCMB"} /></option>
+                <option value="Stanbic IBTC"><UiText text={"Stanbic IBTC"} /></option>
+                <option value="Standard Chartered"><UiText text={"Standard Chartered"} /></option>
+                <option value="Ecobank"><UiText text={"Ecobank"} /></option>
+                <option value="Other"><UiText text={"Other"} /></option>
               </select>
             </div>
 
             <div className="rounded-xl bg-muted/50 border border-border p-3 text-xs text-muted-foreground flex items-start gap-2">
               <Landmark className="w-4 h-4 mt-0.5 text-primary" />
-              <p>Bank details are saved to your device for faster future withdrawals.</p>
+              <p><UiText text={"Bank details are saved to your device for faster future withdrawals."} /></p>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-foreground mb-1">Account Number (10 digits)</label>
-              <input
+              <label className="block text-xs font-medium text-foreground mb-1"><UiText text={"Account Number (10 digits)"} /></label>
+              <UiAttributes><input
                 type="text"
                 value={bankAccount}
                 onChange={(e) => setBankAccount(e.target.value.slice(0, 10))}
                 placeholder="e.g., 1234567890"
                 maxLength={10}
                 className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm outline-none focus:border-primary"
-              />
+              /></UiAttributes>
             </div>
             {error && (
               <div className="flex gap-2 text-sm text-red-600 bg-red-50 rounded-lg p-3">
                 <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <span>{error}</span>
+                <span><UiValue value={error} /></span>
               </div>
             )}
             <button
@@ -331,8 +332,7 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
               disabled={!canProceed()}
               className="w-full bg-primary text-white font-semibold py-2.5 rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Continue
-            </button>
+              <UiText text={"Continue"} />{" "}</button>
           </div>
         )}
 
@@ -340,13 +340,13 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
         {step === 'amount' && (
           <div className="space-y-4">
             <div className="bg-secondary/30 rounded-xl p-3 text-sm border border-border">
-              <p className="text-muted-foreground mb-1">Available Balance</p>
+              <p className="text-muted-foreground mb-1"><UiText text={"Available Balance"} /></p>
               <p className="font-bold text-foreground text-lg">{formatNaira(liveWalletBalance)}</p>
             </div>
 
             {quickAmounts.length > 0 && (
               <div>
-                <p className="text-xs font-medium text-foreground mb-2">Quick amounts</p>
+                <p className="text-xs font-medium text-foreground mb-2"><UiText text={"Quick amounts"} /></p>
                 <div className="grid grid-cols-2 gap-2">
                   {quickAmounts.map((value) => (
                     <button
@@ -363,32 +363,32 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
             )}
 
             <div>
-              <label className="block text-xs font-medium text-foreground mb-1">Amount to Withdraw</label>
+              <label className="block text-xs font-medium text-foreground mb-1"><UiText text={"Amount to Withdraw"} /></label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground font-bold">₦</span>
-                <input
+                <UiAttributes><input
                   type="number"
                   value={withdrawalAmount}
                   onChange={(e) => setWithdrawalAmount(e.target.value)}
                   placeholder={`Minimum: ${MIN_WITHDRAWAL}`}
                   className="w-full pl-8 pr-3 py-2.5 rounded-xl border border-border bg-background text-sm outline-none focus:border-primary"
-                />
+                /></UiAttributes>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Minimum: {formatNaira(MIN_WITHDRAWAL)}</p>
+              <p className="text-xs text-muted-foreground mt-1"><UiText text={"Minimum:"} />{" "}{formatNaira(MIN_WITHDRAWAL)}</p>
             </div>
 
             {amount > 0 && (
               <div className="bg-secondary/30 rounded-xl p-3 space-y-1 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Amount</span>
+                  <span className="text-muted-foreground"><UiText text={"Amount"} /></span>
                   <span className="font-medium">{formatNaira(amount)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Processing Fee (2.5%)</span>
+                  <span className="text-muted-foreground"><UiText text={"Processing Fee (2.5%)"} /></span>
                   <span className="font-medium">{formatNaira(fee)}</span>
                 </div>
                 <div className="border-t border-border pt-1 mt-1 flex justify-between">
-                  <span className="font-semibold text-foreground">You'll Receive</span>
+                  <span className="font-semibold text-foreground"><UiText text={"You'll Receive"} /></span>
                   <span className="font-bold text-primary">{formatNaira(netAmount)}</span>
                 </div>
               </div>
@@ -397,7 +397,7 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
             {error && (
               <div className="flex gap-2 text-sm text-red-600 bg-red-50 rounded-lg p-3">
                 <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <span>{error}</span>
+                <span><UiValue value={error} /></span>
               </div>
             )}
 
@@ -406,15 +406,13 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
                 onClick={() => setStep('account')}
                 className="flex-1 border border-border text-foreground font-semibold py-2.5 rounded-xl hover:bg-secondary transition-colors"
               >
-                Back
-              </button>
+                <UiText text={"Back"} />{" "}</button>
               <button
                 onClick={handleAmountSubmit}
                 disabled={!canProceed()}
                 className="flex-1 bg-primary text-white font-semibold py-2.5 rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Review
-              </button>
+                <UiText text={"Review"} />{" "}</button>
             </div>
           </div>
         )}
@@ -424,7 +422,7 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
           <div className="space-y-4">
             <div className="bg-secondary/30 rounded-xl p-4 space-y-3">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">To</span>
+                <span className="text-muted-foreground"><UiText text={"To"} /></span>
                 <div className="text-right">
                   <p className="font-semibold text-foreground text-sm">{accountName}</p>
                   <p className="text-xs text-muted-foreground">{bankName}</p>
@@ -432,22 +430,22 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
                 </div>
               </div>
               <div className="border-t border-border pt-3 flex justify-between">
-                <span className="text-muted-foreground">Amount</span>
+                <span className="text-muted-foreground"><UiText text={"Amount"} /></span>
                 <span className="font-bold text-foreground">{formatNaira(amount)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Fee</span>
+                <span className="text-muted-foreground"><UiText text={"Fee"} /></span>
                 <span className="font-semibold">{formatNaira(fee)}</span>
               </div>
               <div className="border-t border-border pt-3 flex justify-between">
-                <span className="font-semibold text-foreground">You'll Receive</span>
+                <span className="font-semibold text-foreground"><UiText text={"You'll Receive"} /></span>
                 <span className="font-bold text-primary text-lg">{formatNaira(netAmount)}</span>
               </div>
             </div>
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-900 space-y-1">
-              <p className="font-semibold flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> Secure Transfer</p>
-              <p>Funds will be transferred to your bank account within 24 hours.</p>
+              <p className="font-semibold flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> {" "}<UiText text={"Secure Transfer"} /></p>
+              <p><UiText text={"Funds will be transferred to your bank account within 24 hours."} /></p>
             </div>
 
             <div className="flex gap-3">
@@ -455,16 +453,14 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
                 onClick={() => setStep('amount')}
                 className="flex-1 border border-border text-foreground font-semibold py-2.5 rounded-xl hover:bg-secondary transition-colors"
               >
-                Back
-              </button>
+                <UiText text={"Back"} />{" "}</button>
               <button
                 onClick={handleConfirmWithdrawal}
                 disabled={isSubmitting}
                 className="flex-1 bg-primary text-white font-semibold py-2.5 rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               >
                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                Confirm & Withdraw
-              </button>
+                <UiText text={"Confirm & Withdraw"} />{" "}</button>
             </div>
           </div>
         )}
@@ -472,7 +468,7 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
         {/* Withdrawal History */}
         {withdrawalHistory.length > 0 && (
           <div className="mt-6 pt-6 border-t border-border">
-            <h3 className="font-semibold text-foreground mb-3 text-sm">Recent Withdrawals</h3>
+            <h3 className="font-semibold text-foreground mb-3 text-sm"><UiText text={"Recent Withdrawals"} /></h3>
             <div className="space-y-2 max-h-40 overflow-y-auto">
               {withdrawalHistory.slice(0, 5).map((record) => (
                 <div key={record.id} className="flex justify-between items-start text-xs p-2 rounded-lg bg-secondary/30">
@@ -481,7 +477,7 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
                     <p className="text-muted-foreground">{record.bankAccount}</p>
                     <p className="text-muted-foreground">{new Date(record.timestamp).toLocaleDateString()}</p>
                   </div>
-                  <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 font-medium">Completed</span>
+                  <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 font-medium"><UiText text={"Completed"} /></span>
                 </div>
               ))}
             </div>
@@ -490,7 +486,7 @@ export function MerchantWithdrawal({ merchantId, walletBalance, onBack, onSucces
 
         {walletActivity.length > 0 && (
           <div className="mt-6 pt-6 border-t border-border">
-            <h3 className="font-semibold text-foreground mb-3 text-sm">Wallet Activity</h3>
+            <h3 className="font-semibold text-foreground mb-3 text-sm"><UiText text={"Wallet Activity"} /></h3>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {walletActivity.map((item) => {
                 const normalized = item.type.toLowerCase()

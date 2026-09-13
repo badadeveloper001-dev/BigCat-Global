@@ -1,5 +1,6 @@
 'use client'
 
+import { sessionProfile } from '@/lib/session-profile'
 import { createContext, useContext, useState, useEffect } from 'react'
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
@@ -37,6 +38,7 @@ interface RoleContextType {
   setUser: (user: User | null) => void
   setPreferences: (preferences: GlobalPreferences) => void
   setCountry: (country: SupportedCountry) => void
+  preferencesReady: boolean
   isLoading: boolean
 }
 
@@ -46,6 +48,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   const [role, setRoleState] = useState<string | null>(null)
   const [user, setUserState] = useState<User | null>(null)
   const [preferences, setPreferencesState] = useState<GlobalPreferences>(DEFAULT_GLOBAL_PREFERENCES)
+  const [preferencesReady, setPreferencesReady] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -71,6 +74,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
 
     const hasSupabaseConfig = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
     if (!hasSupabaseConfig) {
+      void initializePreferences().finally(() => { if (isActive) setPreferencesReady(true) })
       const stored = localStorage.getItem('userRole')
       const storedUser = localStorage.getItem('userData')
       if (stored) setRoleState(stored)
@@ -121,7 +125,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       setPreferencesState(buildDefaultPreferences(detectedCountry))
     }
 
-    void initializePreferences()
+    void initializePreferences().finally(() => { if (isActive) setPreferencesReady(true) })
 
     const initializeSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession()
@@ -154,7 +158,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       const storedRole = localStorage.getItem('userRole')
       let storedUserId = ''
       try { storedUserId = JSON.parse(localStorage.getItem('userData') || '{}')?.userId || '' } catch {}
-      if (session && (!storedRole || storedUserId !== session.user.id)) {
+      if (session) {
         try {
           const response = await fetch(`/api/user/profile?userId=${session.user.id}`, {
             headers: { Authorization: `Bearer ${session.access_token}` },
@@ -164,24 +168,9 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
           if (result.success && result.data && isActive) {
             const profile = result.data
             setRoleState(profile.role)
-            setUserState({
-              userId: profile.id,
-              email: profile.email || session.user.email || '',
-              phone: profile.phone || '',
-              name: profile.name || profile.full_name || profile.business_name,
-              city: profile.city || '',
-              state: profile.state || '',
-              role: profile.role,
-              merchantType: profile.merchant_type,
-            })
+            setUserState(sessionProfile(profile, session.user.email))
             localStorage.setItem('userRole', profile.role)
-            localStorage.setItem('userData', JSON.stringify({
-              userId: profile.id,
-              email: profile.email,
-              phone: profile.phone || '',
-              name: profile.name || profile.full_name || profile.business_name,
-              role: profile.role,
-            }))
+            localStorage.setItem('userData', JSON.stringify(sessionProfile(profile, session.user.email)))
           } else {
             // Profile not in auth_users yet — fall back to user_metadata
             if (isActive) {
@@ -236,29 +225,14 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
           const result = await response.json()
           if (result.success && result.data && isActive) {
             const profile = result.data
-            const role = (pendingRole || profile.role || 'buyer') as string
+            const role = (profile.role || 'buyer') as string
             setRoleState(role)
-            setUserState({
-              userId: profile.id,
-              email: profile.email,
-              phone: profile.phone || '',
-              name: profile.name || profile.full_name || profile.business_name,
-              city: profile.city || '',
-              state: profile.state || '',
-              role: role as any,
-              merchantType: profile.merchant_type,
-            })
+            setUserState(sessionProfile(profile, session.user.email))
             localStorage.setItem('userRole', role)
-            localStorage.setItem('userData', JSON.stringify({ userId: profile.id, email: profile.email, name: profile.name || profile.full_name, role }))
+            localStorage.setItem('userData', JSON.stringify(sessionProfile(profile, session.user.email)))
             if (pendingRole) {
               localStorage.removeItem('pendingOAuthRole')
-              if (profile.role !== pendingRole) {
-                fetch('/api/user/profile', {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-                  body: JSON.stringify({ userId: session.user.id, updates: { role: pendingRole } }),
-                }).catch(() => {})
-              }
+
             }
           } else {
             const role = pendingRole || 'buyer'
@@ -349,7 +323,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <RoleContext.Provider value={{ role, user, preferences, setRole, setUser, setPreferences, setCountry, isLoading }}>
+    <RoleContext.Provider value={{ role, user, preferences, setRole, setUser, setPreferences, setCountry, isLoading, preferencesReady }}>
       {children}
     </RoleContext.Provider>
   )

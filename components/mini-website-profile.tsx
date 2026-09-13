@@ -1,4 +1,7 @@
 "use client"
+import { translateBrowserUiText } from "@/lib/ui-translation"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect } from "react"
 import { Store, MapPin, Tag, Share2, Edit2, UserPlus, UserCheck, Loader2, Users } from "lucide-react"
@@ -92,11 +95,11 @@ export function MiniWebsiteProfile({ profile, isOwner = false, buyerId, onEdit }
               {/* Logo Section */}
               <div className="flex flex-col items-center md:items-start">
                 {profile.logo_url ? (
-                  <img
+                  <UiAttributes><img
                     src={profile.logo_url}
                     alt={profile.business_name || "Business logo"}
                     className="w-32 h-32 rounded-2xl object-cover shadow-lg border-4 border-card"
-                  />
+                  /></UiAttributes>
                 ) : (
                   <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center border-4 border-card shadow-lg">
                     <Store className="w-12 h-12 text-muted-foreground" />
@@ -114,18 +117,18 @@ export function MiniWebsiteProfile({ profile, isOwner = false, buyerId, onEdit }
                     {profile.category && (
                       <div className="flex items-center gap-2 mt-2">
                         <Tag className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground font-medium">{profile.category}</span>
+                        <span className="text-sm text-muted-foreground font-medium"><UiValue value={profile.category} /></span>
                       </div>
                     )}
                   </div>
                   {isOwner && (
-                    <button
+                    <UiAttributes><button
                       onClick={onEdit}
                       className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground hover:text-foreground"
                       aria-label="Edit profile"
                     >
                       <Edit2 className="w-5 h-5" />
-                    </button>
+                    </button></UiAttributes>
                   )}
                 </div>
 
@@ -139,7 +142,7 @@ export function MiniWebsiteProfile({ profile, isOwner = false, buyerId, onEdit }
 
                 {/* SMEDAN ID Badge */}
                 <div className="inline-block px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold text-primary mb-4">
-                  SMEDAN {profile.smedan_id}
+                  <UiText text={"SMEDAN"} />{" "}{profile.smedan_id}
                 </div>
 
                 {/* Action Buttons */}
@@ -161,7 +164,7 @@ export function MiniWebsiteProfile({ profile, isOwner = false, buyerId, onEdit }
                       ) : (
                         <UserPlus className="w-4 h-4" />
                       )}
-                      {isFollowing ? 'Following' : 'Follow'}
+                      <UiValue value={isFollowing ? 'Following' : 'Follow'} />
                     </button>
                   )}
                   <button
@@ -170,7 +173,7 @@ export function MiniWebsiteProfile({ profile, isOwner = false, buyerId, onEdit }
                     }}
                     className={`${isOwner ? 'flex-1' : ''} py-2 px-4 bg-secondary border border-border rounded-lg text-foreground hover:bg-secondary/80 transition-colors flex items-center justify-center gap-2`}
                   >
-                    <span>Contact Store</span>
+                    <span><UiText text={"Contact Store"} /></span>
                   </button>
                   <button
                     onClick={async () => {
@@ -183,23 +186,23 @@ export function MiniWebsiteProfile({ profile, isOwner = false, buyerId, onEdit }
                         await navigator.share(shareData)
                       } else {
                         await navigator.clipboard.writeText(window.location.href)
-                        alert('Store link copied to clipboard.')
+                        alert(translateBrowserUiText('Store link copied to clipboard.'))
                       }
                     }}
                     className="px-4 py-2 bg-secondary border border-border rounded-lg text-foreground hover:bg-secondary/80 transition-colors flex items-center justify-center gap-2"
                   >
                     <Share2 className="w-4 h-4" />
-                    <span className="hidden sm:inline">Share</span>
+                    <span className="hidden sm:inline"><UiText text={"Share"} /></span>
                   </button>
                 </div>
                 {/* Follower count + notice */}
                 <div className="mt-3 flex flex-col gap-1">
                   <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                     <Users className="w-3.5 h-3.5" />
-                    {followerCount.toLocaleString('en-NG')} follower{followerCount === 1 ? '' : 's'}
+                    {followerCount.toLocaleString('en-NG')} {" "}<UiText text={"follower"} />{followerCount === 1 ? '' : 's'}
                   </span>
                   {followNotice && (
-                    <p className="text-xs text-primary font-medium">{followNotice}</p>
+                    <p className="text-xs text-primary font-medium"><UiValue value={followNotice} /></p>
                   )}
                 </div>
               </div>
@@ -210,7 +213,7 @@ export function MiniWebsiteProfile({ profile, isOwner = false, buyerId, onEdit }
 
             {/* Description Section */}
             <div>
-              <h2 className="text-lg font-semibold text-foreground mb-3">About This Store</h2>
+              <h2 className="text-lg font-semibold text-foreground mb-3"><UiText text={"About This Store"} /></h2>
               <p className="text-foreground/80 leading-relaxed text-pretty">
                 {profile.business_description || "No description provided yet."}
               </p>
@@ -223,19 +226,18 @@ export function MiniWebsiteProfile({ profile, isOwner = false, buyerId, onEdit }
               <>
               {/* Featured Products Section */}
               <div className="bg-card rounded-3xl shadow-xl shadow-primary/5 border border-border/50 p-6 md:p-8">
-                <h2 className="text-xl font-semibold text-foreground mb-6">Products</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-6"><UiText text={"Products"} /></h2>
                 <div className="rounded-2xl border border-dashed border-border bg-secondary/30 p-8 text-center">
                   <Store className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-sm font-medium text-foreground">No products published yet</p>
-                  <p className="text-xs text-muted-foreground mt-1">Live products will appear here when the merchant adds them.</p>
+                  <p className="text-sm font-medium text-foreground"><UiText text={"No products published yet"} /></p>
+                  <p className="text-xs text-muted-foreground mt-1"><UiText text={"Live products will appear here when the merchant adds them."} /></p>
                 </div>
                 {isOwner && (
                   <button
                     onClick={onEdit}
                     className="w-full mt-6 py-2 px-4 bg-secondary border border-border rounded-lg text-foreground hover:bg-secondary/80 transition-colors font-medium"
                   >
-                    Add Products
-                  </button>
+                    <UiText text={"Add Products"} />{" "}</button>
                 )}
               </div>
               </>
@@ -245,19 +247,18 @@ export function MiniWebsiteProfile({ profile, isOwner = false, buyerId, onEdit }
               <>
               {/* Featured Services Section */}
               <div className="bg-card rounded-3xl shadow-xl shadow-primary/5 border border-border/50 p-6 md:p-8">
-                <h2 className="text-xl font-semibold text-foreground mb-6">Services</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-6"><UiText text={"Services"} /></h2>
                 <div className="rounded-2xl border border-dashed border-border bg-secondary/30 p-8 text-center">
                   <Store className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-sm font-medium text-foreground">No services published yet</p>
-                  <p className="text-xs text-muted-foreground mt-1">Live services will appear here when the merchant adds them.</p>
+                  <p className="text-sm font-medium text-foreground"><UiText text={"No services published yet"} /></p>
+                  <p className="text-xs text-muted-foreground mt-1"><UiText text={"Live services will appear here when the merchant adds them."} /></p>
                 </div>
                 {isOwner && (
                   <button
                     onClick={onEdit}
                     className="w-full mt-6 py-2 px-4 bg-secondary border border-border rounded-lg text-foreground hover:bg-secondary/80 transition-colors font-medium"
                   >
-                    Add Services
-                  </button>
+                    <UiText text={"Add Services"} />{" "}</button>
                 )}
               </div>
               </>

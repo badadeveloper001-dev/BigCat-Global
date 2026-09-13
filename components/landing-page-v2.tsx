@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import Image from "next/image"
 import Link from "next/link"
@@ -83,35 +85,28 @@ function HeroSection() {
           {/* Left: Text */}
           <div className="text-center lg:text-left">
             <h1 className="text-6xl sm:text-7xl lg:text-8xl font-extrabold text-white leading-[0.95] tracking-tight mb-6">
-              Trade
-              <br />
-              Globally.
-              <br />
+              <UiText text={"Trade"} />{" "}<br />
+              <UiText text={"Globally."} />{" "}<br />
               <span className="bg-gradient-to-r from-[#f87171] via-[#fb923c] to-[#fecaca] bg-clip-text text-transparent">
-                Sell Without
-                <br />
-                Borders.
-              </span>
+                <UiText text={"Sell Without"} />{" "}<br />
+                <UiText text={"Borders."} />{" "}</span>
             </h1>
 
             <p className="text-gray-300/90 text-lg sm:text-xl max-w-lg mx-auto lg:mx-0 mb-10 leading-relaxed">
-              Buy and sell seamlessly between Nigeria and China with AI-powered translation, secure international payments, and trusted cross-border logistics.
-            </p>
+              <UiText text={"Buy and sell seamlessly between Nigeria and China with AI-powered translation, secure international payments, and trusted cross-border logistics."} />{" "}</p>
 
             <div className="flex flex-col sm:flex-row gap-4 items-center lg:items-start justify-center lg:justify-start">
               <Link
                 href="/marketplace"
                 className="group inline-flex items-center gap-2 bg-[#dc2626] hover:bg-[#ef4444] text-white text-base font-bold px-10 py-5 rounded-full shadow-2xl shadow-black/40 transition-all hover:-translate-y-1"
               >
-                Start Trading
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <UiText text={"Start Trading"} />{" "}<ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/marketplace"
                 className="inline-flex items-center gap-2 text-gray-200 hover:text-white text-base font-semibold px-8 py-5 rounded-full border border-white/15 hover:border-white/30 bg-white/5 hover:bg-white/10 transition-all hover:-translate-y-1"
               >
-                Become a Merchant
-                <ArrowRight className="w-4 h-4" />
+                <UiText text={"Become a Merchant"} />{" "}<ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
@@ -123,8 +118,7 @@ function HeroSection() {
               <circle cx="100" cy="80" r="50" fill="#dc2626" opacity="0.15" />
               <circle cx="100" cy="80" r="50" fill="none" stroke="#dc2626" strokeWidth="2" opacity="0.5" />
               <text x="100" y="90" textAnchor="middle" fill="#dc2626" fontSize="24" fontWeight="bold" opacity="0.8">
-                NG
-              </text>
+                <UiText text={"NG"} />{" "}</text>
 
               {/* Center: BigCat - Subtle Pulse */}
               <g>
@@ -137,8 +131,7 @@ function HeroSection() {
               <circle cx="300" cy="420" r="50" fill="#dc2626" opacity="0.15" />
               <circle cx="300" cy="420" r="50" fill="none" stroke="#dc2626" strokeWidth="2" opacity="0.5" />
               <text x="300" y="430" textAnchor="middle" fill="#dc2626" fontSize="24" fontWeight="bold" opacity="0.8">
-                CN
-              </text>
+                <UiText text={"CN"} />{" "}</text>
 
               {/* Flow Lines - Subtle */}
               <g stroke="#f87171" strokeWidth="2" opacity="0.4">
@@ -172,15 +165,12 @@ function ExperienceSection() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
           <h2 className="text-5xl sm:text-6xl font-extrabold text-white mb-4 leading-tight">
-            How will you use
-            <br />
+            <UiText text={"How will you use"} />{" "}<br />
             <span className="bg-gradient-to-r from-[#f87171] to-[#fb923c] bg-clip-text text-transparent">
-              BigCat Global?
-            </span>
+              <UiText text={"BigCat Global?"} />{" "}</span>
           </h2>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            Choose your experience and discover your unique journey.
-          </p>
+            <UiText text={"Choose your experience and discover your unique journey."} />{" "}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -199,11 +189,10 @@ function ExperienceSection() {
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br p-3 mb-6" style={{ backgroundImage: `linear-gradient(to bottom right, var(--tw-gradient-stops))` }}>
                     <IconComponent className="w-full h-full text-white opacity-80" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-2">{exp.title}</h3>
-                  <p className="text-gray-400 mb-6">{exp.subtitle}</p>
+                  <h3 className="text-2xl font-bold text-white mb-2"><UiValue value={exp.title} /></h3>
+                  <p className="text-gray-400 mb-6"><UiValue value={exp.subtitle} /></p>
                   <div className="inline-flex items-center gap-2 text-[#f87171] font-semibold">
-                    View Journey
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <UiText text={"View Journey"} />{" "}<ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </button>
@@ -278,7 +267,7 @@ function JourneyVisualization({ selected, onBack }: { selected: ExperienceType; 
   const journey = selected ? journeys[selected] : null
 
   if (!journey) {
-    return <div>Loading...</div>
+    return <div><UiText text={"Loading..."} /></div>
   }
 
   return (
@@ -290,13 +279,11 @@ function JourneyVisualization({ selected, onBack }: { selected: ExperienceType; 
           className="mb-12 inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
         >
           <ChevronDown className="w-5 h-5 rotate-90" />
-          Back
-        </button>
+          <UiText text={"Back"} />{" "}</button>
 
-        <h2 className="text-5xl sm:text-6xl font-extrabold text-white mb-4">{journey.title}</h2>
+        <h2 className="text-5xl sm:text-6xl font-extrabold text-white mb-4"><UiValue value={journey.title} /></h2>
         <p className="text-gray-400 text-lg mb-16">
-          Discover your complete journey on BigCat Global, step by step.
-        </p>
+          <UiText text={"Discover your complete journey on BigCat Global, step by step."} />{" "}</p>
 
         {/* Timeline */}
         <div className="relative">
@@ -327,13 +314,13 @@ function JourneyVisualization({ selected, onBack }: { selected: ExperienceType; 
                   {/* Content Card */}
                   <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 hover:bg-white/[0.08] transition-all">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-sm font-bold text-gray-500">Step {step.number}</span>
+                      <span className="text-sm font-bold text-gray-500"><UiText text={"Step"} />{" "}{step.number}</span>
                       {index < journey.steps.length - 1 && (
                         <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent" />
                       )}
                     </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">{step.title}</h3>
-                    <p className="text-gray-400">{step.subtitle}</p>
+                    <h3 className="text-2xl font-bold text-white mb-2"><UiValue value={step.title} /></h3>
+                    <p className="text-gray-400"><UiValue value={step.subtitle} /></p>
                   </div>
                 </div>
               )
@@ -343,13 +330,12 @@ function JourneyVisualization({ selected, onBack }: { selected: ExperienceType; 
 
         {/* CTA */}
         <div className="mt-20 rounded-[32px] border border-white/10 bg-white/[0.04] p-8 text-center">
-          <p className="text-gray-400 mb-6">Ready to start your journey?</p>
+          <p className="text-gray-400 mb-6"><UiText text={"Ready to start your journey?"} /></p>
           <Link
             href="/marketplace"
             className="inline-flex items-center gap-2 bg-[#dc2626] hover:bg-[#ef4444] text-white font-bold px-10 py-4 rounded-full transition-all hover:-translate-y-1 shadow-lg shadow-black/30"
           >
-            Get Started
-            <ArrowRight className="w-5 h-5" />
+            <UiText text={"Get Started"} />{" "}<ArrowRight className="w-5 h-5" />
           </Link>
         </div>
       </div>
@@ -391,11 +377,9 @@ function WhySection() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
           <h2 className="text-5xl sm:text-6xl font-extrabold text-white mb-4">
-            Why
-            <br />
+            <UiText text={"Why"} />{" "}<br />
             <span className="bg-gradient-to-r from-[#f87171] to-[#fb923c] bg-clip-text text-transparent">
-              BigCat Global?
-            </span>
+              <UiText text={"BigCat Global?"} />{" "}</span>
           </h2>
         </div>
 
@@ -412,8 +396,8 @@ function WhySection() {
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br p-3 mb-6" style={{ backgroundImage: `linear-gradient(to bottom right, var(--tw-gradient-stops))` }}>
                     <ReasonIcon className="w-full h-full text-white opacity-80" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-2">{reason.title}</h3>
-                  <p className="text-gray-400">{reason.description}</p>
+                  <h3 className="text-2xl font-bold text-white mb-2"><UiValue value={reason.title} /></h3>
+                  <p className="text-gray-400"><UiValue value={reason.description} /></p>
                 </div>
               </div>
             )
@@ -429,26 +413,26 @@ function CountriesSection() {
   return (
     <section className="py-32 px-5">
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-5xl font-extrabold text-white mb-6">Supported Countries</h2>
-        <p className="text-gray-400 text-lg mb-16">Starting with the world's largest trade corridors</p>
+        <h2 className="text-5xl font-extrabold text-white mb-6"><UiText text={"Supported Countries"} /></h2>
+        <p className="text-gray-400 text-lg mb-16"><UiText text={"Starting with the world's largest trade corridors"} /></p>
 
         <div className="flex justify-center gap-12 mb-12">
           <div className="text-center">
             <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#dc2626] to-[#ef4444] flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <span className="text-5xl font-bold text-white">NG</span>
+              <span className="text-5xl font-bold text-white"><UiText text={"NG"} /></span>
             </div>
-            <p className="text-white font-bold text-xl">Nigeria</p>
+            <p className="text-white font-bold text-xl"><UiText text={"Nigeria"} /></p>
           </div>
           <div className="text-center">
             <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-red-700 to-red-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <span className="text-5xl font-bold text-white">CN</span>
+              <span className="text-5xl font-bold text-white"><UiText text={"CN"} /></span>
             </div>
-            <p className="text-white font-bold text-xl">China</p>
+            <p className="text-white font-bold text-xl"><UiText text={"China"} /></p>
           </div>
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] py-8 px-6">
-          <p className="text-gray-400">More countries coming soon</p>
+          <p className="text-gray-400"><UiText text={"More countries coming soon"} /></p>
         </div>
       </div>
     </section>
@@ -460,7 +444,7 @@ function ProtectionSection() {
   return (
     <section className="py-32 px-5 bg-white/[0.02]">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-5xl font-extrabold text-white mb-20 text-center">Order Protection</h2>
+        <h2 className="text-5xl font-extrabold text-white mb-20 text-center"><UiText text={"Order Protection"} /></h2>
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Goods in Transit */}
@@ -468,38 +452,34 @@ function ProtectionSection() {
             <div className="w-12 h-12 rounded-xl bg-[#dc2626]/20 flex items-center justify-center mb-6">
               <Package className="w-6 h-6 text-[#f87171]" />
             </div>
-            <h3 className="text-3xl font-bold text-white mb-6">Goods in Transit Protection</h3>
+            <h3 className="text-3xl font-bold text-white mb-6"><UiText text={"Goods in Transit Protection"} /></h3>
 
             <div className="space-y-6 mb-8">
               <div className="flex items-start gap-4">
                 <Truck className="w-5 h-5 text-[#fb923c] flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-white font-semibold">Merchant → Shipment → Tracking → Delivery</p>
-                  <p className="text-gray-400 text-sm mt-1">Full journey coverage</p>
+                  <p className="text-white font-semibold"><UiText text={"Merchant → Shipment → Tracking → Delivery"} /></p>
+                  <p className="text-gray-400 text-sm mt-1"><UiText text={"Full journey coverage"} /></p>
                 </div>
               </div>
 
               <div className="pt-6 border-t border-white/10">
-                <p className="text-gray-400 text-sm font-semibold mb-3">PROTECTS AGAINST:</p>
+                <p className="text-gray-400 text-sm font-semibold mb-3"><UiText text={"PROTECTS AGAINST:"} /></p>
                 <ul className="space-y-2 text-gray-300">
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#f87171] rounded-full" /> Lost Shipment
-                  </li>
+                    <span className="w-1.5 h-1.5 bg-[#f87171] rounded-full" /> {" "}<UiText text={"Lost Shipment"} />{" "}</li>
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#f87171] rounded-full" /> Transit Damage
-                  </li>
+                    <span className="w-1.5 h-1.5 bg-[#f87171] rounded-full" /> {" "}<UiText text={"Transit Damage"} />{" "}</li>
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#f87171] rounded-full" /> Logistics Failure
-                  </li>
+                    <span className="w-1.5 h-1.5 bg-[#f87171] rounded-full" /> {" "}<UiText text={"Logistics Failure"} />{" "}</li>
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#f87171] rounded-full" /> Customs Delay
-                  </li>
+                    <span className="w-1.5 h-1.5 bg-[#f87171] rounded-full" /> {" "}<UiText text={"Customs Delay"} />{" "}</li>
                 </ul>
               </div>
             </div>
 
             <div className="rounded-xl bg-[#dc2626]/10 border border-[#dc2626]/20 p-4">
-              <p className="text-sm text-gray-300">Escrow remains locked during investigation</p>
+              <p className="text-sm text-gray-300"><UiText text={"Escrow remains locked during investigation"} /></p>
             </div>
           </div>
 
@@ -508,38 +488,34 @@ function ProtectionSection() {
             <div className="w-12 h-12 rounded-xl bg-violet-500/20 flex items-center justify-center mb-6">
               <RefreshCw className="w-6 h-6 text-violet-400" />
             </div>
-            <h3 className="text-3xl font-bold text-white mb-6">Return Goods Policy</h3>
+            <h3 className="text-3xl font-bold text-white mb-6"><UiText text={"Return Goods Policy"} /></h3>
 
             <div className="space-y-6 mb-8">
               <div className="flex items-start gap-4">
                 <AlertTriangle className="w-5 h-5 text-violet-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-white font-semibold">Delivered → Issue → Evidence → Resolution</p>
-                  <p className="text-gray-400 text-sm mt-1">5-step review process</p>
+                  <p className="text-white font-semibold"><UiText text={"Delivered → Issue → Evidence → Resolution"} /></p>
+                  <p className="text-gray-400 text-sm mt-1"><UiText text={"5-step review process"} /></p>
                 </div>
               </div>
 
               <div className="pt-6 border-t border-white/10">
-                <p className="text-gray-400 text-sm font-semibold mb-3">APPLICABLE FOR:</p>
+                <p className="text-gray-400 text-sm font-semibold mb-3"><UiText text={"APPLICABLE FOR:"} /></p>
                 <ul className="space-y-2 text-gray-300">
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full" /> Wrong Item
-                  </li>
+                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full" /> {" "}<UiText text={"Wrong Item"} />{" "}</li>
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full" /> Damaged Goods
-                  </li>
+                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full" /> {" "}<UiText text={"Damaged Goods"} />{" "}</li>
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full" /> Counterfeit Products
-                  </li>
+                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full" /> {" "}<UiText text={"Counterfeit Products"} />{" "}</li>
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full" /> Missing Items
-                  </li>
+                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full" /> {" "}<UiText text={"Missing Items"} />{" "}</li>
                 </ul>
               </div>
             </div>
 
             <div className="rounded-xl bg-violet-500/10 border border-violet-500/20 p-4">
-              <p className="text-sm text-gray-300">Refund or replacement guaranteed</p>
+              <p className="text-sm text-gray-300"><UiText text={"Refund or replacement guaranteed"} /></p>
             </div>
           </div>
         </div>
@@ -566,8 +542,8 @@ function OrderTimelineSection() {
     <section className="py-32 px-5 bg-white/[0.02]">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
-          <h2 className="text-5xl font-extrabold text-white mb-4">Order Timeline</h2>
-          <p className="text-gray-400 text-lg">Every stage, beautifully tracked</p>
+          <h2 className="text-5xl font-extrabold text-white mb-4"><UiText text={"Order Timeline"} /></h2>
+          <p className="text-gray-400 text-lg"><UiText text={"Every stage, beautifully tracked"} /></p>
         </div>
 
         <div className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 overflow-x-auto">
@@ -583,7 +559,7 @@ function OrderTimelineSection() {
                     >
                       <StageIcon className="w-8 h-8" />
                     </div>
-                    <p className="text-white text-sm font-semibold text-center whitespace-nowrap">{stage.label}</p>
+                    <p className="text-white text-sm font-semibold text-center whitespace-nowrap"><UiValue value={stage.label} /></p>
                   </div>
                   {index < stages.length - 1 && <div className="w-8 h-1 bg-gradient-to-r from-white/30 to-transparent mx-2 -mt-12" />}
                 </div>
@@ -593,7 +569,7 @@ function OrderTimelineSection() {
         </div>
 
         <div className="mt-12 text-center">
-          <p className="text-gray-400 mb-6">Real-time updates at every milestone</p>
+          <p className="text-gray-400 mb-6"><UiText text={"Real-time updates at every milestone"} /></p>
         </div>
       </div>
     </section>
@@ -606,26 +582,22 @@ function FooterSection() {
     <footer className="border-t border-white/5 py-12 px-5">
       <div className="max-w-6xl mx-auto text-center">
         <div className="mb-8">
-          <h3 className="text-white font-bold text-lg mb-2">BigCat Global</h3>
-          <p className="text-gray-500 text-sm">Trade Globally. Sell Without Borders.</p>
+          <h3 className="text-white font-bold text-lg mb-2"><UiText text={"BigCat Global"} /></h3>
+          <p className="text-gray-500 text-sm"><UiText text={"Trade Globally. Sell Without Borders."} /></p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-6 mb-8">
           <Link href="/terms" className="text-gray-500 hover:text-gray-300 text-sm transition-colors">
-            Terms
-          </Link>
+            <UiText text={"Terms"} />{" "}</Link>
           <Link href="/privacy" className="text-gray-500 hover:text-gray-300 text-sm transition-colors">
-            Privacy
-          </Link>
+            <UiText text={"Privacy"} />{" "}</Link>
           <Link href="/contact" className="text-gray-500 hover:text-gray-300 text-sm transition-colors">
-            Contact
-          </Link>
+            <UiText text={"Contact"} />{" "}</Link>
           <Link href="/help" className="text-gray-500 hover:text-gray-300 text-sm transition-colors">
-            Help
-          </Link>
+            <UiText text={"Help"} />{" "}</Link>
         </div>
 
-        <p className="text-gray-600 text-xs">© {new Date().getFullYear()} BigCat Global. All rights reserved.</p>
+        <p className="text-gray-600 text-xs">© {new Date().getFullYear()} {" "}<UiText text={"BigCat Global. All rights reserved."} /></p>
       </div>
     </footer>
   )

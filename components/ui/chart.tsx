@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import * as React from 'react'
 import * as RechartsPrimitive from 'recharts'
@@ -296,7 +298,7 @@ function ChartLegendContent({
                 }}
               />
             )}
-            {itemConfig?.label}
+            <UiValue value={itemConfig?.label} />
           </div>
         )
       })}

@@ -6,14 +6,16 @@ import { createClient } from './supabase/server'
 export const scopes = ['bigcat', 'orchid', 'trade-logistics'] as const
 export type AdminScope = typeof scopes[number]
 export const adminCookie = 'bigcat_admin_session'
+export class AdminAccessError extends Error { constructor(public code: string, message: string, public status = 403) { super(message) } }
 const roles = { bigcat: 'admin', orchid: 'orchid_admin', 'trade-logistics': 'trade_logistics_admin' }
-function secret() { const value = process.env.ADMIN_SESSION_SECRET; if (!value || value.length < 32) throw new Error('Admin access is not configured.'); return value }
+function secret() { const value = process.env.ADMIN_SESSION_SECRET; if (!value || value.length < 32) throw new AdminAccessError('CONFIGURATION_REQUIRED', 'Admin session configuration is missing. Contact the platform owner.', 503); return value }
 export function equalSecret(a: string, b: string) { return timingSafeEqual(createHash('sha256').update(a).digest(), createHash('sha256').update(b).digest()) }
 export async function adminIdentity() {
  const { user, error } = await getRequestAuthUser()
- if (error || !user) throw new Error('Sign in with your admin account first.')
+ if (error || !user) throw new AdminAccessError('SIGN_IN_REQUIRED', 'Sign in with your admin email and password first.', 401)
  const { data, error: profileError } = await createClient().from('auth_users').select('*').eq('id', user.id).single()
- if (profileError || !data || data.is_suspended === true || !Object.values(roles).includes(data.role)) throw new Error('Admin account required.')
+ if (profileError) throw new AdminAccessError('PROFILE_UNAVAILABLE', 'Unable to verify your account role. Please try again.', 503)
+ if (!data || data.is_suspended === true || !Object.values(roles).includes(data.role)) throw new AdminAccessError('ADMIN_ROLE_REQUIRED', 'This account does not have active administrator access. Ask the platform owner to assign your admin role.')
  return { id: user.id, role: data.role as string }
 }
 export function allowedRole(role: string, scope: AdminScope) { return role === 'admin' || role === roles[scope] }

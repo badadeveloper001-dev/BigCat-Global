@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import Image from "next/image"
 import Link from "next/link"
@@ -140,12 +142,11 @@ export function LandingPage() {
         <div className="max-w-6xl mx-auto px-5 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-2xl bg-white p-1.5 shadow-lg shadow-black/30 ring-1 ring-black/5 overflow-hidden">
-              <Image src="/image.png" alt="BigCat" width={36} height={36} className="w-full h-full object-cover object-top rounded-xl" />
+              <UiAttributes><Image src="/image.png" alt="BigCat" width={36} height={36} className="w-full h-full object-cover object-top rounded-xl" /></UiAttributes>
             </div>
-            <span className="font-extrabold text-white text-lg tracking-tight">BigCat Global</span>
+            <span className="font-extrabold text-white text-lg tracking-tight"><UiText text={"BigCat Global"} /></span>
             <span className="hidden sm:block text-[10px] font-semibold text-[#f87171] bg-[#dc2626]/10 border border-[#dc2626]/30 px-2 py-0.5 rounded-full uppercase tracking-widest ml-1">
-              International
-            </span>
+              <UiText text={"International"} />{" "}</span>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -190,8 +191,7 @@ export function LandingPage() {
             </h1>
 
             <p className="text-gray-300/90 text-lg sm:text-xl max-w-2xl lg:max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed">
-              A visual, bilingual marketplace journey for buyers and merchants from first discovery to protected delivery.
-            </p>
+              <UiText text={"A visual, bilingual marketplace journey for buyers and merchants from first discovery to protected delivery."} />{" "}</p>
 
             <div className="flex flex-col sm:flex-row items-center lg:items-center justify-center lg:justify-start gap-4">
               <Link
@@ -211,14 +211,11 @@ export function LandingPage() {
 
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mt-8">
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-300">
-                Auto-detect region
-              </span>
+                <UiText text={"Auto-detect region"} />{" "}</span>
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-300">
-                English / Chinese
-              </span>
+                <UiText text={"English / Chinese"} />{" "}</span>
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-300">
-                Photo & video proof
-              </span>
+                <UiText text={"Photo & video proof"} />{" "}</span>
             </div>
           </div>
 
@@ -226,18 +223,17 @@ export function LandingPage() {
             <div className="absolute -inset-4 rounded-[36px] bg-gradient-to-br from-[#dc2626]/20 via-transparent to-orange-500/20 blur-2xl" />
             <div className="relative rounded-[32px] border border-white/10 bg-white/5 p-2 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl">
               <div className="relative aspect-[4/5] overflow-hidden rounded-[26px] bg-[#14060a]">
-                <Image
+                <UiAttributes><Image
                   src="/hero-journey.svg"
                   alt="Buyer and merchant onboarding journey"
                   fill
                   priority
                   className="object-cover object-center"
-                />
+                /></UiAttributes>
                 <div className="absolute inset-0 bg-gradient-to-t from-[#14060a]/20 via-transparent to-transparent" />
 
                 <div className="absolute top-4 left-4 rounded-full border border-white/15 bg-[#14060a]/80 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur-md">
-                  Visual onboarding flow
-                </div>
+                  <UiText text={"Visual onboarding flow"} />{" "}</div>
               </div>
             </div>
           </div>
@@ -253,7 +249,7 @@ export function LandingPage() {
               href="/marketplace"
               className="inline-flex items-center gap-1.5 bg-white/5 hover:bg-[#dc2626]/15 border border-white/10 hover:border-[#dc2626]/40 text-gray-300 hover:text-[#f87171] text-sm font-medium px-4 py-2 rounded-full transition-all flex-shrink-0"
             >
-              <ChevronRight className="w-3 h-3 opacity-50" /> {cat}
+              <ChevronRight className="w-3 h-3 opacity-50" /> <UiValue value={cat} />
             </Link>
           ))}
         </div>
@@ -263,14 +259,12 @@ export function LandingPage() {
       <section className="py-14 px-5 bg-[#032c0e]">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#f87171]/60 mb-8">
-            Trusted & Backed By
-          </p>
+            <UiText text={"Trusted & Backed By"} />{" "}</p>
           <div className="flex items-center justify-center gap-10 sm:gap-16 flex-wrap">
             <div className="rounded-2xl border border-white/20 px-4 py-2.5 text-sm font-semibold text-white/90">
-              Orchid Payments
-            </div>
+              <UiText text={"Orchid Payments"} />{" "}</div>
             <div className="bg-white rounded-2xl px-3 py-2 shadow-md opacity-90 hover:opacity-100 transition-opacity">
-              <Image src="/image.png" alt="BigCat Global" width={72} height={36} className="object-contain" />
+              <UiAttributes><Image src="/image.png" alt="BigCat Global" width={72} height={36} className="object-contain" /></UiAttributes>
             </div>
           </div>
         </div>
@@ -280,16 +274,14 @@ export function LandingPage() {
       <section className="py-24 px-5">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#f87171]">What We Offer</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#f87171]"><UiText text={"What We Offer"} /></span>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mt-3 mb-4 leading-tight">
-              One platform.<br />
+              <UiText text={"One platform."} /><br />
               <span className="bg-gradient-to-r from-[#f87171] to-orange-400 bg-clip-text text-transparent">
-                Infinite possibilities.
-              </span>
+                <UiText text={"Infinite possibilities."} />{" "}</span>
             </h2>
             <p className="text-gray-400 text-lg max-w-xl mx-auto">
-              Everything you need to buy, sell, scale, and succeed — built into a single smart marketplace.
-            </p>
+              <UiText text={"Everything you need to buy, sell, scale, and succeed — built into a single smart marketplace."} />{" "}</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -301,10 +293,10 @@ export function LandingPage() {
                 <div className={`inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br ${f.gradient} shadow-lg mb-5`}>
                   <f.icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-white mb-2.5">{f.title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{f.description}</p>
+                <h3 className="text-lg font-bold text-white mb-2.5"><UiValue value={f.title} /></h3>
+                <p className="text-gray-400 text-sm leading-relaxed"><UiValue value={f.description} /></p>
                 <div className={`mt-5 inline-flex items-center gap-1.5 text-xs font-semibold bg-gradient-to-r ${f.gradient} bg-clip-text text-transparent`}>
-                  Learn more <ChevronRight className="w-3 h-3 text-red-400" />
+                  <UiText text={"Learn more"} />{" "}<ChevronRight className="w-3 h-3 text-red-400" />
                 </div>
               </div>
             ))}
@@ -317,12 +309,10 @@ export function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
         <div className="max-w-6xl mx-auto relative">
           <div className="text-center mb-12">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-400">How it works</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-400"><UiText text={"How it works"} /></span>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mt-3 mb-4">
-              A simple flow from
-              <span className="block bg-gradient-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent">
-                discovery to delivery
-              </span>
+              <UiText text={"A simple flow from"} />{" "}<span className="block bg-gradient-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent">
+                <UiText text={"discovery to delivery"} />{" "}</span>
             </h2>
           </div>
 
@@ -360,10 +350,10 @@ export function LandingPage() {
                       <step.icon className="w-5 h-5 text-white" />
                     </div>
                     <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#fca5a5] mb-2">
-                      Step {index + 1}
+                      <UiText text={"Step"} />{" "}{index + 1}
                     </div>
-                    <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-                    <p className="text-sm leading-relaxed text-gray-400">{step.description}</p>
+                    <h3 className="text-lg font-bold text-white mb-2"><UiValue value={step.title} /></h3>
+                    <p className="text-sm leading-relaxed text-gray-400"><UiValue value={step.description} /></p>
                   </div>
                   {index < 3 && (
                     <div className="hidden lg:flex items-center justify-center py-3 text-[#f87171]">
@@ -377,13 +367,13 @@ export function LandingPage() {
             <div className="mt-8 rounded-[24px] border border-[#dc2626]/20 bg-[#14060a]/70 p-5 sm:p-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#fca5a5]">Visual flow</p>
-                  <p className="text-white font-semibold mt-1">Buyer → discovery → trusted checkout → delivery &amp; growth</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#fca5a5]"><UiText text={"Visual flow"} /></p>
+                  <p className="text-white font-semibold mt-1"><UiText text={"Buyer → discovery → trusted checkout → delivery &amp; growth"} /></p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-gray-300">Verified merchants</span>
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-gray-300">Protected payments</span>
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-gray-300">Live updates</span>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-gray-300"><UiText text={"Verified merchants"} /></span>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-gray-300"><UiText text={"Protected payments"} /></span>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-gray-300"><UiText text={"Live updates"} /></span>
                 </div>
               </div>
             </div>
@@ -395,12 +385,11 @@ export function LandingPage() {
       <section className="py-24 px-5 bg-white/[0.02] border-y border-white/5">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-400">Merchant Stories</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-400"><UiText text={"Merchant Stories"} /></span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-3 mb-4">
-              Real people.{" "}
+              <UiText text={"Real people."} />{" "}
               <span className="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">
-                Real growth.
-              </span>
+                <UiText text={"Real growth."} />{" "}</span>
             </h2>
           </div>
 
@@ -415,7 +404,7 @@ export function LandingPage() {
                     <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                <p className="text-gray-300 text-sm leading-relaxed mb-6 italic">&ldquo;{t.quote}&rdquo;</p>
+                <p className="text-gray-300 text-sm leading-relaxed mb-6 italic"><UiText text={"&ldquo;"} />{t.quote}<UiText text={"&rdquo;"} /></p>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-[#dc2626] flex items-center justify-center font-bold text-white text-sm flex-shrink-0">
                     {t.avatar}
@@ -442,34 +431,29 @@ export function LandingPage() {
           <div className="inline-flex items-center gap-2 bg-[#dc2626]/10 border border-[#dc2626]/25 rounded-full px-4 py-1.5 mb-8">
             <Zap className="w-3.5 h-3.5 text-[#f87171]" />
             <span className="text-xs font-semibold text-[#fca5a5] uppercase tracking-widest">
-              Join 50,000+ merchants
-            </span>
+              <UiText text={"Join 50,000+ merchants"} />{" "}</span>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-extrabold text-white mb-5 leading-tight">
-            Your business deserves{" "}
+            <UiText text={"Your business deserves"} />{" "}
             <span className="bg-gradient-to-r from-[#f87171] to-[#fb923c] bg-clip-text text-transparent">
-              to be seen.
-            </span>
+              <UiText text={"to be seen."} />{" "}</span>
           </h2>
           <p className="text-gray-400 text-lg mb-10 max-w-lg mx-auto">
-            Open your store today. It&apos;s free, fast, and backed by Nigeria&apos;s most trusted business network.
-          </p>
+            <UiText text={"Open your store today. It&apos;s free, fast, and backed by Nigeria&apos;s most trusted business network."} />{" "}</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/marketplace"
               className="group inline-flex items-center gap-2 bg-[#dc2626] hover:bg-[#ef4444] text-white text-base font-bold px-10 py-4 rounded-full shadow-2xl shadow-black/40 transition-all hover:-translate-y-0.5"
             >
-              Open My Store Free
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              <UiText text={"Open My Store Free"} />{" "}<ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
               href="/marketplace"
               className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm font-medium transition-colors"
             >
               <Smartphone className="w-4 h-4" />
-              Or shop as a buyer
-            </Link>
+              <UiText text={"Or shop as a buyer"} />{" "}</Link>
           </div>
         </div>
       </section>
@@ -479,29 +463,27 @@ export function LandingPage() {
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-white p-1.5 shadow-md ring-1 ring-black/5 overflow-hidden">
-              <Image src="/image.png" alt="BigCat" width={28} height={28} className="w-full h-full object-cover object-top rounded-lg" />
+              <UiAttributes><Image src="/image.png" alt="BigCat" width={28} height={28} className="w-full h-full object-cover object-top rounded-lg" /></UiAttributes>
             </div>
-            <span className="font-bold text-white text-sm">BigCat Global</span>
+            <span className="font-bold text-white text-sm"><UiText text={"BigCat Global"} /></span>
           </div>
           <div className="flex items-center gap-6 flex-wrap justify-center">
-            <Link href="/marketplace" className="text-gray-500 hover:text-gray-300 text-xs transition-colors">Browse</Link>
-            <Link href="/marketplace" className="text-gray-500 hover:text-gray-300 text-xs transition-colors">Sell</Link>
-            <Link href="/help" className="text-gray-500 hover:text-gray-300 text-xs transition-colors">Help Center</Link>
-            <Link href="/contact" className="text-gray-500 hover:text-gray-300 text-xs transition-colors">Contact</Link>
-            <Link href="/terms" className="text-gray-500 hover:text-gray-300 text-xs transition-colors">Terms</Link>
-            <Link href="/privacy" className="text-gray-500 hover:text-gray-300 text-xs transition-colors">Privacy</Link>
+            <Link href="/marketplace" className="text-gray-500 hover:text-gray-300 text-xs transition-colors"><UiText text={"Browse"} /></Link>
+            <Link href="/marketplace" className="text-gray-500 hover:text-gray-300 text-xs transition-colors"><UiText text={"Sell"} /></Link>
+            <Link href="/help" className="text-gray-500 hover:text-gray-300 text-xs transition-colors"><UiText text={"Help Center"} /></Link>
+            <Link href="/contact" className="text-gray-500 hover:text-gray-300 text-xs transition-colors"><UiText text={"Contact"} /></Link>
+            <Link href="/terms" className="text-gray-500 hover:text-gray-300 text-xs transition-colors"><UiText text={"Terms"} /></Link>
+            <Link href="/privacy" className="text-gray-500 hover:text-gray-300 text-xs transition-colors"><UiText text={"Privacy"} /></Link>
           </div>
           <div className="flex items-center gap-4">
             <div className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/80">
-              Orchid
-            </div>
+              <UiText text={"Orchid"} />{" "}</div>
             <div className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/80">
-              BigCat Global
-            </div>
+              <UiText text={"BigCat Global"} />{" "}</div>
           </div>
         </div>
         <div className="max-w-5xl mx-auto mt-8 pt-6 border-t border-white/5 text-center">
-          <p className="text-gray-600 text-xs">© {new Date().getFullYear()} BigCat Global. All rights reserved.</p>
+          <p className="text-gray-600 text-xs">© {new Date().getFullYear()} {" "}<UiText text={"BigCat Global. All rights reserved."} /></p>
         </div>
       </footer>
 

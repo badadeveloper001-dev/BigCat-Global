@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState } from "react"
 import { useRole } from "@/lib/role-context"
@@ -18,6 +20,7 @@ export function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
     try {
       const response = await fetch('/api/admin/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: code }) })
       const result = await response.json()
+      if (response.status === 401) { window.location.assign('/admin-portal'); return }
       if (!response.ok) throw new Error(result.error || 'Access denied.')
       window.location.assign(result.redirect)
     } catch (err) { setError(err instanceof Error ? err.message : 'Access unavailable.') }
@@ -35,7 +38,7 @@ export function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="font-semibold text-foreground">Admin Access</h1>
+          <h1 className="font-semibold text-foreground"><UiText text={"Admin Access"} /></h1>
           <div className="w-9" />
         </div>
       </header>
@@ -53,11 +56,9 @@ export function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
           {/* Title */}
           <div className="text-center mb-8">
             <h2 className="text-xl font-bold text-foreground">
-              Secure Admin Access
-            </h2>
+              <UiText text={"Secure Admin Access"} />{" "}</h2>
             <p className="text-muted-foreground mt-2 text-sm text-pretty">
-              Enter your administrator access code to continue
-            </p>
+              <UiText text={"Enter your administrator access code to continue"} />{" "}</p>
           </div>
 
           {/* Form */}
@@ -66,20 +67,20 @@ export function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
               <div className="absolute left-4 top-1/2 -translate-y-1/2">
                 <Lock className="w-5 h-5 text-muted-foreground" />
               </div>
-              <input
+              <UiAttributes><input
                 type="password"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="Enter access code"
                 className="w-full pl-12 pr-4 py-3.5 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                 autoComplete="off"
-              />
+              /></UiAttributes>
             </div>
 
             {error && (
               <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl">
                 <AlertCircle className="w-4 h-4 text-destructive" />
-                <p className="text-sm text-destructive">{error}</p>
+                <p className="text-sm text-destructive"><UiValue value={error} /></p>
               </div>
             )}
 
@@ -88,21 +89,20 @@ export function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
               disabled={!code || isLoading}
               className="w-full py-3.5 bg-primary text-primary-foreground rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
             >
-              {isLoading ? "Verifying..." : "Access Dashboard"}
+              <UiValue value={isLoading ? "Verifying..." : "Access Dashboard"} />
             </button>
           </form>
 
           {/* Help */}
           <p className="text-center text-xs text-muted-foreground mt-6">
-            Forgot your access code?{" "}
+            <UiText text={"Forgot your access code?"} />{" "}
             <button
               onClick={() => {
                 window.location.href = "mailto:support@bigcat.ng?subject=Admin%20Access%20Code%20Support"
               }}
               className="text-primary hover:underline"
             >
-              Contact support
-            </button>
+              <UiText text={"Contact support"} />{" "}</button>
           </p>
 
         </div>

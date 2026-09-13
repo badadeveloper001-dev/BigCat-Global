@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import Image from "next/image"
 import Link from "next/link"
@@ -166,17 +168,17 @@ function AnimatedLine({ active }: { active: boolean }) {
 
 function NigeriaFlag() {
   return (
-    <svg viewBox="0 0 3 2" className="h-9 w-12 sm:h-11 sm:w-16 rounded-md shadow-lg shadow-black/10 overflow-hidden" aria-label="Nigeria flag">
+    <UiAttributes><svg viewBox="0 0 3 2" className="h-9 w-12 sm:h-11 sm:w-16 rounded-md shadow-lg shadow-black/10 overflow-hidden" aria-label="Nigeria flag">
       <rect width="3" height="2" fill="#008753" />
       <rect x="1" width="1" height="2" fill="#fff" />
       <rect x="2" width="1" height="2" fill="#008753" />
-    </svg>
+    </svg></UiAttributes>
   )
 }
 
 function ChinaFlag() {
   return (
-    <svg viewBox="0 0 3 2" className="h-9 w-12 sm:h-11 sm:w-16 rounded-md shadow-lg shadow-black/10 overflow-hidden" aria-label="China flag">
+    <UiAttributes><svg viewBox="0 0 3 2" className="h-9 w-12 sm:h-11 sm:w-16 rounded-md shadow-lg shadow-black/10 overflow-hidden" aria-label="China flag">
       <rect width="3" height="2" fill="#de2910" />
       <g transform="translate(0.75 0.55) scale(0.24)">
         <polygon points="0,-1 0.2245,-0.309 0.9511,-0.309 0.3633,0.118 0.5878,0.809 0,0.382 -0.5878,0.809 -0.3633,0.118 -0.9511,-0.309 -0.2245,-0.309" fill="#ffde00" />
@@ -193,7 +195,7 @@ function ChinaFlag() {
       <g transform="translate(1.68 0.9) scale(0.07)">
         <polygon points="0,-1 0.2245,-0.309 0.9511,-0.309 0.3633,0.118 0.5878,0.809 0,0.382 -0.5878,0.809 -0.3633,0.118 -0.9511,-0.309 -0.2245,-0.309" fill="#ffde00" />
       </g>
-    </svg>
+    </svg></UiAttributes>
   )
 }
 
@@ -255,13 +257,13 @@ function JourneyTimeline({
                 <div className={`py-2.5 flex-1 transition-all duration-500 pb-8 ${isActive ? "opacity-100" : isPast ? "opacity-60" : "opacity-30"}`}>
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: isActive ? step.color : "rgba(255,255,255,0.3)" }}>
-                      Step {i + 1}
+                      <UiText text={"Step"} />{" "}{i + 1}
                     </span>
                     {isActive && <Dot color={step.color} pulse />}
                   </div>
-                  <p className="font-bold text-lg text-white leading-tight">{step.label}</p>
+                  <p className="font-bold text-lg text-white leading-tight"><UiValue value={step.label} /></p>
                   {isActive && (
-                    <p className="text-white/75 text-sm mt-1 animate-in fade-in duration-300">{step.detail}</p>
+                    <p className="text-white/75 text-sm mt-1 animate-in fade-in duration-300"><UiValue value={step.detail} /></p>
                   )}
                 </div>
               </button>
@@ -307,7 +309,7 @@ function HeroSection() {
               <ChinaFlag />
             </div>
             <div className="w-[160px] sm:w-[220px] drop-shadow-[0_20px_40px_rgba(0,0,0,0.18)]">
-              <Image
+              <UiAttributes><Image
                 src="/bigcat-logo-transparent.png"
                 alt="BigCat Global"
                 width={640}
@@ -315,7 +317,7 @@ function HeroSection() {
                 priority
                 className="h-auto w-full object-contain"
                 style={{ filter: "brightness(0) invert(1)" }}
-              />
+              /></UiAttributes>
             </div>
             <div className="shrink-0 rounded-full bg-white/10 p-1.5 backdrop-blur-sm">
               <NigeriaFlag />
@@ -324,35 +326,26 @@ function HeroSection() {
 
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/30 bg-white/10 text-white text-xs font-medium mb-8 tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            Trusted cross-border trade
-          </div>
+            <UiText text={"Trusted cross-border trade"} />{" "}</div>
 
           <h1 className="text-[clamp(3rem,8vw,6rem)] font-black text-white leading-[0.9] tracking-tighter mb-8">
-            Trade
-            <br />
-            Globally.
-            <br />
+            <UiText text={"Trade"} />{" "}<br />
+            <UiText text={"Globally."} />{" "}<br />
             <span className="text-white/90">
-              Sell Without
-              <br />
-              Borders.
-            </span>
+              <UiText text={"Sell Without"} />{" "}<br />
+              <UiText text={"Borders."} />{" "}</span>
           </h1>
 
           <p className="text-white/85 text-lg sm:text-xl max-w-lg mx-auto lg:mx-0 mb-6 leading-relaxed">
-            Discover trusted services, book with confidence, and trade across Nigeria and China with
-            AI-powered translation, secure payments, and verified logistics.
-          </p>
+            <UiText text={"Discover trusted services, book with confidence, and trade across Nigeria and China with AI-powered translation, secure payments, and verified logistics."} />{" "}</p>
 
           <div className="mb-10 flex flex-wrap items-center justify-center lg:justify-start gap-3">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3.5 py-2 text-sm font-medium text-white">
               <Lock className="w-4 h-4" />
-              100% Escrow Protected
-            </div>
+              <UiText text={"100% Escrow Protected"} />{" "}</div>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3.5 py-2 text-sm font-medium text-white">
               <Shield className="w-4 h-4 text-white" />
-              Buyer & seller protection
-            </div>
+              <UiText text={"Buyer & seller protection"} />{" "}</div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -360,15 +353,13 @@ function HeroSection() {
               href="/marketplace?view=services"
               className="group inline-flex items-center justify-center gap-2 bg-white hover:bg-[#fff0f0] text-[#d94a4a] text-base font-bold px-10 py-4 rounded-full shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-0.5"
             >
-              Explore Services
-              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+              <UiText text={"Explore Services"} />{" "}<ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link
               href="/marketplace"
               className="inline-flex items-center justify-center gap-2 text-white hover:text-white/80 text-base font-semibold px-8 py-4 rounded-full border border-white/30 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:-translate-y-0.5"
             >
-              Browse Marketplace
-            </Link>
+              <UiText text={"Browse Marketplace"} />{" "}</Link>
           </div>
 
           {/* Stats */}
@@ -417,8 +408,8 @@ function HeroSection() {
             <circle cx="150" cy="260" r="58" fill="#dc2626" fillOpacity="0.15" />
             <circle cx="150" cy="260" r="58" stroke="#dc2626" strokeWidth="2" strokeOpacity="0.7" />
             <circle cx="150" cy="260" r="44" fill="#dc2626" fillOpacity="0.2" />
-            <text x="150" y="252" textAnchor="middle" fill="white" fontSize="11" fontWeight="800" letterSpacing="1">BIGCAT</text>
-            <text x="150" y="268" textAnchor="middle" fill="white" fontSize="9" opacity="0.6">GLOBAL</text>
+            <text x="150" y="252" textAnchor="middle" fill="white" fontSize="11" fontWeight="800" letterSpacing="1"><UiText text={"BIGCAT"} /></text>
+            <text x="150" y="268" textAnchor="middle" fill="white" fontSize="9" opacity="0.6"><UiText text={"GLOBAL"} /></text>
             <circle cx="150" cy="260" r="56">
               <animate attributeName="r" values="56;60;56" dur="3s" repeatCount="indefinite" />
               <animate attributeName="opacity" values="0.3;0;0.3" dur="3s" repeatCount="indefinite" />
@@ -454,7 +445,7 @@ function HeroSection() {
             ].map((l) => (
               <g key={l.y}>
                 <rect x="170" y={l.y - 10} width="110" height="20" rx="10" fill="white" fillOpacity="0.04" />
-                <text x="225" y={l.y + 4} textAnchor="middle" fill={l.color} fontSize="8.5" fontWeight="600" opacity="0.8">{l.text}</text>
+                <text x="225" y={l.y + 4} textAnchor="middle" fill={l.color} fontSize="8.5" fontWeight="600" opacity="0.8"><UiValue value={l.text} /></text>
               </g>
             ))}
           </svg>
@@ -494,8 +485,7 @@ function ExperienceSection() {
             className="flex items-center gap-2 text-white/80 hover:text-white transition-colors mb-10 text-sm font-medium"
           >
             <ChevronLeft className="w-4 h-4" />
-            Back to all experiences
-          </button>
+            <UiText text={"Back to all experiences"} />{" "}</button>
 
           <JourneyTimeline
             steps={stepsMap[selected]}
@@ -509,7 +499,7 @@ function ExperienceSection() {
               href="/marketplace"
               className="inline-flex items-center gap-2 bg-[#dc2626] hover:bg-[#ef4444] text-white font-bold px-10 py-4 rounded-full shadow-xl shadow-red-900/30 transition-all hover:-translate-y-0.5"
             >
-              {selected === "buyer" ? "Start Browsing" : "Get Started"}
+              <UiValue value={selected === "buyer" ? "Start Browsing" : "Get Started"} />
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -522,17 +512,14 @@ function ExperienceSection() {
     <section className="py-28 px-5 bg-[#8d0909] border-t border-white/10">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
-          <p className="text-white/80 text-sm font-bold uppercase tracking-[0.2em] mb-4">Your Experience</p>
+          <p className="text-white/80 text-sm font-bold uppercase tracking-[0.2em] mb-4"><UiText text={"Your Experience"} /></p>
           <h2 className="text-[clamp(2.2rem,6vw,4.5rem)] font-black text-white leading-tight">
-            How will you use
-            <br />
+            <UiText text={"How will you use"} />{" "}<br />
             <span className="text-white/90">
-              BigCat Global?
-            </span>
+              <UiText text={"BigCat Global?"} />{" "}</span>
           </h2>
           <p className="text-white/80 mt-5 text-lg max-w-md mx-auto">
-            Pick your role to see your complete journey — step by step.
-          </p>
+            <UiText text={"Pick your role to see your complete journey — step by step."} />{" "}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -552,13 +539,12 @@ function ExperienceSection() {
                   <ArrowRight className="w-5 h-5 text-[#5f4b46] group-hover:text-[#1f1412] group-hover:translate-x-1 transition-all duration-300" />
                 </div>
 
-                <h3 className="text-2xl font-extrabold text-[#1f1412] mb-2">{role.label}</h3>
+                <h3 className="text-2xl font-extrabold text-[#1f1412] mb-2"><UiValue value={role.label} /></h3>
                 <p className="text-[#5f4b46] text-sm leading-relaxed">{role.sub}</p>
 
                 <div className="mt-6 flex items-center gap-2">
                   <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ color: role.color, background: `${role.color}15` }}>
-                    See my journey →
-                  </span>
+                    <UiText text={"See my journey →"} />{" "}</span>
                 </div>
               </button>
             )
@@ -579,8 +565,8 @@ function WhySection() {
 
       <div className="relative max-w-6xl mx-auto">
         <div className="text-center mb-20">
-          <p className="text-[#FF0000] text-sm font-bold uppercase tracking-[0.2em] mb-4">Built Different</p>
-          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]">Why BigCat Global?</h2>
+          <p className="text-[#FF0000] text-sm font-bold uppercase tracking-[0.2em] mb-4"><UiText text={"Built Different"} /></p>
+          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]"><UiText text={"Why BigCat Global?"} /></h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -597,8 +583,8 @@ function WhySection() {
                     style={{ background: `${b.color}18`, border: `1.5px solid ${b.color}30` }}>
                     <Icon className="w-5 h-5" style={{ color: b.color }} />
                   </div>
-                  <h3 className="text-xl font-extrabold text-[#1f1412] mb-3">{b.title}</h3>
-                  <p className="text-[#5f4b46] text-sm leading-relaxed">{b.detail}</p>
+                  <h3 className="text-xl font-extrabold text-[#1f1412] mb-3"><UiValue value={b.title} /></h3>
+                  <p className="text-[#5f4b46] text-sm leading-relaxed"><UiValue value={b.detail} /></p>
                 </div>
               </div>
             )
@@ -614,9 +600,9 @@ function CountriesSection() {
     <section className="py-28 px-5 bg-[#fffaf7]">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
-          <p className="text-[#FF0000] text-sm font-bold uppercase tracking-[0.2em] mb-4">Coverage</p>
-          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]">Supported Countries</h2>
-          <p className="text-[#5f4b46] mt-4 text-lg">Two powerhouse economies. One marketplace.</p>
+          <p className="text-[#FF0000] text-sm font-bold uppercase tracking-[0.2em] mb-4"><UiText text={"Coverage"} /></p>
+          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]"><UiText text={"Supported Countries"} /></h2>
+          <p className="text-[#5f4b46] mt-4 text-lg"><UiText text={"Two powerhouse economies. One marketplace."} /></p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
@@ -651,8 +637,7 @@ function CountriesSection() {
         </div>
 
         <div className="text-center py-6 rounded-2xl border border-dashed border-[#f2d7d0] text-[#5f4b46] text-sm">
-          🌍 &nbsp; More countries coming soon — UK, UAE, Ghana and beyond
-        </div>
+          <UiText text={"🌍 &nbsp; More countries coming soon — UK, UAE, Ghana and beyond"} />{" "}</div>
       </div>
     </section>
   )
@@ -684,11 +669,10 @@ function ProtectionSection() {
     <section className="py-28 px-5" style={{ background: "linear-gradient(to bottom, #fff5f5, #fff1f2)" }}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
-          <p className="text-[#FF0000] text-sm font-bold uppercase tracking-[0.2em] mb-4">Order Protection</p>
-          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]">You're covered.</h2>
+          <p className="text-[#FF0000] text-sm font-bold uppercase tracking-[0.2em] mb-4"><UiText text={"Order Protection"} /></p>
+          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]"><UiText text={"You're covered."} /></h2>
           <p className="text-[#5f4b46] mt-4 text-lg max-w-md mx-auto">
-            Every transaction on BigCat is protected end-to-end.
-          </p>
+            <UiText text={"Every transaction on BigCat is protected end-to-end."} />{" "}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -712,7 +696,7 @@ function ProtectionSection() {
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-extrabold text-[#1f1412] mb-5">{card.title}</h3>
+                  <h3 className="text-xl font-extrabold text-[#1f1412] mb-5"><UiValue value={card.title} /></h3>
 
                   {/* Flow */}
                   <div className="flex items-center gap-1 mb-6 overflow-x-auto">
@@ -757,9 +741,9 @@ function OrderTimelineSection() {
     <section className="py-28 px-5 bg-[#fff2f2]">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
-          <p className="text-[#FF0000] text-sm font-bold uppercase tracking-[0.2em] mb-4">Order Journey</p>
-          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]">Every stage. Tracked.</h2>
-          <p className="text-[#5f4b46] mt-4">Real-time milestones from order to delivery.</p>
+          <p className="text-[#FF0000] text-sm font-bold uppercase tracking-[0.2em] mb-4"><UiText text={"Order Journey"} /></p>
+          <h2 className="text-[clamp(2rem,5vw,4rem)] font-black text-[#1f1412]"><UiText text={"Every stage. Tracked."} /></h2>
+          <p className="text-[#5f4b46] mt-4"><UiText text={"Real-time milestones from order to delivery."} /></p>
         </div>
 
         <div className="relative">
@@ -785,7 +769,7 @@ function OrderTimelineSection() {
                   </div>
                   <span className="text-xs text-center w-16 leading-tight transition-all duration-500"
                     style={{ color: isCurrent ? "white" : isDone ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)" }}>
-                    {stage.label}
+                    <UiValue value={stage.label} />
                   </span>
                   {isCurrent && <div className="w-1.5 h-1.5 rounded-full bg-[#FF0000] animate-pulse" />}
                 </button>
@@ -795,8 +779,8 @@ function OrderTimelineSection() {
 
           {/* Active stage detail */}
           <div className="mt-8 text-center p-8 rounded-3xl border border-red-100 bg-[#fff8f8]">
-            <div className="text-sm text-[#5f4b46] mb-1">Currently at stage {active + 1} of {ORDER_STAGES.length}</div>
-            <div className="text-2xl font-black text-[#1f1412]">{ORDER_STAGES[active].label}</div>
+            <div className="text-sm text-[#5f4b46] mb-1"><UiText text={"Currently at stage"} />{" "}{active + 1} {" "}<UiText text={"of"} />{" "}{ORDER_STAGES.length}</div>
+            <div className="text-2xl font-black text-[#1f1412]"><UiValue value={ORDER_STAGES[active].label} /></div>
           </div>
         </div>
       </div>
@@ -810,10 +794,9 @@ function FooterSection() {
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-14">
           <div className="col-span-2 sm:col-span-1">
-            <div className="text-xl font-black text-[#1f1412] mb-3">BigCat Global</div>
+            <div className="text-xl font-black text-[#1f1412] mb-3"><UiText text={"BigCat Global"} /></div>
             <p className="text-[#5f4b46] text-sm leading-relaxed">
-              Trade between Nigeria and China — powered by AI, secured by escrow.
-            </p>
+              <UiText text={"Trade between Nigeria and China — powered by AI, secured by escrow."} />{" "}</p>
           </div>
 
           {[
@@ -822,7 +805,7 @@ function FooterSection() {
             { label: "Company", links: [{ name: "Contact", href: "/contact" }, { name: "Become a Merchant", href: "/marketplace" }] },
           ].map((col) => (
             <div key={col.label}>
-              <p className="text-[#1f1412] font-bold text-sm mb-4">{col.label}</p>
+              <p className="text-[#1f1412] font-bold text-sm mb-4"><UiValue value={col.label} /></p>
               <div className="space-y-3">
                 {col.links.map((l) => (
                   <Link key={l.name} href={l.href} className="block text-[#5f4b46] hover:text-[#1f1412] text-sm transition-colors">{l.name}</Link>
@@ -833,11 +816,10 @@ function FooterSection() {
         </div>
 
         <div className="border-t border-red-100 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-[#5f4b46] text-xs">© 2026 BigCat Global. All rights reserved.</p>
+          <p className="text-[#5f4b46] text-xs"><UiText text={"© 2026 BigCat Global. All rights reserved."} /></p>
           <div className="flex items-center gap-2 text-xs text-[#5f4b46]">
             <Shield className="w-3.5 h-3.5" />
-            Protected by BigCat Escrow
-          </div>
+            <UiText text={"Protected by BigCat Escrow"} />{" "}</div>
         </div>
       </div>
     </footer>

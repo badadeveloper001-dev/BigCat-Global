@@ -1,4 +1,7 @@
 'use client'
+import { translateBrowserUiText } from "@/lib/ui-translation"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useEffect, useState } from 'react'
 import { useRole } from '@/lib/role-context'
@@ -252,7 +255,7 @@ export function MerchantPromotions() {
   }
 
   const handleDeletePromotion = async (id: string) => {
-    if (!confirm('Delete this promotion?')) return
+    if (!confirm(translateBrowserUiText('Delete this promotion?'))) return
     if (!user?.userId) {
       setError('Merchant session not found. Please sign in again.')
       return
@@ -338,7 +341,7 @@ export function MerchantPromotions() {
 
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
+          <UiValue value={error} />
         </div>
       )}
 
@@ -347,27 +350,25 @@ export function MerchantPromotions() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Zap className="w-5 h-5" /> Active Discounts & Promotions
-            </h3>
+              <Zap className="w-5 h-5" /> {" "}<UiText text={"Active Discounts & Promotions"} />{" "}</h3>
             <button
               onClick={() => setShowCreateForm(!showCreateForm)}
               className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90"
             >
-              <Plus className="w-4 h-4" /> New Promotion
-            </button>
+              <Plus className="w-4 h-4" /> {" "}<UiText text={"New Promotion"} />{" "}</button>
           </div>
 
           {showCreateForm && (
             <form onSubmit={handleCreatePromotion} className="rounded-lg border border-border bg-card p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
+                <UiAttributes><input
                   type="text"
                   placeholder="Promotion name (e.g., Summer Sale)"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                   className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                />
+                /></UiAttributes>
                 <select
                   value={formData.type}
                   onChange={(e) =>
@@ -375,15 +376,15 @@ export function MerchantPromotions() {
                   }
                   className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
                 >
-                  <option value="discount">Discount</option>
-                  <option value="flash_sale">Flash Sale</option>
-                  <option value="bundle">Bundle Deal</option>
+                  <option value="discount"><UiText text={"Discount"} /></option>
+                  <option value="flash_sale"><UiText text={"Flash Sale"} /></option>
+                  <option value="bundle"><UiText text={"Bundle Deal"} /></option>
                 </select>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-medium">Discount Type</label>
+                  <label className="text-xs font-medium"><UiText text={"Discount Type"} /></label>
                   <select
                     value={formData.discount_type}
                     onChange={(e) =>
@@ -392,41 +393,41 @@ export function MerchantPromotions() {
                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm mt-1"
                     disabled={formData.rule_type !== 'standard'}
                   >
-                    <option value="percentage">Percentage (%)</option>
-                    <option value="fixed">Fixed Amount (₦)</option>
+                    <option value="percentage"><UiText text={"Percentage (%)"} /></option>
+                    <option value="fixed"><UiText text={"Fixed Amount (₦)"} /></option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-medium">Discount Value</label>
-                  <input
+                  <label className="text-xs font-medium"><UiText text={"Discount Value"} /></label>
+                  <UiAttributes><input
                     type="number"
                     placeholder={formData.discount_type === 'percentage' ? '10' : '1000'}
                     value={formData.discount_value}
                     onChange={(e) => setFormData({ ...formData, discount_value: Number(e.target.value) })}
                     required
                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm mt-1"
-                  />
+                  /></UiAttributes>
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-medium">Promotion Rule</label>
+                <label className="text-xs font-medium"><UiText text={"Promotion Rule"} /></label>
                 <select
                   value={formData.rule_type}
                   onChange={(e) => setFormData({ ...formData, rule_type: e.target.value as PromotionRuleType })}
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm mt-1"
                 >
-                  <option value="standard">Standard Discount</option>
-                  <option value="spend_x_save_y">Spend X, Save Y</option>
-                  <option value="buy_x_get_y">Buy X, Get Y</option>
-                  <option value="nth_item_discount">Nth Item Discount</option>
+                  <option value="standard"><UiText text={"Standard Discount"} /></option>
+                  <option value="spend_x_save_y"><UiText text={"Spend X, Save Y"} /></option>
+                  <option value="buy_x_get_y"><UiText text={"Buy X, Get Y"} /></option>
+                  <option value="nth_item_discount"><UiText text={"Nth Item Discount"} /></option>
                 </select>
               </div>
 
               {formData.rule_type === 'spend_x_save_y' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-medium">Spend Threshold (₦)</label>
+                    <label className="text-xs font-medium"><UiText text={"Spend Threshold (₦)"} /></label>
                     <input
                       type="number"
                       value={formData.spend_threshold ?? ''}
@@ -436,7 +437,7 @@ export function MerchantPromotions() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Save Amount (₦)</label>
+                    <label className="text-xs font-medium"><UiText text={"Save Amount (₦)"} /></label>
                     <input
                       type="number"
                       value={formData.discount_value}
@@ -451,7 +452,7 @@ export function MerchantPromotions() {
               {formData.rule_type === 'buy_x_get_y' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-medium">Buy Quantity (X)</label>
+                    <label className="text-xs font-medium"><UiText text={"Buy Quantity (X)"} /></label>
                     <input
                       type="number"
                       min={1}
@@ -462,7 +463,7 @@ export function MerchantPromotions() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Get Quantity (Y)</label>
+                    <label className="text-xs font-medium"><UiText text={"Get Quantity (Y)"} /></label>
                     <input
                       type="number"
                       min={1}
@@ -478,7 +479,7 @@ export function MerchantPromotions() {
               {formData.rule_type === 'nth_item_discount' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-medium">Apply To Every Nth Item</label>
+                    <label className="text-xs font-medium"><UiText text={"Apply To Every Nth Item"} /></label>
                     <input
                       type="number"
                       min={2}
@@ -489,7 +490,7 @@ export function MerchantPromotions() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Nth Item Discount (%)</label>
+                    <label className="text-xs font-medium"><UiText text={"Nth Item Discount (%)"} /></label>
                     <input
                       type="number"
                       min={1}
@@ -505,7 +506,7 @@ export function MerchantPromotions() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="text-xs font-medium">Min. Purchase (₦)</label>
+                  <label className="text-xs font-medium"><UiText text={"Min. Purchase (₦)"} /></label>
                   <input
                     type="number"
                     value={formData.min_purchase_amount}
@@ -516,7 +517,7 @@ export function MerchantPromotions() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-medium">Start Date</label>
+                  <label className="text-xs font-medium"><UiText text={"Start Date"} /></label>
                   <input
                     type="date"
                     value={formData.start_date}
@@ -526,7 +527,7 @@ export function MerchantPromotions() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-medium">End Date</label>
+                  <label className="text-xs font-medium"><UiText text={"End Date"} /></label>
                   <input
                     type="date"
                     value={formData.end_date}
@@ -538,11 +539,11 @@ export function MerchantPromotions() {
               </div>
 
               <div>
-                <label className="text-xs font-medium">Apply to products</label>
-                <p className="text-xs text-muted-foreground mt-1">Leave all unchecked to apply to every product.</p>
+                <label className="text-xs font-medium"><UiText text={"Apply to products"} /></label>
+                <p className="text-xs text-muted-foreground mt-1"><UiText text={"Leave all unchecked to apply to every product."} /></p>
                 <div className="mt-2 max-h-40 overflow-auto rounded-lg border border-border bg-background p-2 space-y-2">
                   {merchantProducts.length === 0 ? (
-                    <p className="text-xs text-muted-foreground px-2 py-1">No products found yet.</p>
+                    <p className="text-xs text-muted-foreground px-2 py-1"><UiText text={"No products found yet."} /></p>
                   ) : (
                     merchantProducts.map((product) => {
                       const checked = formData.product_ids.includes(product.id)
@@ -573,25 +574,24 @@ export function MerchantPromotions() {
                   disabled={loading}
                   className="flex-1 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50"
                 >
-                  {loading ? 'Creating...' : 'Create Promotion'}
+                  <UiValue value={loading ? 'Creating...' : 'Create Promotion'} />
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowCreateForm(false)}
                   className="flex-1 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
                 >
-                  Cancel
-                </button>
+                  <UiText text={"Cancel"} />{" "}</button>
               </div>
             </form>
           )}
 
           {loading ? (
-            <div className="text-center py-8 text-muted-foreground">Loading promotions...</div>
+            <div className="text-center py-8 text-muted-foreground"><UiText text={"Loading promotions..."} /></div>
           ) : promotions.length === 0 ? (
             <div className="rounded-lg border border-dashed border-border bg-muted/50 p-8 text-center">
               <Zap className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p className="text-muted-foreground">No promotions yet. Create one to get started!</p>
+              <p className="text-muted-foreground"><UiText text={"No promotions yet. Create one to get started!"} /></p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -608,40 +608,38 @@ export function MerchantPromotions() {
                       <h4 className="font-semibold">{promo.name}</h4>
                       {isActive(promo.start_date, promo.end_date) ? (
                         <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded">
-                          Active
-                        </span>
+                          <UiText text={"Active"} />{" "}</span>
                       ) : (
                         <span className="text-xs font-medium text-gray-600 bg-gray-50 px-2 py-1 rounded">
-                          Inactive
-                        </span>
+                          <UiText text={"Inactive"} />{" "}</span>
                       )}
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3 text-sm">
                       <div>
-                        <p className="text-muted-foreground text-xs">Rule</p>
+                        <p className="text-muted-foreground text-xs"><UiText text={"Rule"} /></p>
                         <p className="font-semibold">{promotionRuleLabel(promo)}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-xs">Uses</p>
+                        <p className="text-muted-foreground text-xs"><UiText text={"Uses"} /></p>
                         <p className="font-semibold">
                           {promo.current_uses}
                           {promo.max_uses ? `/${promo.max_uses}` : ''}
                         </p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-xs">Duration</p>
+                        <p className="text-muted-foreground text-xs"><UiText text={"Duration"} /></p>
                         <p className="font-semibold text-xs">
                           {new Date(promo.start_date).toLocaleDateString()} -{' '}
                           {new Date(promo.end_date).toLocaleDateString()}
                         </p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-xs">Min. Purchase</p>
+                        <p className="text-muted-foreground text-xs"><UiText text={"Min. Purchase"} /></p>
                         <p className="font-semibold">₦{formatNaira(promo.min_purchase_amount)}</p>
                       </div>
                     </div>
                     <div className="mt-3 text-xs text-muted-foreground">
-                      Applies to: <span className="font-medium text-foreground">{selectedProductsLabel(promo.product_ids)}</span>
+                      <UiText text={"Applies to:"} />{" "}<span className="font-medium text-foreground">{selectedProductsLabel(promo.product_ids)}</span>
                     </div>
                   </div>
                   <div className="flex gap-2 ml-4">
@@ -667,15 +665,13 @@ export function MerchantPromotions() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Tag className="w-5 h-5" /> Coupon Codes
-            </h3>
+              <Tag className="w-5 h-5" /> {" "}<UiText text={"Coupon Codes"} />{" "}</h3>
             {!showCreateForm ? (
               <button
                 onClick={() => setShowCreateForm(true)}
                 className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90"
               >
-                <Plus className="w-4 h-4" /> New Coupon
-              </button>
+                <Plus className="w-4 h-4" /> {" "}<UiText text={"New Coupon"} />{" "}</button>
             ) : null}
           </div>
 
@@ -685,7 +681,7 @@ export function MerchantPromotions() {
               className="rounded-lg border border-border bg-card p-6 space-y-4"
             >
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input
+                <UiAttributes><input
                   type="text"
                   placeholder="Coupon code (e.g., SUMMER20)"
                   value={couponData.code}
@@ -694,7 +690,7 @@ export function MerchantPromotions() {
                   }
                   required
                   className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                />
+                /></UiAttributes>
                 <select
                   value={couponData.discount_type}
                   onChange={(e) =>
@@ -702,10 +698,10 @@ export function MerchantPromotions() {
                   }
                   className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
                 >
-                  <option value="percentage">Percentage (%)</option>
-                  <option value="fixed">Fixed Amount (₦)</option>
+                  <option value="percentage"><UiText text={"Percentage (%)"} /></option>
+                  <option value="fixed"><UiText text={"Fixed Amount (₦)"} /></option>
                 </select>
-                <input
+                <UiAttributes><input
                   type="number"
                   placeholder={couponData.discount_type === 'percentage' ? '20' : '5000'}
                   value={couponData.discount_value}
@@ -714,12 +710,12 @@ export function MerchantPromotions() {
                   }
                   required
                   className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                />
+                /></UiAttributes>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-medium">Start Date</label>
+                  <label className="text-xs font-medium"><UiText text={"Start Date"} /></label>
                   <input
                     type="date"
                     value={couponData.start_date}
@@ -731,7 +727,7 @@ export function MerchantPromotions() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-medium">End Date</label>
+                  <label className="text-xs font-medium"><UiText text={"End Date"} /></label>
                   <input
                     type="date"
                     value={couponData.end_date}
@@ -750,25 +746,24 @@ export function MerchantPromotions() {
                   disabled={loading}
                   className="flex-1 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50"
                 >
-                  {loading ? 'Creating...' : 'Create Coupon'}
+                  <UiValue value={loading ? 'Creating...' : 'Create Coupon'} />
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowCreateForm(false)}
                   className="flex-1 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
                 >
-                  Cancel
-                </button>
+                  <UiText text={"Cancel"} />{" "}</button>
               </div>
             </form>
           )}
 
           {loading ? (
-            <div className="text-center py-8 text-muted-foreground">Loading coupons...</div>
+            <div className="text-center py-8 text-muted-foreground"><UiText text={"Loading coupons..."} /></div>
           ) : coupons.length === 0 ? (
             <div className="rounded-lg border border-dashed border-border bg-muted/50 p-8 text-center">
               <Tag className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p className="text-muted-foreground">No coupons yet. Create one to get started!</p>
+              <p className="text-muted-foreground"><UiText text={"No coupons yet. Create one to get started!"} /></p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -783,9 +778,9 @@ export function MerchantPromotions() {
                         {coupon.code}
                       </div>
                       <div>
-                        <p className="font-semibold">{formatDiscount(coupon)} off</p>
+                        <p className="font-semibold">{formatDiscount(coupon)} {" "}<UiText text={"off"} /></p>
                         <p className="text-xs text-muted-foreground">
-                          Valid {new Date(coupon.start_date).toLocaleDateString()} -{' '}
+                          <UiText text={"Valid"} />{" "}{new Date(coupon.start_date).toLocaleDateString()} -{' '}
                           {new Date(coupon.end_date).toLocaleDateString()}
                         </p>
                       </div>
@@ -819,40 +814,40 @@ export function MerchantPromotions() {
           {!analytics ? (
             <div className="rounded-lg border border-border bg-card p-8 text-center">
               <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p className="text-muted-foreground">No analytics data yet.</p>
+              <p className="text-muted-foreground"><UiText text={"No analytics data yet."} /></p>
             </div>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div className="rounded-lg border border-border bg-card p-4">
-                  <p className="text-xs text-muted-foreground">Active Promotions</p>
+                  <p className="text-xs text-muted-foreground"><UiText text={"Active Promotions"} /></p>
                   <p className="text-2xl font-bold mt-1">{analytics.promotionsActive}/{analytics.promotionsTotal}</p>
                 </div>
                 <div className="rounded-lg border border-border bg-card p-4">
-                  <p className="text-xs text-muted-foreground">Active Coupons</p>
+                  <p className="text-xs text-muted-foreground"><UiText text={"Active Coupons"} /></p>
                   <p className="text-2xl font-bold mt-1">{analytics.couponsActive}/{analytics.couponsTotal}</p>
                 </div>
                 <div className="rounded-lg border border-border bg-card p-4">
-                  <p className="text-xs text-muted-foreground">Total Uses</p>
+                  <p className="text-xs text-muted-foreground"><UiText text={"Total Uses"} /></p>
                   <p className="text-2xl font-bold mt-1">{analytics.totalUses}</p>
                 </div>
                 <div className="rounded-lg border border-border bg-card p-4">
-                  <p className="text-xs text-muted-foreground">Revenue Impact</p>
+                  <p className="text-xs text-muted-foreground"><UiText text={"Revenue Impact"} /></p>
                   <p className="text-2xl font-bold mt-1">₦{formatNaira(analytics.totalRevenueImpact)}</p>
                 </div>
               </div>
 
               <div className="rounded-lg border border-border bg-card p-4">
-                <h4 className="font-semibold mb-3">Top Promotions</h4>
+                <h4 className="font-semibold mb-3"><UiText text={"Top Promotions"} /></h4>
                 {analytics.topPromotions.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No promotion usage yet.</p>
+                  <p className="text-sm text-muted-foreground"><UiText text={"No promotion usage yet."} /></p>
                 ) : (
                   <div className="space-y-2">
                     {analytics.topPromotions.map((promo) => (
                       <div key={promo.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
                         <div>
                           <p className="text-sm font-medium">{promo.name}</p>
-                          <p className="text-xs text-muted-foreground">{promo.active ? 'Active' : 'Inactive'}</p>
+                          <p className="text-xs text-muted-foreground"><UiValue value={promo.active ? 'Active' : 'Inactive'} /></p>
                         </div>
                         <p className="text-sm font-semibold">
                           {promo.uses}

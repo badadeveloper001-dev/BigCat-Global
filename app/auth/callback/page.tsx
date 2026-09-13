@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
@@ -127,20 +129,19 @@ export default function OAuthCallbackPage() {
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
         {errorMessage ? (
           <>
-            <h1 className="text-xl font-semibold text-foreground">Google sign-in could not be completed</h1>
+            <h1 className="text-xl font-semibold text-foreground"><UiText text={"Google sign-in could not be completed"} /></h1>
             <p className="mt-3 text-sm text-muted-foreground">{errorMessage}</p>
             <a
               href="/marketplace"
               className="mt-6 inline-flex rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground"
             >
-              Return to sign in
-            </a>
+              <UiText text={"Return to sign in"} />{" "}</a>
           </>
         ) : (
           <>
             <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-            <h1 className="mt-4 text-xl font-semibold text-foreground">Completing Google sign-in</h1>
-            <p className="mt-2 text-sm text-muted-foreground">Please wait while we securely open your marketplace account.</p>
+            <h1 className="mt-4 text-xl font-semibold text-foreground"><UiText text={"Completing Google sign-in"} /></h1>
+            <p className="mt-2 text-sm text-muted-foreground"><UiText text={"Please wait while we securely open your marketplace account."} /></p>
           </>
         )}
       </div>

@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect } from "react"
 import { ArrowLeft, Package, Clock, Truck, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react"
@@ -179,7 +181,7 @@ export function MerchantOrders({ onBack }: MerchantOrdersProps) {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="font-semibold text-foreground">Incoming Orders</h1>
+          <h1 className="font-semibold text-foreground"><UiText text={"Incoming Orders"} /></h1>
         </div>
       </header>
 
@@ -187,20 +189,19 @@ export function MerchantOrders({ onBack }: MerchantOrdersProps) {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <RefreshCw className="w-8 h-8 text-muted-foreground animate-spin mb-3" />
-            <p className="text-muted-foreground">Loading orders...</p>
+            <p className="text-muted-foreground"><UiText text={"Loading orders..."} /></p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-12">
             <AlertCircle className="w-12 h-12 text-destructive mb-3" />
-            <p className="text-destructive">{error}</p>
+            <p className="text-destructive"><UiValue value={error} /></p>
           </div>
         ) : orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
             <Package className="w-16 h-16 text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No orders yet</h2>
+            <h2 className="text-xl font-semibold mb-2"><UiText text={"No orders yet"} /></h2>
             <p className="text-muted-foreground text-center">
-              Orders will appear here when customers purchase your products
-            </p>
+              <UiText text={"Orders will appear here when customers purchase your products"} />{" "}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -232,14 +233,14 @@ export function MerchantOrders({ onBack }: MerchantOrdersProps) {
                   {/* Order Header */}
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <p className="text-xs text-muted-foreground">Order ID</p>
+                      <p className="text-xs text-muted-foreground"><UiText text={"Order ID"} /></p>
                       <p className="font-mono text-sm font-medium">
                         {order.id.slice(0, 8).toUpperCase()}
                       </p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 ${statusConfig[order.status]?.color || 'bg-muted text-muted-foreground'}`}>
                       <StatusIcon className="w-3.5 h-3.5" />
-                      {statusConfig[order.status]?.label || order.status}
+                      <UiValue value={statusConfig[order.status]?.label || order.status} />
                     </span>
                   </div>
 
@@ -263,7 +264,7 @@ export function MerchantOrders({ onBack }: MerchantOrdersProps) {
                       {formatDate(order.created_at)}
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-muted-foreground">Your Earnings</p>
+                      <p className="text-xs text-muted-foreground"><UiText text={"Your Earnings"} /></p>
                       <p className="font-semibold text-foreground">
                         N{orderItems.reduce((sum: number, item: any) => sum + Number(item.total_price || item.price || 0), 0).toLocaleString()}
                       </p>
@@ -272,26 +273,25 @@ export function MerchantOrders({ onBack }: MerchantOrdersProps) {
 
                   {/* Delivery Info */}
                   <div className="mt-3 pt-3 border-t border-border">
-                    <p className="text-xs text-muted-foreground mb-1">Delivery Address</p>
+                    <p className="text-xs text-muted-foreground mb-1"><UiText text={"Delivery Address"} /></p>
                     <p className="text-sm text-foreground">{order.delivery_address}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Tracking ID: {String(order.tracking_id || `BC-${String(order.id).replace(/-/g, '').slice(0, 10).toUpperCase()}`)}</p>
+                    <p className="text-xs text-muted-foreground mt-1"><UiText text={"Tracking ID:"} />{" "}{String(order.tracking_id || `BC-${String(order.id).replace(/-/g, '').slice(0, 10).toUpperCase()}`)}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {order.delivery_type === 'pickup'
+                      <UiValue value={order.delivery_type === 'pickup'
                         ? 'Pickup at Drop-off Point'
                         : order.delivery_type === 'express'
                           ? 'Express Delivery'
-                          : 'Normal Delivery'}
+                          : 'Normal Delivery'} />
                     </p>
                     {hasReturnFlow && (
                       <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50 p-3">
-                        <p className="text-xs text-blue-700 font-semibold">Return goods tracking</p>
+                        <p className="text-xs text-blue-700 font-semibold"><UiText text={"Return goods tracking"} /></p>
                         <p className="text-sm text-blue-900 mt-1">{getReturnStatusLabel(returnStatus)}</p>
                         <a
                           href={`/track/${order.id}`}
                           className="mt-2 inline-flex text-xs font-medium text-blue-700 underline underline-offset-2"
                         >
-                          Track return movement
-                        </a>
+                          <UiText text={"Track return movement"} />{" "}</a>
                       </div>
                     )}
                   </div>
@@ -299,27 +299,27 @@ export function MerchantOrders({ onBack }: MerchantOrdersProps) {
                   {/* Escrow Status */}
                   <div className="mt-3 pt-3 border-t border-border space-y-2">
                     <div className="flex items-center justify-between">
-                      <p className="text-xs text-muted-foreground">Payment Status</p>
+                      <p className="text-xs text-muted-foreground"><UiText text={"Payment Status"} /></p>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${paymentHeld ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'}`}>
-                        {paymentHeld ? 'Held in Escrow' : 'Released from Escrow'}
+                        <UiValue value={paymentHeld ? 'Held in Escrow' : 'Released from Escrow'} />
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-foreground">Merchant Payment</span>
+                      <span className="text-foreground"><UiText text={"Merchant Payment"} /></span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClass(escrow.merchant_status)}`}>
-                        {escrow.merchant_status === 'held' ? 'Held' : 'Released'}
+                        <UiValue value={escrow.merchant_status === 'held' ? 'Held' : 'Released'} />
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-foreground">Merchant Escrow Amount</span>
+                      <span className="text-foreground"><UiText text={"Merchant Escrow Amount"} /></span>
                       <span className="font-semibold text-foreground">
                         N{Number(escrow.product_amount || 0).toLocaleString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-foreground">Logistics Payment</span>
+                      <span className="text-foreground"><UiText text={"Logistics Payment"} /></span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClass(escrow.logistics_status)}`}>
-                        {escrow.logistics_status === 'held' ? 'Held' : 'Released'}
+                        <UiValue value={escrow.logistics_status === 'held' ? 'Held' : 'Released'} />
                       </span>
                     </div>
                   </div>
@@ -327,15 +327,14 @@ export function MerchantOrders({ onBack }: MerchantOrdersProps) {
                   {/* Status Update */}
                   {order.status !== 'delivered' && (
                     <div className="mt-3 pt-3 border-t border-border">
-                      <p className="text-xs text-muted-foreground mb-2">Update Status</p>
+                      <p className="text-xs text-muted-foreground mb-2"><UiText text={"Update Status"} /></p>
                       {(String(order.status).toLowerCase() === 'paid' || String(order.status).toLowerCase() === 'pending') && (
                         <button
                           onClick={() => handleStatusChange(order.id, 'order_received')}
                           disabled={isUpdating}
                           className="w-full rounded-lg bg-primary text-primary-foreground py-2.5 text-sm font-medium disabled:opacity-60"
                         >
-                          Mark Order Received
-                        </button>
+                          <UiText text={"Mark Order Received"} />{" "}</button>
                       )}
 
                       {String(order.status).toLowerCase() === 'order_received' && (
@@ -344,8 +343,7 @@ export function MerchantOrders({ onBack }: MerchantOrdersProps) {
                           disabled={isUpdating}
                           className="w-full rounded-lg bg-indigo-600 text-white py-2.5 text-sm font-medium disabled:opacity-60"
                         >
-                          Mark Order Packed
-                        </button>
+                          <UiText text={"Mark Order Packed"} />{" "}</button>
                       )}
 
                       {String(order.status).toLowerCase() === 'order_packed' && (
@@ -354,19 +352,17 @@ export function MerchantOrders({ onBack }: MerchantOrdersProps) {
                           disabled={isUpdating}
                           className="w-full rounded-lg bg-emerald-600 text-white py-2.5 text-sm font-medium disabled:opacity-60"
                         >
-                          Mark Order Taken For Delivery
-                        </button>
+                          <UiText text={"Mark Order Taken For Delivery"} />{" "}</button>
                       )}
 
                       {['order_taken_for_delivery', 'in_transit', 'completed'].includes(String(order.status).toLowerCase()) && (
-                        <p className="text-xs text-muted-foreground">Waiting for logistics and buyer confirmation to complete settlement.</p>
+                        <p className="text-xs text-muted-foreground"><UiText text={"Waiting for logistics and buyer confirmation to complete settlement."} /></p>
                       )}
 
                       {isUpdating && (
                         <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                           <RefreshCw className="w-3 h-3 animate-spin" />
-                          Updating...
-                        </p>
+                          <UiText text={"Updating..."} />{" "}</p>
                       )}
                     </div>
                   )}
@@ -375,7 +371,7 @@ export function MerchantOrders({ onBack }: MerchantOrdersProps) {
                     <div className="mt-3 pt-3 border-t border-border">
                       <div className="flex items-center gap-2 text-green-600">
                         <CheckCircle2 className="w-4 h-4" />
-                        <span className="text-sm font-medium">Order completed - Funds released</span>
+                        <span className="text-sm font-medium"><UiText text={"Order completed - Funds released"} /></span>
                       </div>
                     </div>
                   )}

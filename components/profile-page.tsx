@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect, useRef } from 'react'
 import { useRole } from '@/lib/role-context'
@@ -159,7 +161,7 @@ export function ProfilePage({ onBack }: { onBack: () => void }) {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <h1 className="font-semibold text-foreground">Edit Profile</h1>
+            <h1 className="font-semibold text-foreground"><UiText text={"Edit Profile"} /></h1>
             <div className="w-9" />
           </div>
         </header>
@@ -181,7 +183,7 @@ export function ProfilePage({ onBack }: { onBack: () => void }) {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="font-semibold text-foreground">Edit Profile</h1>
+          <h1 className="font-semibold text-foreground"><UiText text={"Edit Profile"} /></h1>
           <div className="w-9" />
         </div>
       </header>
@@ -202,7 +204,7 @@ export function ProfilePage({ onBack }: { onBack: () => void }) {
             ) : (
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
             )}
-            <p className="text-sm font-medium">{message.text}</p>
+            <p className="text-sm font-medium"><UiValue value={message.text} /></p>
           </div>
         )}
 
@@ -210,12 +212,12 @@ export function ProfilePage({ onBack }: { onBack: () => void }) {
         <div className="bg-card border border-border rounded-2xl p-6 text-center">
           <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 relative group cursor-pointer">
             {profile?.avatar_url ? (
-              <Image
+              <UiAttributes><Image
                 src={profile.avatar_url}
                 alt={profile.name}
                 fill
                 className="rounded-full object-cover"
-              />
+              /></UiAttributes>
             ) : (
               <span className="text-4xl font-bold text-primary">
                 {(profile?.name || 'U').charAt(0).toUpperCase()}
@@ -241,28 +243,26 @@ export function ProfilePage({ onBack }: { onBack: () => void }) {
             onChange={handleAvatarUpload}
             className="hidden"
           />
-          <p className="text-sm text-muted-foreground">Click to change photo</p>
+          <p className="text-sm text-muted-foreground"><UiText text={"Click to change photo"} /></p>
         </div>
 
         {/* Form Fields */}
         <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
           <div>
             <label className="text-sm font-semibold text-foreground block mb-2">
-              Full Name
-            </label>
-            <input
+              <UiText text={"Full Name"} />{" "}</label>
+            <UiAttributes><input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary transition-colors"
               placeholder="Enter your full name"
-            />
+            /></UiAttributes>
           </div>
 
           <div>
             <label className="text-sm font-semibold text-foreground block mb-2">
-              Email Address
-            </label>
+              <UiText text={"Email Address"} />{" "}</label>
             <input
               type="email"
               value={profile?.email || ''}
@@ -270,21 +270,19 @@ export function ProfilePage({ onBack }: { onBack: () => void }) {
               className="w-full px-4 py-3 bg-secondary rounded-lg border border-border text-muted-foreground opacity-60"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Change email in Settings
-            </p>
+              <UiText text={"Change email in Settings"} />{" "}</p>
           </div>
 
           <div>
             <label className="text-sm font-semibold text-foreground block mb-2">
-              Phone Number
-            </label>
-            <input
+              <UiText text={"Phone Number"} />{" "}</label>
+            <UiAttributes><input
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:outline-none focus:border-primary transition-colors"
               placeholder="Enter phone number"
-            />
+            /></UiAttributes>
           </div>
 
           
@@ -300,13 +298,11 @@ export function ProfilePage({ onBack }: { onBack: () => void }) {
             {saving ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Saving...
-              </>
+                <UiText text={"Saving..."} />{" "}</>
             ) : (
               <>
                 <Check className="w-5 h-5" />
-                Save Changes
-              </>
+                <UiText text={"Save Changes"} />{" "}</>
             )}
           </button>
 
@@ -314,8 +310,7 @@ export function ProfilePage({ onBack }: { onBack: () => void }) {
             onClick={onBack}
             className="w-full py-4 bg-secondary text-foreground font-semibold rounded-xl hover:bg-secondary/80 transition-colors"
           >
-            Cancel
-          </button>
+            <UiText text={"Cancel"} />{" "}</button>
         </div>
       </div>
     </div>

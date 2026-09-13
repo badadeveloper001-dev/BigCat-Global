@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -13,7 +15,7 @@ import { AdminDashboard } from "./admin-dashboard"
 
 export function MarketplaceApp() {
   const router = useRouter()
-  const { role, user, setUser, isLoading } = useRole()
+  const { role, user, setUser, setRole, isLoading } = useRole()
   const [adminAuthenticated, setAdminAuthenticated] = useState(false)
   const [setupComplete, setSetupComplete] = useState(false)
   const [storeSettingsComplete, setStoreSettingsComplete] = useState(false)
@@ -26,12 +28,14 @@ export function MarketplaceApp() {
 
   // Check if merchant setup and store settings are already completed
   useEffect(() => {
+    setSetupComplete(merchantSetupCompleted)
+    setStoreSettingsComplete(merchantSetupCompleted)
     if (merchantSetupCompleted) {
       setSetupComplete(true)
       // Assume store settings are complete if basic setup is complete
       setStoreSettingsComplete(true)
     }
-  }, [merchantSetupCompleted])
+  }, [merchantSetupCompleted, user?.userId])
 
   useEffect(() => {
     if (typeof window === "undefined") return
@@ -64,9 +68,13 @@ export function MarketplaceApp() {
   // Handle merchant setup flow - only show if setup not completed
   const needsSetup = role === "merchant" && !merchantSetupCompleted && !setupComplete
   
+  if (needsSetup && !user?.merchantProfile) {
+    return <div className="min-h-screen flex flex-col items-center justify-center gap-4"><p><UiText text={"We could not load your store profile. Your saved setup has not been changed."} /></p><button onClick={() => window.location.reload()}><UiText text={"Retry"} /></button><button onClick={() => setRole(null)}><UiText text={"Back to sign in"} /></button></div>
+  }
   if (needsSetup) {
     return (
       <MerchantSetup
+        onBack={() => setRole(null)}
         userId={user?.userId || ""}
         smedanId={merchantSmedanId}
         onComplete={(profile) => {

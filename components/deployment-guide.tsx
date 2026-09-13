@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState } from 'react'
 import { CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react'
@@ -161,17 +163,15 @@ export function DeploymentGuide() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-2">
-            BigCat Global - Deployment Guide
-          </h1>
+            <UiText text={"BigCat Global - Deployment Guide"} />{" "}</h1>
           <p className="text-lg text-muted-foreground">
-            Complete checklist for deployment and testing
-          </p>
+            <UiText text={"Complete checklist for deployment and testing"} />{" "}</p>
         </div>
 
         {/* Progress */}
         <div className="bg-card border border-border rounded-2xl p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-foreground">Overall Progress</h2>
+            <h2 className="text-xl font-semibold text-foreground"><UiText text={"Overall Progress"} /></h2>
             <span className="text-2xl font-bold text-primary">{completionPercent}%</span>
           </div>
           <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
@@ -181,8 +181,7 @@ export function DeploymentGuide() {
             />
           </div>
           <p className="text-sm text-muted-foreground mt-2">
-            {completedSteps.size} of {steps.length} steps completed
-          </p>
+            {completedSteps.size} {" "}<UiText text={"of"} />{" "}{steps.length} {" "}<UiText text={"steps completed"} />{" "}</p>
         </div>
 
         {/* Steps */}
@@ -205,8 +204,8 @@ export function DeploymentGuide() {
                     )}
                   </div>
                   <div className="text-left">
-                    <h3 className="font-semibold text-foreground">{step.title}</h3>
-                    <p className="text-sm text-muted-foreground">{step.description}</p>
+                    <h3 className="font-semibold text-foreground"><UiValue value={step.title} /></h3>
+                    <p className="text-sm text-muted-foreground"><UiValue value={step.description} /></p>
                   </div>
                 </div>
                 <ArrowRight className={`w-5 h-5 text-muted-foreground transition-transform ${completedSteps.has(step.id) ? 'rotate-90' : ''}`} />
@@ -217,7 +216,7 @@ export function DeploymentGuide() {
                   {step.details.map((detail, i) => (
                     <div key={i} className="flex items-center gap-3 text-sm">
                       <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                      <span className="text-foreground">{detail}</span>
+                      <span className="text-foreground"><UiValue value={detail} /></span>
                     </div>
                   ))}
                 </div>
@@ -232,15 +231,14 @@ export function DeploymentGuide() {
             <AlertCircle className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
             <div>
               <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                Important Notes Before Deployment
-              </h3>
+                <UiText text={"Important Notes Before Deployment"} />{" "}</h3>
               <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
-                <li>• Ensure all database migrations have been executed in Supabase</li>
-                <li>• Test payment gateway integrations in sandbox mode first</li>
-                <li>• Verify all environment variables are correctly set in Vercel</li>
-                <li>• Conduct thorough testing of all user flows</li>
-                <li>• Have admin codes ready for different admin levels</li>
-                <li>• Set up monitoring and error tracking before going live</li>
+                <li><UiText text={"• Ensure all database migrations have been executed in Supabase"} /></li>
+                <li><UiText text={"• Test payment gateway integrations in sandbox mode first"} /></li>
+                <li><UiText text={"• Verify all environment variables are correctly set in Vercel"} /></li>
+                <li><UiText text={"• Conduct thorough testing of all user flows"} /></li>
+                <li><UiText text={"• Have admin codes ready for different admin levels"} /></li>
+                <li><UiText text={"• Set up monitoring and error tracking before going live"} /></li>
               </ul>
             </div>
           </div>
@@ -249,35 +247,35 @@ export function DeploymentGuide() {
         {/* Key Features Summary */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-card border border-border rounded-xl p-4">
-            <h4 className="font-semibold text-foreground mb-2">✅ Implemented Features</h4>
+            <h4 className="font-semibold text-foreground mb-2"><UiText text={"✅ Implemented Features"} /></h4>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• All currency in Naira (₦)</li>
-              <li>• Multi-payment checkout</li>
-              <li>• Merchant store setup</li>
-              <li>• Admin dashboards</li>
-              <li>• Add to cart flow</li>
+              <li><UiText text={"• All currency in Naira (₦)"} /></li>
+              <li><UiText text={"• Multi-payment checkout"} /></li>
+              <li><UiText text={"• Merchant store setup"} /></li>
+              <li><UiText text={"• Admin dashboards"} /></li>
+              <li><UiText text={"• Add to cart flow"} /></li>
             </ul>
           </div>
 
           <div className="bg-card border border-border rounded-xl p-4">
-            <h4 className="font-semibold text-foreground mb-2">🔧 Configuration</h4>
+            <h4 className="font-semibold text-foreground mb-2"><UiText text={"🔧 Configuration"} /></h4>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Database schema ready</li>
-              <li>• Payment methods configured</li>
-              <li>• Currency utilities in place</li>
-              <li>• Auth system complete</li>
-              <li>• Delivery fee calculation</li>
+              <li><UiText text={"• Database schema ready"} /></li>
+              <li><UiText text={"• Payment methods configured"} /></li>
+              <li><UiText text={"• Currency utilities in place"} /></li>
+              <li><UiText text={"• Auth system complete"} /></li>
+              <li><UiText text={"• Delivery fee calculation"} /></li>
             </ul>
           </div>
 
           <div className="bg-card border border-border rounded-xl p-4">
-            <h4 className="font-semibold text-foreground mb-2">📋 Testing Areas</h4>
+            <h4 className="font-semibold text-foreground mb-2"><UiText text={"📋 Testing Areas"} /></h4>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Buyer signup & login</li>
-              <li>• Merchant onboarding</li>
-              <li>• Payment selection</li>
-              <li>• Order creation</li>
-              <li>• Admin access</li>
+              <li><UiText text={"• Buyer signup & login"} /></li>
+              <li><UiText text={"• Merchant onboarding"} /></li>
+              <li><UiText text={"• Payment selection"} /></li>
+              <li><UiText text={"• Order creation"} /></li>
+              <li><UiText text={"• Admin access"} /></li>
             </ul>
           </div>
         </div>

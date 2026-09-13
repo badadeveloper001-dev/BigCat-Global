@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
@@ -75,24 +77,22 @@ export function PalmpayAdminDashboard({ embedded = false }: PalmpayAdminDashboar
               onClick={() => router.push("/admin/bigcat")}
               className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
             >
-              <ArrowLeft className="w-4 h-4" /> Back
-            </button>
-            <h1 className="font-semibold">Orchid Admin</h1>
-            <span className="text-xs text-muted-foreground">Payments</span>
+              <ArrowLeft className="w-4 h-4" /> {" "}<UiText text={"Back"} />{" "}</button>
+            <h1 className="font-semibold"><UiText text={"Orchid Admin"} /></h1>
+            <span className="text-xs text-muted-foreground"><UiText text={"Payments"} /></span>
           </div>
         </header>
       ) : null}
 
-      <div className="px-4 pt-3 text-right"><button className="text-sm text-muted-foreground" onClick={async () => { const response = await fetch('/api/admin/session', { method: 'DELETE' }); if (response.ok) window.location.assign('/admin-portal') }}>End admin session</button></div>
+      <div className="px-4 pt-3 text-right"><button className="text-sm text-muted-foreground" onClick={async () => { const response = await fetch('/api/admin/session', { method: 'DELETE' }); if (response.ok) window.location.assign('/admin-portal') }}><UiText text={"End admin session"} /></button></div>
       <main className="mx-auto max-w-6xl px-4 py-6 space-y-5">
         <section className="rounded-2xl border border-border bg-card p-5">
           <div className="flex items-center gap-3 mb-2">
             <ShieldCheck className="w-5 h-5 text-primary" />
-            <h2 className="font-semibold">Orchid Payment Operations</h2>
+            <h2 className="font-semibold"><UiText text={"Orchid Payment Operations"} /></h2>
           </div>
           <p className="text-sm text-muted-foreground">
-            Monitor cross-border settlements and Trade Protection status. Escrow integration remains modular for Orchid API onboarding.
-          </p>
+            <UiText text={"Monitor cross-border settlements and Trade Protection status. Escrow integration remains modular for Orchid API onboarding."} />{" "}</p>
         </section>
 
         <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -100,22 +100,22 @@ export function PalmpayAdminDashboard({ embedded = false }: PalmpayAdminDashboar
             <div key={card.label} className="rounded-xl border border-border bg-card p-4">
               <card.icon className="w-4 h-4 text-primary mb-2" />
               <p className="text-lg font-bold">{card.value}</p>
-              <p className="text-xs text-muted-foreground">{card.label}</p>
+              <p className="text-xs text-muted-foreground"><UiValue value={card.label} /></p>
             </div>
           ))}
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-5">
-          <h3 className="font-semibold mb-2">Trade Protection Module</h3>
+          <h3 className="font-semibold mb-2"><UiText text={"Trade Protection Module"} /></h3>
           <ul className="text-sm text-muted-foreground space-y-1">
-            <li>Payment Status tracking is active.</li>
-            <li>Merchant Verification hooks are active.</li>
-            <li>Shipment Progress hooks are active.</li>
-            <li>Buyer Protection Status is visible for post-payment workflows.</li>
+            <li><UiText text={"Payment Status tracking is active."} /></li>
+            <li><UiText text={"Merchant Verification hooks are active."} /></li>
+            <li><UiText text={"Shipment Progress hooks are active."} /></li>
+            <li><UiText text={"Buyer Protection Status is visible for post-payment workflows."} /></li>
           </ul>
         </section>
 
-        {loading ? <p className="text-sm text-muted-foreground">Refreshing Orchid metrics...</p> : null}
+        {loading ? <p className="text-sm text-muted-foreground"><UiText text={"Refreshing Orchid metrics..."} /></p> : null}
       </main>
     </div>
   )

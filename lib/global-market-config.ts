@@ -122,7 +122,7 @@ export function buildDefaultPreferences(country?: SupportedCountry): GlobalPrefe
     language: countryConfig.defaultLanguage,
     currency: countryConfig.defaultCurrency,
     aiLanguage: countryConfig.defaultLanguage,
-    region: resolvedCountry === 'CN' ? 'Guangdong' : 'Lagos',
+    region: '',
   }
 }
 

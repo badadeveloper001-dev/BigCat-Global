@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect, useCallback } from "react"
 import { Wallet, ArrowLeftRight, Plus, RefreshCw, TrendingUp, Clock, ChevronDown, X, Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
@@ -237,7 +239,7 @@ export function MultiCurrencyWallet({
     return (
       <div className="flex items-center justify-center py-10 gap-2 text-gray-500">
         <Loader2 className="w-5 h-5 animate-spin" />
-        <span className="text-sm">Loading wallet…</span>
+        <span className="text-sm"><UiText text={"Loading wallet…"} /></span>
       </div>
     )
   }
@@ -246,7 +248,7 @@ export function MultiCurrencyWallet({
     return (
       <div className="flex items-center gap-2 p-4 rounded-xl bg-red-500/10 text-red-400 text-sm border border-red-500/20">
         <AlertCircle className="w-4 h-4 flex-shrink-0" />
-        {error}
+        <UiValue value={error} />
       </div>
     )
   }
@@ -257,16 +259,16 @@ export function MultiCurrencyWallet({
     return (
       <div className="space-y-3">
         <div className="flex items-center justify-between mb-1">
-          <p className="text-sm font-semibold text-foreground">Pay with your Orchid Wallet</p>
+          <p className="text-sm font-semibold text-foreground"><UiText text={"Pay with your Orchid Wallet"} /></p>
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <span className={rateSource === "live" ? "text-green-500" : "text-yellow-500"}>●</span>
-            {rateSource === "live" ? "Live rates" : "Fallback rates"}
+            <UiValue value={rateSource === "live" ? "Live rates" : "Fallback rates"} />
           </div>
         </div>
         <p className="text-[11px] text-muted-foreground">
-          {rateSource === "live"
+          <UiValue value={rateSource === "live"
             ? `Provider: ${rateProvider} · Updated ${new Date(rateUpdatedAt || Date.now()).toLocaleTimeString()}`
-            : "Using fallback rates while live provider is unavailable."}
+            : "Using fallback rates while live provider is unavailable."} />
         </p>
 
         {currencies.map((c) => {
@@ -299,9 +301,9 @@ export function MultiCurrencyWallet({
                   {meta.flag}
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-bold text-foreground">{c} Wallet</p>
+                  <p className="text-sm font-bold text-foreground"><UiValue value={c} /> {" "}<UiText text={"Wallet"} /></p>
                   <p className="text-xs text-muted-foreground">
-                    Balance: {fmt(balance, c)}
+                    <UiText text={"Balance:"} />{" "}{fmt(balance, c)}
                   </p>
                 </div>
               </div>
@@ -311,11 +313,11 @@ export function MultiCurrencyWallet({
                 </p>
                 {c !== "NGN" && (
                   <p className="text-xs text-muted-foreground">
-                    1 {c} = ₦{(rates.NGN / rates[c]).toLocaleString("en", { maximumFractionDigits: 2 })}
+                    1 <UiValue value={c} /> = ₦{(rates.NGN / rates[c]).toLocaleString("en", { maximumFractionDigits: 2 })}
                   </p>
                 )}
                 {!canAfford && (
-                  <p className="text-xs text-red-400 mt-0.5">Insufficient</p>
+                  <p className="text-xs text-red-400 mt-0.5"><UiText text={"Insufficient"} /></p>
                 )}
               </div>
             </button>
@@ -323,8 +325,7 @@ export function MultiCurrencyWallet({
         })}
 
         <p className="text-xs text-muted-foreground text-center pt-1">
-          Funds locked in escrow until delivery confirmed
-        </p>
+          <UiText text={"Funds locked in escrow until delivery confirmed"} />{" "}</p>
       </div>
     )
   }
@@ -336,11 +337,11 @@ export function MultiCurrencyWallet({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Wallet className="w-5 h-5 text-primary" />
-          <h3 className="font-bold text-foreground">Orchid Wallet</h3>
+          <h3 className="font-bold text-foreground"><UiText text={"Orchid Wallet"} /></h3>
         </div>
         <div className="flex items-center gap-2">
           <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${rateSource === "live" ? "bg-green-500/10 text-green-600" : "bg-yellow-500/10 text-yellow-600"}`}>
-            {rateSource === "live" ? "● Live rates" : "● Cached rates"}
+            <UiValue value={rateSource === "live" ? "● Live rates" : "● Cached rates"} />
           </span>
           <button onClick={() => { fetchRates(); fetchWallet() }}
             className="p-1.5 rounded-lg hover:bg-secondary transition-colors text-muted-foreground">
@@ -349,9 +350,9 @@ export function MultiCurrencyWallet({
         </div>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        {rateSource === "live"
+        <UiValue value={rateSource === "live"
           ? `Provider: ${rateProvider} · Last sync ${new Date(rateUpdatedAt || Date.now()).toLocaleString()}`
-          : "Live FX temporarily unavailable. Using resilient fallback rates."}
+          : "Live FX temporarily unavailable. Using resilient fallback rates."} />
       </p>
 
       {/* Wallet cards */}
@@ -370,14 +371,14 @@ export function MultiCurrencyWallet({
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-lg">{meta.flag}</span>
                   <span className="text-xs font-bold px-2 py-0.5 rounded-full"
-                    style={{ color: meta.color, background: `${meta.color}15` }}>{c}</span>
+                    style={{ color: meta.color, background: `${meta.color}15` }}><UiValue value={c} /></span>
                 </div>
                 <p className="text-2xl font-black text-foreground">{fmt(balance, c)}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">≈ ${inUSD.toFixed(2)} USD</p>
+                <p className="text-xs text-muted-foreground mt-0.5">≈ ${inUSD.toFixed(2)} {" "}<UiText text={"USD"} /></p>
                 {lockedBalance > 0 && (
-                  <p className="text-xs text-yellow-500 mt-1">🔒 {fmt(lockedBalance, c)} in escrow</p>
+                  <p className="text-xs text-yellow-500 mt-1">🔒 {fmt(lockedBalance, c)} {" "}<UiText text={"in escrow"} /></p>
                 )}
-                <p className="text-xs text-muted-foreground/60 mt-0.5">{meta.name}</p>
+                <p className="text-xs text-muted-foreground/60 mt-0.5"><UiValue value={meta.name} /></p>
               </div>
             </div>
           )
@@ -388,19 +389,19 @@ export function MultiCurrencyWallet({
       <div className="rounded-xl border border-border bg-secondary/30 p-3">
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" />
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Live Exchange Rates (USD base)</span>
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide"><UiText text={"Live Exchange Rates (USD base)"} /></span>
         </div>
         <div className="grid grid-cols-2 gap-x-6 gap-y-1">
           <div className="flex justify-between text-xs">
-            <span className="text-muted-foreground">1 USD</span>
+            <span className="text-muted-foreground"><UiText text={"1 USD"} /></span>
             <span className="font-semibold text-foreground">₦{rates.NGN.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-xs">
-            <span className="text-muted-foreground">1 USD</span>
+            <span className="text-muted-foreground"><UiText text={"1 USD"} /></span>
             <span className="font-semibold text-foreground">¥{rates.CNY.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-xs">
-            <span className="text-muted-foreground">1 CNY</span>
+            <span className="text-muted-foreground"><UiText text={"1 CNY"} /></span>
             <span className="font-semibold text-foreground">₦{(rates.NGN / rates.CNY).toFixed(2)}</span>
           </div>
         </div>
@@ -413,15 +414,13 @@ export function MultiCurrencyWallet({
           className="flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Fund Wallet
-        </button>
+          <UiText text={"Fund Wallet"} />{" "}</button>
         <button
           onClick={() => setShowConvert(true)}
           className="flex items-center justify-center gap-2 py-3 rounded-xl border border-border bg-card font-semibold text-sm text-foreground hover:bg-secondary transition-colors"
         >
           <ArrowLeftRight className="w-4 h-4" />
-          Convert
-        </button>
+          <UiText text={"Convert"} />{" "}</button>
       </div>
 
       {/* Recent transactions */}
@@ -429,7 +428,7 @@ export function MultiCurrencyWallet({
         <div className="rounded-xl border border-border overflow-hidden">
           <div className="px-4 py-3 border-b border-border flex items-center gap-2">
             <Clock className="w-4 h-4 text-muted-foreground" />
-            <p className="text-sm font-semibold text-foreground">Recent Transactions</p>
+            <p className="text-sm font-semibold text-foreground"><UiText text={"Recent Transactions"} /></p>
           </div>
           <div className="divide-y divide-border max-h-64 overflow-y-auto">
             {transactions.slice(0, 10).map((tx) => {
@@ -465,7 +464,7 @@ export function MultiCurrencyWallet({
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 px-4">
           <div className="bg-card border border-border rounded-2xl w-full max-w-sm p-6">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="font-bold text-foreground">Fund Wallet</h3>
+              <h3 className="font-bold text-foreground"><UiText text={"Fund Wallet"} /></h3>
               <button onClick={() => { setShowFund(false); setFundMsg("") }}>
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
@@ -473,7 +472,7 @@ export function MultiCurrencyWallet({
 
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Currency</label>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block"><UiText text={"Currency"} /></label>
                 <div className="grid grid-cols-3 gap-2">
                   {(["NGN", "USD", "CNY"] as Currency[]).map((c) => (
                     <button key={c}
@@ -482,7 +481,7 @@ export function MultiCurrencyWallet({
                         fundCurrency === c ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"
                       }`}
                     >
-                      {CURRENCY_META[c].flag} {c}
+                      {CURRENCY_META[c].flag} <UiValue value={c} />
                     </button>
                   ))}
                 </div>
@@ -490,19 +489,19 @@ export function MultiCurrencyWallet({
 
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-                  Amount ({fundCurrency})
+                  <UiText text={"Amount ("} />{fundCurrency})
                 </label>
-                <input
+                <UiAttributes><input
                   type="number"
                   value={fundAmount}
                   onChange={(e) => setFundAmount(e.target.value)}
                   placeholder={`Enter ${CURRENCY_META[fundCurrency].symbol} amount`}
                   className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:border-primary"
-                />
+                /></UiAttributes>
               </div>
 
               {fundMsg && (
-                <p className={`text-sm ${fundMsg.startsWith("✅") ? "text-green-600" : "text-red-500"}`}>{fundMsg}</p>
+                <p className={`text-sm ${fundMsg.startsWith("✅") ? "text-green-600" : "text-red-500"}`}><UiValue value={fundMsg} /></p>
               )}
 
               <button
@@ -511,7 +510,7 @@ export function MultiCurrencyWallet({
                 className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {fundLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                {fundLoading ? "Funding…" : `Fund ${fundCurrency} Wallet`}
+                <UiValue value={fundLoading ? "Funding…" : `Fund ${fundCurrency} Wallet`} />
               </button>
             </div>
           </div>
@@ -523,7 +522,7 @@ export function MultiCurrencyWallet({
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 px-4">
           <div className="bg-card border border-border rounded-2xl w-full max-w-sm p-6">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="font-bold text-foreground">Convert Currency</h3>
+              <h3 className="font-bold text-foreground"><UiText text={"Convert Currency"} /></h3>
               <button onClick={() => { setShowConvert(false); setConvertMsg("") }}>
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
@@ -532,26 +531,26 @@ export function MultiCurrencyWallet({
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">From</label>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block"><UiText text={"From"} /></label>
                   <select
                     value={fromCurrency}
                     onChange={(e) => setFromCurrency(e.target.value as Currency)}
                     className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:border-primary"
                   >
                     {(["NGN", "USD", "CNY"] as Currency[]).map((c) => (
-                      <option key={c} value={c}>{CURRENCY_META[c].flag} {c} — {fmt(getBalance(c), c)}</option>
+                      <option key={c} value={c}>{CURRENCY_META[c].flag} <UiValue value={c} /> — {fmt(getBalance(c), c)}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">To</label>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block"><UiText text={"To"} /></label>
                   <select
                     value={toCurrency}
                     onChange={(e) => setToCurrency(e.target.value as Currency)}
                     className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:border-primary"
                   >
                     {(["NGN", "USD", "CNY"] as Currency[]).map((c) => (
-                      <option key={c} value={c}>{CURRENCY_META[c].flag} {c}</option>
+                      <option key={c} value={c}>{CURRENCY_META[c].flag} <UiValue value={c} /></option>
                     ))}
                   </select>
                 </div>
@@ -559,31 +558,31 @@ export function MultiCurrencyWallet({
 
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-                  Amount in {fromCurrency}
+                  <UiText text={"Amount in"} />{" "}{fromCurrency}
                 </label>
-                <input
+                <UiAttributes><input
                   type="number"
                   value={convertAmount}
                   onChange={(e) => setConvertAmount(e.target.value)}
                   placeholder={`Enter ${CURRENCY_META[fromCurrency].symbol} amount`}
                   className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:border-primary"
-                />
+                /></UiAttributes>
               </div>
 
               {converted !== null && convertAmount && (
                 <div className="rounded-xl bg-secondary/40 p-3 text-center">
-                  <p className="text-xs text-muted-foreground">You will receive</p>
+                  <p className="text-xs text-muted-foreground"><UiText text={"You will receive"} /></p>
                   <p className="text-xl font-black text-foreground mt-0.5">
                     {fmt(converted, toCurrency)}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Rate: 1 {fromCurrency} = {(rates[toCurrency] / rates[fromCurrency]).toFixed(4)} {toCurrency}
+                    <UiText text={"Rate: 1"} />{" "}{fromCurrency} = {(rates[toCurrency] / rates[fromCurrency]).toFixed(4)} {toCurrency}
                   </p>
                 </div>
               )}
 
               {convertMsg && (
-                <p className={`text-sm ${convertMsg.startsWith("✅") ? "text-green-600" : "text-red-500"}`}>{convertMsg}</p>
+                <p className={`text-sm ${convertMsg.startsWith("✅") ? "text-green-600" : "text-red-500"}`}><UiValue value={convertMsg} /></p>
               )}
 
               <button
@@ -592,7 +591,7 @@ export function MultiCurrencyWallet({
                 className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {convertLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                {convertLoading ? "Converting…" : "Convert Now"}
+                <UiValue value={convertLoading ? "Converting…" : "Convert Now"} />
               </button>
             </div>
           </div>

@@ -1,3 +1,5 @@
+
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
 import * as React from 'react'
 import {
   ChevronLeftIcon,
@@ -10,13 +12,13 @@ import { Button, buttonVariants } from '@/components/ui/button'
 
 function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
   return (
-    <nav
+    <UiAttributes><nav
       role="navigation"
       aria-label="pagination"
       data-slot="pagination"
       className={cn('mx-auto flex w-full justify-center', className)}
       {...props}
-    />
+    /></UiAttributes>
   )
 }
 
@@ -70,15 +72,15 @@ function PaginationPrevious({
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
   return (
-    <PaginationLink
+    <UiAttributes><PaginationLink
       aria-label="Go to previous page"
       size="default"
       className={cn('gap-1 px-2.5 sm:pl-2.5', className)}
       {...props}
     >
       <ChevronLeftIcon />
-      <span className="hidden sm:block">Previous</span>
-    </PaginationLink>
+      <span className="hidden sm:block"><UiText text={"Previous"} /></span>
+    </PaginationLink></UiAttributes>
   )
 }
 
@@ -87,15 +89,15 @@ function PaginationNext({
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
   return (
-    <PaginationLink
+    <UiAttributes><PaginationLink
       aria-label="Go to next page"
       size="default"
       className={cn('gap-1 px-2.5 sm:pr-2.5', className)}
       {...props}
     >
-      <span className="hidden sm:block">Next</span>
+      <span className="hidden sm:block"><UiText text={"Next"} /></span>
       <ChevronRightIcon />
-    </PaginationLink>
+    </PaginationLink></UiAttributes>
   )
 }
 
@@ -111,7 +113,7 @@ function PaginationEllipsis({
       {...props}
     >
       <MoreHorizontalIcon className="size-4" />
-      <span className="sr-only">More pages</span>
+      <span className="sr-only"><UiText text={"More pages"} /></span>
     </span>
   )
 }

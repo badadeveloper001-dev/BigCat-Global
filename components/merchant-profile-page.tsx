@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect, useRef } from 'react'
 import { useRole } from '@/lib/role-context'
@@ -324,7 +326,7 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <h1 className="font-semibold text-foreground">Merchant Profile</h1>
+            <h1 className="font-semibold text-foreground"><UiText text={"Merchant Profile"} /></h1>
             <div className="w-9" />
           </div>
         </header>
@@ -346,7 +348,7 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="font-semibold text-foreground">Merchant Profile</h1>
+          <h1 className="font-semibold text-foreground"><UiText text={"Merchant Profile"} /></h1>
           <div className="w-9" />
         </div>
       </header>
@@ -370,7 +372,7 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
             }`}
           >
             <Icon className="w-4 h-4" />
-            {label}
+            <UiValue value={label} />
           </button>
         ))}
       </div>
@@ -392,7 +394,7 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
               <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
             )}
             <p className={`text-sm ${message.type === 'success' ? 'text-green-500' : 'text-destructive'}`}>
-              {message.text}
+              <UiValue value={message.text} />
             </p>
           </div>
         )}
@@ -405,12 +407,12 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
               <div className="relative">
                 <div className="relative w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden border-2 border-border">
                   {(profile?.avatar_url || user?.merchantProfile?.logo_url) ? (
-                    <Image
+                    <UiAttributes><Image
                       src={profile?.avatar_url || user?.merchantProfile?.logo_url}
                       alt="Profile"
                       fill
                       className="object-cover"
-                    />
+                    /></UiAttributes>
                   ) : (
                     <User className="w-12 h-12 text-primary" />
                   )}
@@ -427,63 +429,59 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
             {/* Email (read-only) */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Email Address
-              </label>
+                <UiText text={"Email Address"} />{" "}</label>
               <div className="flex items-center gap-3 px-4 py-3 bg-secondary/50 border border-border rounded-xl">
                 <Mail className="w-5 h-5 text-muted-foreground" />
                 <span className="text-muted-foreground">{profile?.email}</span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Email cannot be changed here</p>
+              <p className="text-xs text-muted-foreground mt-1"><UiText text={"Email cannot be changed here"} /></p>
             </div>
 
             {/* Full Name */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Full Name
-              </label>
+                <UiText text={"Full Name"} />{" "}</label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
+                <UiAttributes><input
                   type="text"
                   value={formData.full_name}
                   onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                   placeholder="Enter your full name"
                   className="w-full pl-10 pr-4 py-3 bg-secondary border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
+                /></UiAttributes>
               </div>
             </div>
 
             {/* Phone */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Phone Number
-              </label>
+                <UiText text={"Phone Number"} />{" "}</label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
+                <UiAttributes><input
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   placeholder="Enter your phone number"
                   className="w-full pl-10 pr-4 py-3 bg-secondary border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
+                /></UiAttributes>
               </div>
             </div>
 
             {/* Address */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Home Address
-              </label>
+                <UiText text={"Home Address"} />{" "}</label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
-                <textarea
+                <UiAttributes><textarea
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   placeholder="Enter your home address"
                   rows={3}
                   className="w-full pl-10 pr-4 py-3 bg-secondary border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                />
+                /></UiAttributes>
               </div>
             </div>
 
@@ -492,15 +490,14 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <Globe className="w-4 h-4 text-primary" />
-                  <h3 className="font-semibold text-foreground">Mini Website</h3>
+                  <h3 className="font-semibold text-foreground"><UiText text={"Mini Website"} /></h3>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Your store website is generated automatically. Customize it and share the link with customers.
-                </p>
+                  <UiText text={"Your store website is generated automatically. Customize it and share the link with customers."} />{" "}</p>
               </div>
 
               <div className="rounded-xl border border-border bg-card px-3 py-3">
-                <p className="text-xs font-medium text-muted-foreground mb-1">Website link</p>
+                <p className="text-xs font-medium text-muted-foreground mb-1"><UiText text={"Website link"} /></p>
                 <p className="text-sm text-foreground break-all">{generatedWebsiteUrl || 'Website link will appear here'}</p>
               </div>
 
@@ -508,27 +505,26 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                     <Palette className="w-4 h-4" />
-                    Theme
-                  </label>
+                    <UiText text={"Theme"} />{" "}</label>
                   <select
                     value={formData.website_theme}
                     onChange={(e) => setFormData({ ...formData, website_theme: e.target.value as WebsiteTheme })}
                     className="w-full px-4 py-3 bg-secondary border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     {WEBSITE_THEMES.map((theme) => (
-                      <option key={theme.id} value={theme.id}>{theme.label}</option>
+                      <option key={theme.id} value={theme.id}><UiValue value={theme.label} /></option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">Layout</label>
+                  <label className="block text-sm font-medium text-foreground mb-2"><UiText text={"Layout"} /></label>
                   <select
                     value={formData.website_layout}
                     onChange={(e) => setFormData({ ...formData, website_layout: e.target.value as WebsiteLayout })}
                     className="w-full px-4 py-3 bg-secondary border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     {WEBSITE_LAYOUTS.map((layout) => (
-                      <option key={layout.id} value={layout.id}>{layout.label}</option>
+                      <option key={layout.id} value={layout.id}><UiValue value={layout.label} /></option>
                     ))}
                   </select>
                 </div>
@@ -541,16 +537,14 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
                   className="flex-1 py-3 bg-secondary text-foreground rounded-xl font-semibold flex items-center justify-center gap-2"
                 >
                   <Copy className="w-4 h-4" />
-                  Copy Link
-                </button>
+                  <UiText text={"Copy Link"} />{" "}</button>
                 <button
                   type="button"
                   onClick={handlePreviewWebsite}
                   className="flex-1 py-3 bg-card border border-border text-foreground rounded-xl font-semibold flex items-center justify-center gap-2"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  Preview Site
-                </button>
+                  <UiText text={"Preview Site"} />{" "}</button>
               </div>
             </div>
 
@@ -563,13 +557,11 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
               {saving ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Saving...
-                </>
+                  <UiText text={"Saving..."} />{" "}</>
               ) : (
                 <>
                   <Check className="w-5 h-5" />
-                  Save Changes
-                </>
+                  <UiText text={"Save Changes"} />{" "}</>
               )}
             </button>
           </div>
@@ -590,25 +582,23 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
             {/* Store Name */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Store Name *
-              </label>
+                <UiText text={"Store Name *"} />{" "}</label>
               <div className="relative">
                 <Store className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
+                <UiAttributes><input
                   type="text"
                   value={formData.business_name}
                   onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
                   placeholder="Enter your store name"
                   className="w-full pl-10 pr-4 py-3 bg-secondary border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
+                /></UiAttributes>
               </div>
             </div>
 
             {/* Store Category */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Store Category
-              </label>
+                <UiText text={"Store Category"} />{" "}</label>
               <select
                 value={formData.business_category}
                 onChange={(e) => setFormData({ ...formData, business_category: e.target.value })}
@@ -616,7 +606,7 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
-                    {cat}
+                    <UiValue value={cat} />
                   </option>
                 ))}
               </select>
@@ -625,45 +615,41 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
             {/* Store Description */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Store Description
-              </label>
+                <UiText text={"Store Description"} />{" "}</label>
               <div className="relative">
                 <FileText className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
-                <textarea
+                <UiAttributes><textarea
                   value={formData.business_description}
                   onChange={(e) => setFormData({ ...formData, business_description: e.target.value })}
                   placeholder="Describe your store and what you sell..."
                   rows={4}
                   className="w-full pl-10 pr-4 py-3 bg-secondary border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                />
+                /></UiAttributes>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {formData.business_description.length}/500 characters
-              </p>
+                {formData.business_description.length}<UiText text={"/500 characters"} />{" "}</p>
             </div>
 
             {/* Store Location */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Store Location
-              </label>
+                <UiText text={"Store Location"} />{" "}</label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
+                <UiAttributes><input
                   type="text"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   placeholder="e.g., Lagos, Nigeria"
                   className="w-full pl-10 pr-4 py-3 bg-secondary border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
+                /></UiAttributes>
               </div>
             </div>
 
             {/* Website Link */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Store Website Link
-              </label>
+                <UiText text={"Store Website Link"} />{" "}</label>
               <div className="relative">
                 <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
@@ -673,21 +659,20 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
                   className="w-full pl-10 pr-4 py-3 bg-secondary border border-border rounded-xl text-foreground"
                 />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">This is the buyer-facing website link for your store.</p>
+              <p className="text-xs text-muted-foreground mt-1"><UiText text={"This is the buyer-facing website link for your store."} /></p>
             </div>
 
             {/* SMEDAN ID (read-only) */}
             {profile?.smedan_id && (
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  SMEDAN ID
-                </label>
+                  <UiText text={"SMEDAN ID"} />{" "}</label>
                 <div className="flex items-center gap-3 px-4 py-3 bg-secondary/50 border border-border rounded-xl">
                   <FileText className="w-5 h-5 text-muted-foreground" />
                   <span className="text-muted-foreground">{profile.smedan_id}</span>
                   <Check className="w-4 h-4 text-green-500 ml-auto" />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">Verified business registration</p>
+                <p className="text-xs text-muted-foreground mt-1"><UiText text={"Verified business registration"} /></p>
               </div>
             )}
 
@@ -700,13 +685,11 @@ export function MerchantProfilePage({ onBack }: { onBack: () => void }) {
               {saving ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Saving...
-                </>
+                  <UiText text={"Saving..."} />{" "}</>
               ) : (
                 <>
                   <Check className="w-5 h-5" />
-                  Save Store Details
-                </>
+                  <UiText text={"Save Store Details"} />{" "}</>
               )}
             </button>
           </div>

@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useEffect, useMemo, useState } from "react"
 import { useRole } from "@/lib/role-context"
@@ -99,31 +101,31 @@ export function BuyerTrackPackagePage({ orderId }: TrackPageProps) {
             <ArrowLeft className="w-5 h-5" />
           </a>
           <div>
-            <h1 className="font-semibold text-foreground">Track Package</h1>
-            <p className="text-xs text-muted-foreground">Tracking ID: {String(order?.tracking_id || `BC-${String(orderId).replace(/-/g, "").slice(0, 10).toUpperCase()}`)}</p>
+            <h1 className="font-semibold text-foreground"><UiText text={"Track Package"} /></h1>
+            <p className="text-xs text-muted-foreground"><UiText text={"Tracking ID:"} />{" "}{String(order?.tracking_id || `BC-${String(orderId).replace(/-/g, "").slice(0, 10).toUpperCase()}`)}</p>
           </div>
         </div>
       </header>
 
       <main className="p-4 space-y-4 max-w-2xl mx-auto">
         {error ? (
-          <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</div>
+          <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"><UiValue value={error} /></div>
         ) : (
           <>
             <section className="rounded-2xl border border-border bg-card p-4 space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">Current Status</p>
+                <p className="text-sm text-muted-foreground"><UiText text={"Current Status"} /></p>
                 <span className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold bg-indigo-50 text-indigo-700">
                   <Truck className="w-3.5 h-3.5" />
                   {statusLabels[String(order?.status || "").toLowerCase()] || String(order?.status || "Unknown")}
                 </span>
               </div>
-              <p className="text-sm text-foreground">Order #{String(order?.id || "").slice(0, 8).toUpperCase()}</p>
-              <p className="text-xs text-muted-foreground">Delivery Address: {String(order?.delivery_address || "N/A")}</p>
+              <p className="text-sm text-foreground"><UiText text={"Order #"} />{String(order?.id || "").slice(0, 8).toUpperCase()}</p>
+              <p className="text-xs text-muted-foreground"><UiText text={"Delivery Address:"} />{" "}{String(order?.delivery_address || "N/A")}</p>
             </section>
 
             <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
-              <h2 className="text-sm font-semibold text-foreground">Delivery Timeline</h2>
+              <h2 className="text-sm font-semibold text-foreground"><UiText text={"Delivery Timeline"} /></h2>
               <div className="space-y-2">
                 {timeline.map((stage, index) => {
                   const done = index <= currentStep
@@ -140,30 +142,30 @@ export function BuyerTrackPackagePage({ orderId }: TrackPageProps) {
             </section>
 
             <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
-              <h2 className="text-sm font-semibold text-foreground">Rider Information</h2>
+              <h2 className="text-sm font-semibold text-foreground"><UiText text={"Rider Information"} /></h2>
               <div className="rounded-xl border border-border bg-secondary/40 p-3 space-y-1">
                 <p className="text-sm text-foreground flex items-center gap-2"><User className="w-4 h-4" /> {String(order?.assigned_rider?.name || "Not assigned yet")}</p>
-                <p className="text-xs text-muted-foreground">Phone: {String(order?.assigned_rider?.phone || "N/A")}</p>
-                <p className="text-xs text-muted-foreground">Region: {String(order?.assigned_rider?.region || "N/A")}</p>
-                <p className="text-xs text-muted-foreground">Assigned At: {order?.logistics_assigned_at ? new Date(order.logistics_assigned_at).toLocaleString() : "N/A"}</p>
-                <p className="text-xs text-muted-foreground">Completed At: {order?.logistics_completed_at ? new Date(order.logistics_completed_at).toLocaleString() : "N/A"}</p>
+                <p className="text-xs text-muted-foreground"><UiText text={"Phone:"} />{" "}{String(order?.assigned_rider?.phone || "N/A")}</p>
+                <p className="text-xs text-muted-foreground"><UiText text={"Region:"} />{" "}{String(order?.assigned_rider?.region || "N/A")}</p>
+                <p className="text-xs text-muted-foreground"><UiText text={"Assigned At:"} />{" "}{order?.logistics_assigned_at ? new Date(order.logistics_assigned_at).toLocaleString() : "N/A"}</p>
+                <p className="text-xs text-muted-foreground"><UiText text={"Completed At:"} />{" "}{order?.logistics_completed_at ? new Date(order.logistics_completed_at).toLocaleString() : "N/A"}</p>
               </div>
             </section>
 
             <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
-              <h2 className="text-sm font-semibold text-foreground flex items-center gap-2"><MapPin className="w-4 h-4" /> Map View</h2>
+              <h2 className="text-sm font-semibold text-foreground flex items-center gap-2"><MapPin className="w-4 h-4" /> {" "}<UiText text={"Map View"} /></h2>
               {mapSrc ? (
                 <div className="rounded-xl overflow-hidden border border-border">
-                  <iframe
+                  <UiAttributes><iframe
                     title="Delivery map"
                     src={mapSrc}
                     className="w-full h-64"
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                  />
+                  /></UiAttributes>
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">Map unavailable. Delivery address is missing.</p>
+                <p className="text-sm text-muted-foreground"><UiText text={"Map unavailable. Delivery address is missing."} /></p>
               )}
             </section>
           </>

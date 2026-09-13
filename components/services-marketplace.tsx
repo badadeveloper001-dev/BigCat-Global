@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, Calendar, CheckCircle2, ChevronRight, Clock, FileText, Loader2, MapPin, MessageCircle, Search, Wallet, Wrench, X } from 'lucide-react'
@@ -164,9 +166,8 @@ export function ServicesMarketplace({
     <div className="px-4 py-4 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <button onClick={onBack} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="w-4 h-4" /> Back
-        </button>
-        <h2 className="text-lg font-bold text-foreground">Services</h2>
+          <ArrowLeft className="w-4 h-4" /> {" "}<UiText text={"Back"} />{" "}</button>
+        <h2 className="text-lg font-bold text-foreground"><UiText text={"Services"} /></h2>
         <div className="w-10" />
       </div>
 
@@ -177,14 +178,14 @@ export function ServicesMarketplace({
             onClick={() => setActiveTab(tab)}
             className={`flex-1 text-xs font-semibold py-1.5 rounded-lg transition-all ${activeTab === tab ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'}`}
           >
-            {tab === 'browse' ? 'Browse' : tab === 'jobs' ? `My Jobs${bookings.length > 0 ? ` (${bookings.length})` : ''}` : `Bills${pendingBills.length > 0 ? ` (${pendingBills.length})` : ''}`}
+            <UiValue value={tab === 'browse' ? 'Browse' : tab === 'jobs' ? `My Jobs${bookings.length > 0 ? ` (${bookings.length})` : ''}` : `Bills${pendingBills.length > 0 ? ` (${pendingBills.length})` : ''}`} />
           </button>
         ))}
       </div>
 
       {error && (
         <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive flex items-start justify-between gap-2">
-          <span>{error}</span>
+          <span><UiValue value={error} /></span>
           <button onClick={() => setError('')}><X className="w-4 h-4 shrink-0" /></button>
         </div>
       )}
@@ -194,19 +195,18 @@ export function ServicesMarketplace({
           <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-start gap-2">
             <MessageCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <p className="text-xs text-amber-800 leading-relaxed">
-              <span className="font-semibold">How it works:</span> Browse services → Chat the provider → Agree on price → Provider sends you a bill → Pay securely through BigCat.
-            </p>
+              <span className="font-semibold"><UiText text={"How it works:"} /></span> {" "}<UiText text={"Browse services → Chat the provider → Agree on price → Provider sends you a bill → Pay securely through BigCat."} />{" "}</p>
           </div>
 
           <div className="bg-card border border-border rounded-2xl p-3 space-y-3">
             <div className="flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2">
               <Search className="w-4 h-4 text-muted-foreground" />
-              <input value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && loadServices()} placeholder="Search services..." className="w-full bg-transparent text-sm outline-none" />
-              <button onClick={loadServices} className="text-xs text-primary font-medium">Search</button>
+              <UiAttributes><input value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && loadServices()} placeholder="Search services..." className="w-full bg-transparent text-sm outline-none" /></UiAttributes>
+              <button onClick={loadServices} className="text-xs text-primary font-medium"><UiText text={"Search"} /></button>
             </div>
             {categories.length > 0 && (
               <div className="flex gap-2 overflow-auto pb-0.5">
-                <button onClick={() => setCategory('')} className={`px-3 py-1.5 text-xs rounded-full border shrink-0 ${!category ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-border text-muted-foreground'}`}>All</button>
+                <button onClick={() => setCategory('')} className={`px-3 py-1.5 text-xs rounded-full border shrink-0 ${!category ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-border text-muted-foreground'}`}><UiText text={"All"} /></button>
                 {categories.map((item) => (
                   <button key={item} onClick={() => setCategory(item)} className={`px-3 py-1.5 text-xs rounded-full border shrink-0 ${category === item ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-border text-muted-foreground'}`}>{item}</button>
                 ))}
@@ -215,11 +215,11 @@ export function ServicesMarketplace({
           </div>
 
           {loading ? (
-            <div className="py-10 flex items-center justify-center text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin mr-2" />Loading...</div>
+            <div className="py-10 flex items-center justify-center text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin mr-2" /><UiText text={"Loading..."} /></div>
           ) : services.length === 0 ? (
             <div className="rounded-2xl border border-border bg-card p-8 text-center">
               <Wrench className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">No services available yet</p>
+              <p className="text-sm text-muted-foreground"><UiText text={"No services available yet"} /></p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -233,7 +233,7 @@ export function ServicesMarketplace({
                       </div>
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{service.description || 'No description provided'}</p>
                       <div className="flex items-center gap-1 mt-1.5 text-xs text-muted-foreground font-medium">
-                        <span>{service.merchant_name || 'Merchant'}</span>
+                        <span><UiValue value={service.merchant_name || 'Merchant'} /></span>
                         {(service.service_city || service.service_state) && (
                           <><span className="text-border">•</span><MapPin className="w-3 h-3" /><span>{[service.service_city, service.service_state].filter(Boolean).join(', ')}</span></>
                         )}
@@ -250,11 +250,11 @@ export function ServicesMarketplace({
 
       {activeTab === 'jobs' && (
         <div className="space-y-3">
-          <p className="text-xs text-muted-foreground">Active and completed service jobs you have paid for.</p>
+          <p className="text-xs text-muted-foreground"><UiText text={"Active and completed service jobs you have paid for."} /></p>
           {bookings.length === 0 ? (
             <div className="rounded-2xl border border-border bg-card p-8 text-center">
               <Wrench className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">No active jobs yet. Pay a bill to get started.</p>
+              <p className="text-sm text-muted-foreground"><UiText text={"No active jobs yet. Pay a bill to get started."} /></p>
             </div>
           ) : (
             bookings.map((booking) => (
@@ -262,8 +262,8 @@ export function ServicesMarketplace({
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-semibold text-sm text-foreground">{booking.service?.title || 'Service job'}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Provider: {booking.merchant_name || 'Merchant'}</p>
-                    {booking.service_address && <p className="text-xs text-muted-foreground">Location: {booking.service_address}</p>}
+                    <p className="text-xs text-muted-foreground mt-0.5"><UiText text={"Provider:"} />{" "}<UiValue value={booking.merchant_name || 'Merchant'} /></p>
+                    {booking.service_address && <p className="text-xs text-muted-foreground"><UiText text={"Location:"} />{" "}{booking.service_address}</p>}
                     {booking.scheduled_at && (
                       <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                         <Calendar className="w-3 h-3" />
@@ -285,9 +285,8 @@ export function ServicesMarketplace({
                 {booking.status === 'completed' && (
                   <div className="grid grid-cols-2 gap-2 mt-3">
                     <button onClick={() => updateBooking(booking.id, 'released')} className="rounded-lg bg-primary text-primary-foreground py-2 text-xs font-medium flex items-center justify-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Confirm & Release
-                    </button>
-                    <button onClick={() => updateBooking(booking.id, 'disputed')} className="rounded-lg bg-destructive/10 text-destructive py-2 text-xs font-medium">Report Issue</button>
+                      <CheckCircle2 className="w-3.5 h-3.5" /> {" "}<UiText text={"Confirm & Release"} />{" "}</button>
+                    <button onClick={() => updateBooking(booking.id, 'disputed')} className="rounded-lg bg-destructive/10 text-destructive py-2 text-xs font-medium"><UiText text={"Report Issue"} /></button>
                   </div>
                 )}
               </div>
@@ -301,48 +300,47 @@ export function ServicesMarketplace({
           {bills.length === 0 ? (
             <div className="rounded-2xl border border-border bg-card p-8 text-center">
               <FileText className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">No bills yet. Chat a service provider to get a quote.</p>
+              <p className="text-sm text-muted-foreground"><UiText text={"No bills yet. Chat a service provider to get a quote."} /></p>
             </div>
           ) : (
             <>
               {pendingBills.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold text-foreground">Pending Payment</p>
+                  <p className="text-xs font-semibold text-foreground"><UiText text={"Pending Payment"} /></p>
                   {pendingBills.map((bill) => (
                     <div key={bill.id} className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="font-semibold text-sm text-foreground">{bill.scope_summary || 'Service bill'}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">From: {bill.merchant_name || 'Merchant'}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5"><UiText text={"From:"} />{" "}<UiValue value={bill.merchant_name || 'Merchant'} /></p>
                           {bill.timeline && <p className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{bill.timeline}</p>}
                           {Array.isArray(bill.line_items) && bill.line_items.length > 0 && (
                             <div className="mt-2 space-y-1">
                               {bill.line_items.map((item: any, i: number) => (
                                 <div key={i} className="flex items-center justify-between text-xs text-muted-foreground">
-                                  <span>{item.description}{item.quantity > 1 ? ` \u00d7${item.quantity}` : ''}</span>
+                                  <span><UiValue value={item.description} />{item.quantity > 1 ? ` \u00d7${item.quantity}` : ''}</span>
                                   <span>{formatNaira(Number(item.unit_price) * Number(item.quantity || 1))}</span>
                                 </div>
                               ))}
                               {Number(bill.discount_amount) > 0 && (
                                 <div className="flex items-center justify-between text-xs text-primary font-medium">
-                                  <span>Discount</span><span>-{formatNaira(Number(bill.discount_amount))}</span>
+                                  <span><UiText text={"Discount"} /></span><span>-{formatNaira(Number(bill.discount_amount))}</span>
                                 </div>
                               )}
                             </div>
                           )}
                           {bill.notes && <p className="text-xs text-muted-foreground italic mt-1">"{bill.notes}"</p>}
-                          {bill.valid_until && <p className="text-xs text-amber-600 mt-1">Expires: {new Date(bill.valid_until).toLocaleDateString('en-NG')}</p>}
+                          {bill.valid_until && <p className="text-xs text-amber-600 mt-1"><UiText text={"Expires:"} />{" "}{new Date(bill.valid_until).toLocaleDateString('en-NG')}</p>}
                         </div>
                         <div className="text-right shrink-0">
                           <p className="text-base font-bold text-foreground">{formatNaira(Number(bill.total_amount))}</p>
-                          <span className="text-[10px] text-primary font-medium">Total</span>
+                          <span className="text-[10px] text-primary font-medium"><UiText text={"Total"} /></span>
                         </div>
                       </div>
                       <div className="mt-3 grid grid-cols-2 gap-2">
                         <button onClick={() => proceedToBillCheckout(bill)} className="rounded-xl bg-primary text-primary-foreground py-2 text-sm font-semibold flex items-center justify-center gap-1.5">
-                          <Wallet className="w-4 h-4" />Pay Now
-                        </button>
-                        <button onClick={async () => { await fetch('/api/service-bills', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'cancel', billId: bill.id, actorId: buyerId, actorType: 'buyer' }) }); await loadBills() }} className="rounded-xl border border-destructive/30 bg-destructive/10 text-destructive py-2 text-sm font-medium">Decline</button>
+                          <Wallet className="w-4 h-4" /><UiText text={"Pay Now"} />{" "}</button>
+                        <button onClick={async () => { await fetch('/api/service-bills', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'cancel', billId: bill.id, actorId: buyerId, actorType: 'buyer' }) }); await loadBills() }} className="rounded-xl border border-destructive/30 bg-destructive/10 text-destructive py-2 text-sm font-medium"><UiText text={"Decline"} /></button>
                       </div>
                     </div>
                   ))}
@@ -350,18 +348,18 @@ export function ServicesMarketplace({
               )}
               {paidBills.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold text-muted-foreground">Paid Bills</p>
+                  <p className="text-xs font-semibold text-muted-foreground"><UiText text={"Paid Bills"} /></p>
                   {paidBills.map((bill) => (
                     <div key={bill.id} className="rounded-2xl border border-border bg-card p-4">
                       <div className="flex items-center justify-between gap-3">
                         <div>
                           <p className="font-semibold text-sm text-foreground">{bill.scope_summary || 'Service bill'}</p>
-                          <p className="text-xs text-muted-foreground">From: {bill.merchant_name || 'Merchant'}</p>
+                          <p className="text-xs text-muted-foreground"><UiText text={"From:"} />{" "}<UiValue value={bill.merchant_name || 'Merchant'} /></p>
                           <p className="text-xs text-muted-foreground">{new Date(bill.created_at).toLocaleDateString('en-NG')}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-bold text-foreground">{formatNaira(Number(bill.total_amount))}</p>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">Paid</span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium"><UiText text={"Paid"} /></span>
                         </div>
                       </div>
                     </div>
@@ -391,39 +389,37 @@ export function ServicesMarketplace({
             <div className="px-5 pb-5 space-y-4">
               {viewService.description && (
                 <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">About This Service</p>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1"><UiText text={"About This Service"} /></p>
                   <p className="text-sm text-foreground leading-relaxed">{viewService.description}</p>
                 </div>
               )}
               <div className="rounded-xl bg-secondary/50 p-3 space-y-2">
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="w-24 shrink-0 text-muted-foreground text-xs font-semibold">Provider</span>
-                  <span className="font-medium text-foreground">{viewService.merchant_name || 'Merchant'}</span>
+                  <span className="w-24 shrink-0 text-muted-foreground text-xs font-semibold"><UiText text={"Provider"} /></span>
+                  <span className="font-medium text-foreground"><UiValue value={viewService.merchant_name || 'Merchant'} /></span>
                 </div>
                 {(viewService.service_city || viewService.service_state) && (
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="w-24 shrink-0 text-muted-foreground text-xs font-semibold">Location</span>
+                    <span className="w-24 shrink-0 text-muted-foreground text-xs font-semibold"><UiText text={"Location"} /></span>
                     <span className="flex items-center gap-1 text-foreground"><MapPin className="w-3 h-3 text-primary" />{[viewService.service_city, viewService.service_state].filter(Boolean).join(', ')}</span>
                   </div>
                 )}
                 {Array.isArray(viewService.working_days) && viewService.working_days.length > 0 && (
                   <div className="flex items-start gap-2 text-sm">
-                    <span className="w-24 shrink-0 text-muted-foreground text-xs font-semibold">Available</span>
+                    <span className="w-24 shrink-0 text-muted-foreground text-xs font-semibold"><UiText text={"Available"} /></span>
                     <span className="text-foreground">{viewService.working_days.join(', ')}{viewService.working_hours ? ` \u00b7 ${viewService.working_hours}` : ''}</span>
                   </div>
                 )}
               </div>
               <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
-                <p className="text-xs font-semibold text-primary mb-0.5">Pricing by agreement</p>
-                <p className="text-xs text-muted-foreground">Price is discussed directly with the provider. Once you agree, the provider will send you a bill to pay securely through BigCat.</p>
+                <p className="text-xs font-semibold text-primary mb-0.5"><UiText text={"Pricing by agreement"} /></p>
+                <p className="text-xs text-muted-foreground"><UiText text={"Price is discussed directly with the provider. Once you agree, the provider will send you a bill to pay securely through BigCat."} /></p>
               </div>
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <button onClick={() => { setViewService(null); startChatWithMerchant(viewService) }} disabled={suspended} className="w-full rounded-xl bg-primary text-primary-foreground px-3 py-2.5 text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-60">
-                  <MessageCircle className="w-4 h-4" /> Chat Provider
-                </button>
+                  <MessageCircle className="w-4 h-4" /> {" "}<UiText text={"Chat Provider"} />{" "}</button>
                 <button onClick={() => { setViewService(null); startChatWithMerchant(viewService) }} disabled={suspended} className="w-full rounded-xl border border-primary text-primary px-3 py-2.5 text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-60">
-                  Request Quote
-                </button>
+                  <UiText text={"Request Quote"} />{" "}</button>
               </div>
             </div>
           </div>
@@ -432,9 +428,9 @@ export function ServicesMarketplace({
 
       {suspended && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-4 mt-4">
-          <p className="text-sm font-semibold text-red-700">Account Suspended</p>
-          <p className="text-xs text-red-700 mt-1">Temporarily suspended for violating platform policies. Strikes: {strikeCount}</p>
-          <button onClick={() => { resetSafetyState(buyerId); setSuspended(false); setStrikeCount(0); setError('') }} className="mt-3 px-3 py-2 rounded-lg border border-red-200 bg-white text-red-700 text-xs font-medium">Reset Strikes (Demo)</button>
+          <p className="text-sm font-semibold text-red-700"><UiText text={"Account Suspended"} /></p>
+          <p className="text-xs text-red-700 mt-1"><UiText text={"Temporarily suspended for violating platform policies. Strikes:"} />{" "}{strikeCount}</p>
+          <button onClick={() => { resetSafetyState(buyerId); setSuspended(false); setStrikeCount(0); setError('') }} className="mt-3 px-3 py-2 rounded-lg border border-red-200 bg-white text-red-700 text-xs font-medium"><UiText text={"Reset Strikes (Demo)"} /></button>
         </div>
       )}
     </div>

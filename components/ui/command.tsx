@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import * as React from 'react'
 import { Command as CommandPrimitive } from 'cmdk'
@@ -45,8 +47,8 @@ function CommandDialog({
   return (
     <Dialog {...props}>
       <DialogHeader className="sr-only">
-        <DialogTitle>{title}</DialogTitle>
-        <DialogDescription>{description}</DialogDescription>
+        <DialogTitle><UiValue value={title} /></DialogTitle>
+        <DialogDescription><UiValue value={description} /></DialogDescription>
       </DialogHeader>
       <DialogContent
         className={cn('overflow-hidden p-0', className)}

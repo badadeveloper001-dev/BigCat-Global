@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import Image from "next/image"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -511,35 +513,35 @@ export function NigeriaAiAssistant({
           <div>
             <div className="flex items-center gap-2">
               <div className="relative h-5 w-5 overflow-hidden rounded-sm bg-white border border-border">
-                <Image
+                <UiAttributes><Image
                   src="/image.png"
                   alt="BigCat logo"
                   fill
                   className="object-contain"
                   sizes="20px"
-                />
+                /></UiAttributes>
               </div>
               <h2 className="text-sm font-semibold text-foreground">
-                {assistantMode === "merchant" ? "BigCat AI BizPilot" : "BigCat AI"}
+                <UiValue value={assistantMode === "merchant" ? "BigCat AI BizPilot" : "BigCat AI"} />
               </h2>
             </div>
             <p className="text-xs text-muted-foreground">
-              {assistantMode === "merchant"
+              <UiValue value={assistantMode === "merchant"
                 ? "Business assistant for sales, pricing, listings, and inventory decisions"
-                : "Multilingual assistant with Nigerian language support"}
+                : "Multilingual assistant with Nigerian language support"} />
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <button
+            <UiAttributes><button
               onClick={() => setAutoSpeak((prev) => !prev)}
               type="button"
               className={`h-7 rounded-md border px-2 text-[10px] ${autoSpeak ? "border-primary text-primary" : "border-border text-muted-foreground"}`}
               title="Toggle auto voice replies"
             >
-              {autoSpeak ? "Auto Voice On" : "Auto Voice Off"}
-            </button>
+              <UiValue value={autoSpeak ? "Auto Voice On" : "Auto Voice Off"} />
+            </button></UiAttributes>
             <span className="text-[10px] text-muted-foreground">
-              Reply language: {language === "auto" ? replyLanguage.toUpperCase() : language.toUpperCase()}
+              <UiText text={"Reply language:"} />{" "}{language === "auto" ? replyLanguage.toUpperCase() : language.toUpperCase()}
             </span>
             <Languages className="w-4 h-4 text-muted-foreground" />
             <select
@@ -549,7 +551,7 @@ export function NigeriaAiAssistant({
             >
               {LANG_OPTIONS.map((item) => (
                 <option key={item.value} value={item.value}>
-                  {item.label}
+                  <UiValue value={item.label} />
                 </option>
               ))}
             </select>
@@ -567,13 +569,13 @@ export function NigeriaAiAssistant({
                 : "bg-card border border-border text-foreground"
             }`}
           >
-            {message.text}
+            <UiValue value={message.text} />
 
               {message.role === "assistant" && (message.products?.length || message.vendors?.length || message.services?.length) ? (
                 <div className="mt-2 space-y-2">
                   {message.products?.length ? (
                     <div>
-                      <p className="text-[11px] font-semibold text-muted-foreground mb-1">Found products</p>
+                      <p className="text-[11px] font-semibold text-muted-foreground mb-1"><UiText text={"Found products"} /></p>
                       <div className="space-y-1">
                         {message.products.map((product: any) => (
                           <div key={product.id} className="space-y-1">
@@ -585,7 +587,7 @@ export function NigeriaAiAssistant({
                             >
                               <div>
                                 <span className="font-semibold text-foreground">{product.name}</span>
-                                <span className="text-muted-foreground"> - NGN {Number(product.price || 0).toLocaleString()}</span>
+                                <span className="text-muted-foreground"> {" "}<UiText text={"- NGN"} />{" "}{Number(product.price || 0).toLocaleString()}</span>
                               </div>
                               {product.confidence_badges && (
                                 <div className="text-[10px] text-amber-600 font-medium">{product.confidence_badges}</div>
@@ -613,15 +615,13 @@ export function NigeriaAiAssistant({
                                 }}
                                 className="text-[10px] px-2 py-1 rounded bg-primary/20 text-primary hover:bg-primary/30 transition-colors"
                               >
-                                ♡ Wishlist
-                              </button>
+                                <UiText text={"♡ Wishlist"} />{" "}</button>
                               <button
                                 type="button"
                                 onClick={() => setError('📬 Alert set! We will notify you when back in stock.')}
                                 className="text-[10px] px-2 py-1 rounded bg-blue-500/20 text-blue-600 hover:bg-blue-500/30 transition-colors"
                               >
-                                🔔 Alert
-                              </button>
+                                <UiText text={"🔔 Alert"} />{" "}</button>
                             </div>
                           </div>
                         ))}
@@ -631,7 +631,7 @@ export function NigeriaAiAssistant({
 
                   {message.vendors?.length ? (
                     <div>
-                      <p className="text-[11px] font-semibold text-muted-foreground mb-1">Found vendors</p>
+                      <p className="text-[11px] font-semibold text-muted-foreground mb-1"><UiText text={"Found vendors"} /></p>
                       <div className="space-y-1">
                         {message.vendors.map((vendor) => (
                           <button
@@ -651,7 +651,7 @@ export function NigeriaAiAssistant({
 
                   {message.services?.length ? (
                     <div>
-                      <p className="text-[11px] font-semibold text-muted-foreground mb-1">Found services</p>
+                      <p className="text-[11px] font-semibold text-muted-foreground mb-1"><UiText text={"Found services"} /></p>
                       <div className="space-y-1">
                         {message.services.map((service) => (
                           <button
@@ -662,7 +662,7 @@ export function NigeriaAiAssistant({
                             className="w-full text-left rounded-lg bg-secondary/60 px-2 py-1 text-xs border border-transparent hover:border-primary/40 transition-colors disabled:cursor-default"
                           >
                             <span className="font-semibold text-foreground">{service.name}</span>
-                            <span className="text-muted-foreground"> - NGN {Number(service.price || 0).toLocaleString()} - {service.vendor} - {service.location}</span>
+                            <span className="text-muted-foreground"> {" "}<UiText text={"- NGN"} />{" "}{Number(service.price || 0).toLocaleString()} - {service.vendor} - {service.location}</span>
                           </button>
                         ))}
                       </div>
@@ -676,8 +676,7 @@ export function NigeriaAiAssistant({
         {loading ? (
           <div className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
             <Loader2 className="w-4 h-4 animate-spin" />
-            Thinking...
-          </div>
+            <UiText text={"Thinking..."} />{" "}</div>
         ) : null}
       </div>
 
@@ -695,17 +694,17 @@ export function NigeriaAiAssistant({
           ))}
         </div>
 
-        {error ? <p className="mb-2 text-xs text-destructive">{error}</p> : null}
-        {voiceHint ? <p className="mb-2 text-xs text-muted-foreground">{voiceHint}</p> : null}
-        {voiceCaptureHint ? <p className="mb-2 text-xs text-muted-foreground">{voiceCaptureHint}</p> : null}
+        {error ? <p className="mb-2 text-xs text-destructive"><UiValue value={error} /></p> : null}
+        {voiceHint ? <p className="mb-2 text-xs text-muted-foreground"><UiValue value={voiceHint} /></p> : null}
+        {voiceCaptureHint ? <p className="mb-2 text-xs text-muted-foreground"><UiValue value={voiceCaptureHint} /></p> : null}
         {error ? (
           <p className="mb-2 text-[11px] text-muted-foreground">
-            Voice diagnostics: locale={voiceDebug.locale || "n/a"}, attempt={voiceDebug.attempt}, error={voiceDebug.lastError || "none"}, chars={voiceDebug.transcriptChars}
+            <UiText text={"Voice diagnostics: locale="} />{voiceDebug.locale || "n/a"}<UiText text={", attempt="} />{voiceDebug.attempt}<UiText text={", error="} />{voiceDebug.lastError || "none"}<UiText text={", chars="} />{voiceDebug.transcriptChars}
           </p>
         ) : null}
 
         <div className="flex items-center gap-2">
-          <button
+          <UiAttributes><button
             onClick={toggleVoiceInput}
             type="button"
             className={`h-10 w-10 rounded-full border border-border flex items-center justify-center ${
@@ -715,9 +714,9 @@ export function NigeriaAiAssistant({
             title="Voice input"
           >
             <Mic className="w-4 h-4" />
-          </button>
+          </button></UiAttributes>
 
-          <button
+          <UiAttributes><button
             onClick={speakLatestReply}
             type="button"
             className="h-10 w-10 rounded-full border border-border bg-background text-foreground flex items-center justify-center"
@@ -725,9 +724,9 @@ export function NigeriaAiAssistant({
             title="Speak latest reply"
           >
             <Volume2 className="w-4 h-4" />
-          </button>
+          </button></UiAttributes>
 
-          <input
+          <UiAttributes><input
             value={input}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={(event) => {
@@ -738,9 +737,9 @@ export function NigeriaAiAssistant({
             }}
             placeholder={assistantMode === "merchant" ? "Ask for business ideas, promos, pricing help..." : "Ask for products, vendors, prices..."}
             className="h-10 flex-1 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/30"
-          />
+          /></UiAttributes>
 
-          <button
+          <UiAttributes><button
             onClick={() => sendPrompt(input)}
             type="button"
             disabled={loading || !input.trim()}
@@ -749,7 +748,7 @@ export function NigeriaAiAssistant({
             title="Send message"
           >
             <Send className="w-4 h-4" />
-          </button>
+          </button></UiAttributes>
         </div>
       </div>
     </div>

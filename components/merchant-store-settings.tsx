@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useEffect, useRef } from 'react'
 import { Store, Phone, Mail, MapPin, Globe, Save, Loader2, CheckCircle2, AlertCircle, Copy, ExternalLink, Palette } from 'lucide-react'
@@ -334,47 +336,45 @@ export function MerchantStoreSettings({ onComplete }: MerchantStoreSettingsProps
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Store className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl font-bold text-foreground">Store Settings</h1>
+            <h1 className="text-3xl font-bold text-foreground"><UiText text={"Store Settings"} /></h1>
           </div>
-          <p className="text-muted-foreground">Configure your store details and payment information</p>
+          <p className="text-muted-foreground"><UiText text={"Configure your store details and payment information"} /></p>
         </div>
 
         {/* Store Information */}
         <div className="bg-card rounded-2xl border border-border p-6 mb-6">
           <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
             <Store className="w-5 h-5" />
-            Store Information
-          </h2>
+            <UiText text={"Store Information"} />{" "}</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Store Name</label>
-              <input
+              <label className="block text-sm font-medium text-foreground mb-2"><UiText text={"Store Name"} /></label>
+              <UiAttributes><input
                 type="text"
                 name="storeName"
                 value={storeSettings.storeName}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 bg-muted rounded-lg text-foreground border border-border focus:outline-none focus:border-primary"
                 placeholder="Enter store name"
-              />
+              /></UiAttributes>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Store Description</label>
-              <textarea
+              <label className="block text-sm font-medium text-foreground mb-2"><UiText text={"Store Description"} /></label>
+              <UiAttributes><textarea
                 name="storeDescription"
                 value={storeSettings.storeDescription}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 bg-muted rounded-lg text-foreground border border-border focus:outline-none focus:border-primary resize-none h-24"
                 placeholder="Tell customers about your store"
-              />
+              /></UiAttributes>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                   <Mail className="w-4 h-4" />
-                  Email
-                </label>
+                  <UiText text={"Email"} />{" "}</label>
                 <input
                   type="email"
                   name="storeEmail"
@@ -386,8 +386,7 @@ export function MerchantStoreSettings({ onComplete }: MerchantStoreSettingsProps
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                   <Phone className="w-4 h-4" />
-                  Phone
-                </label>
+                  <UiText text={"Phone"} />{" "}</label>
                 <input
                   type="tel"
                   name="storePhone"
@@ -402,30 +401,28 @@ export function MerchantStoreSettings({ onComplete }: MerchantStoreSettingsProps
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
-                  Location
-                </label>
-                <input
+                  <UiText text={"Location"} />{" "}</label>
+                <UiAttributes><input
                   type="text"
                   name="storeLocation"
                   value={storeSettings.storeLocation}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 bg-muted rounded-lg text-foreground border border-border focus:outline-none focus:border-primary"
                   placeholder="City or region"
-                />
+                /></UiAttributes>
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                   <Globe className="w-4 h-4" />
-                  Website
-                </label>
-                <input
+                  <UiText text={"Website"} />{" "}</label>
+                <UiAttributes><input
                   type="url"
                   name="storeWebsite"
                   value={generatedWebsiteUrl}
                   readOnly
                   className="w-full px-4 py-2 bg-muted rounded-lg text-foreground border border-border focus:outline-none focus:border-primary"
                   placeholder="https://example.com"
-                />
+                /></UiAttributes>
               </div>
             </div>
           </div>
@@ -435,14 +432,12 @@ export function MerchantStoreSettings({ onComplete }: MerchantStoreSettingsProps
         <div className="bg-card rounded-2xl border border-border p-6 mb-6">
           <h2 className="text-xl font-semibold text-foreground mb-2 flex items-center gap-2">
             <Globe className="w-5 h-5" />
-            Mini Website
-          </h2>
+            <UiText text={"Mini Website"} />{" "}</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Your store gets a mini website automatically. Customize the look and share the link with customers.
-          </p>
+            <UiText text={"Your store gets a mini website automatically. Customize the look and share the link with customers."} />{" "}</p>
 
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 mb-4">
-            <p className="text-xs font-semibold text-primary mb-2">Generated website link</p>
+            <p className="text-xs font-semibold text-primary mb-2"><UiText text={"Generated website link"} /></p>
             <p className="text-sm text-foreground break-all">{generatedWebsiteUrl || 'Your link will appear here'}</p>
             <div className="mt-3 flex flex-col sm:flex-row gap-2">
               <button
@@ -451,16 +446,14 @@ export function MerchantStoreSettings({ onComplete }: MerchantStoreSettingsProps
                 className="flex-1 rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold flex items-center justify-center gap-2"
               >
                 <Copy className="w-4 h-4" />
-                Copy Link
-              </button>
+                <UiText text={"Copy Link"} />{" "}</button>
               <button
                 type="button"
                 onClick={handlePreviewWebsite}
                 className="flex-1 rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-semibold text-foreground flex items-center justify-center gap-2"
               >
                 <ExternalLink className="w-4 h-4" />
-                Preview Website
-              </button>
+                <UiText text={"Preview Website"} />{" "}</button>
             </div>
           </div>
 
@@ -484,8 +477,8 @@ export function MerchantStoreSettings({ onComplete }: MerchantStoreSettingsProps
           <div className={`rounded-2xl border p-4 ${bannerPreviewStyle.card}`}>
             <div className="flex items-center justify-between gap-3 mb-4">
               <div>
-                <h3 className="text-sm font-semibold text-foreground">Banner Content</h3>
-                <p className="text-xs text-muted-foreground mt-1">Customize the text, template, and messaging for your promotional banner.</p>
+                <h3 className="text-sm font-semibold text-foreground"><UiText text={"Banner Content"} /></h3>
+                <p className="text-xs text-muted-foreground mt-1"><UiText text={"Customize the text, template, and messaging for your promotional banner."} /></p>
               </div>
               <label className="inline-flex items-center gap-2 text-sm font-medium text-foreground">
                 <input
@@ -494,8 +487,7 @@ export function MerchantStoreSettings({ onComplete }: MerchantStoreSettingsProps
                   onChange={(e) => handleBannerToggle(e.target.checked)}
                   className="h-4 w-4 rounded border-border"
                 />
-                Show banner
-              </label>
+                <UiText text={"Show banner"} />{" "}</label>
             </div>
 
             <div className={`rounded-2xl border p-5 shadow-sm ${bannerPreviewStyle.shell}`}>
@@ -511,7 +503,7 @@ export function MerchantStoreSettings({ onComplete }: MerchantStoreSettingsProps
 
             <div className="mt-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Banner Template</label>
+                <label className="block text-sm font-medium text-foreground mb-2"><UiText text={"Banner Template"} /></label>
                 <select
                   value={storeSettings.websiteBanner.template}
                   onChange={(e) => handleBannerTemplateChange(e.target.value as WebsiteBannerConfig['template'])}
@@ -519,61 +511,61 @@ export function MerchantStoreSettings({ onComplete }: MerchantStoreSettingsProps
                 >
                   {WEBSITE_BANNER_TEMPLATES.map((template) => (
                     <option key={template.id} value={template.id}>
-                      {template.label}
+                      <UiValue value={template.label} />
                     </option>
                   ))}
                 </select>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {WEBSITE_BANNER_TEMPLATES.find((template) => template.id === storeSettings.websiteBanner.template)?.description}
+                  <UiValue value={WEBSITE_BANNER_TEMPLATES.find((template) => template.id === storeSettings.websiteBanner.template)?.description} />
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">Badge</label>
-                  <input
+                  <label className="block text-sm font-medium text-foreground mb-2"><UiText text={"Badge"} /></label>
+                  <UiAttributes><input
                     type="text"
                     value={storeSettings.websiteBanner.badge}
                     onChange={(e) => handleBannerFieldChange('badge', e.target.value)}
                     maxLength={40}
                     className="w-full px-4 py-2 bg-muted rounded-lg text-foreground border border-border focus:outline-none focus:border-primary"
                     placeholder="Limited Offer"
-                  />
+                  /></UiAttributes>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">Button Label</label>
-                  <input
+                  <label className="block text-sm font-medium text-foreground mb-2"><UiText text={"Button Label"} /></label>
+                  <UiAttributes><input
                     type="text"
                     value={storeSettings.websiteBanner.ctaText}
                     onChange={(e) => handleBannerFieldChange('ctaText', e.target.value)}
                     maxLength={28}
                     className="w-full px-4 py-2 bg-muted rounded-lg text-foreground border border-border focus:outline-none focus:border-primary"
                     placeholder="Shop the deal"
-                  />
+                  /></UiAttributes>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Headline</label>
-                <input
+                <label className="block text-sm font-medium text-foreground mb-2"><UiText text={"Headline"} /></label>
+                <UiAttributes><input
                   type="text"
                   value={storeSettings.websiteBanner.headline}
                   onChange={(e) => handleBannerFieldChange('headline', e.target.value)}
                   maxLength={90}
                   className="w-full px-4 py-2 bg-muted rounded-lg text-foreground border border-border focus:outline-none focus:border-primary"
                   placeholder="Save big on selected items this week"
-                />
+                /></UiAttributes>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Supporting Text</label>
-                <textarea
+                <label className="block text-sm font-medium text-foreground mb-2"><UiText text={"Supporting Text"} /></label>
+                <UiAttributes><textarea
                   value={storeSettings.websiteBanner.subheadline}
                   onChange={(e) => handleBannerFieldChange('subheadline', e.target.value)}
                   maxLength={180}
                   className="w-full px-4 py-2 bg-muted rounded-lg text-foreground border border-border focus:outline-none focus:border-primary resize-none h-24"
                   placeholder="Highlight your offer, promo code, or hero product in one short message."
-                />
+                /></UiAttributes>
               </div>
 
 
@@ -583,48 +575,48 @@ export function MerchantStoreSettings({ onComplete }: MerchantStoreSettingsProps
 
         {/* Payment Information */}
         <div className="bg-card rounded-2xl border border-border p-6 mb-6">
-          <h2 className="text-xl font-semibold text-foreground mb-4">Payment Information</h2>
-          <p className="text-sm text-muted-foreground mb-4">We&apos;ll use this to disburse your earnings</p>
+          <h2 className="text-xl font-semibold text-foreground mb-4"><UiText text={"Payment Information"} /></h2>
+          <p className="text-sm text-muted-foreground mb-4"><UiText text={"We&apos;ll use this to disburse your earnings"} /></p>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Account Name</label>
-              <input
+              <label className="block text-sm font-medium text-foreground mb-2"><UiText text={"Account Name"} /></label>
+              <UiAttributes><input
                 type="text"
                 name="bankAccountName"
                 value={storeSettings.bankAccountName}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 bg-muted rounded-lg text-foreground border border-border focus:outline-none focus:border-primary"
                 placeholder="Your bank account name"
-              />
+              /></UiAttributes>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Account Number</label>
-                <input
+                <label className="block text-sm font-medium text-foreground mb-2"><UiText text={"Account Number"} /></label>
+                <UiAttributes><input
                   type="text"
                   name="bankAccountNumber"
                   value={storeSettings.bankAccountNumber}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 bg-muted rounded-lg text-foreground border border-border focus:outline-none focus:border-primary"
                   placeholder="Your account number"
-                />
+                /></UiAttributes>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Bank Code</label>
+                <label className="block text-sm font-medium text-foreground mb-2"><UiText text={"Bank Code"} /></label>
                 <select
                   name="bankCode"
                   value={storeSettings.bankCode}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 bg-muted rounded-lg text-foreground border border-border focus:outline-none focus:border-primary"
                 >
-                  <option value="">Select a bank</option>
-                  <option value="011">First Bank</option>
-                  <option value="012">United Bank for Africa</option>
-                  <option value="007">Zenith Bank</option>
-                  <option value="056">Guaranty Trust Bank</option>
-                  <option value="035">Wema Bank</option>
+                  <option value=""><UiText text={"Select a bank"} /></option>
+                  <option value="011"><UiText text={"First Bank"} /></option>
+                  <option value="012"><UiText text={"United Bank for Africa"} /></option>
+                  <option value="007"><UiText text={"Zenith Bank"} /></option>
+                  <option value="056"><UiText text={"Guaranty Trust Bank"} /></option>
+                  <option value="035"><UiText text={"Wema Bank"} /></option>
                 </select>
               </div>
             </div>
@@ -635,14 +627,14 @@ export function MerchantStoreSettings({ onComplete }: MerchantStoreSettingsProps
         {error && (
           <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0" />
-            <p className="text-sm text-destructive">{error}</p>
+            <p className="text-sm text-destructive"><UiValue value={error} /></p>
           </div>
         )}
 
         {success && (
           <div className="mb-4 p-4 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center gap-3">
             <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-            <p className="text-sm text-green-600">Store settings saved successfully!</p>
+            <p className="text-sm text-green-600"><UiText text={"Store settings saved successfully!"} /></p>
           </div>
         )}
 
@@ -655,13 +647,11 @@ export function MerchantStoreSettings({ onComplete }: MerchantStoreSettingsProps
           {saving ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              Saving...
-            </>
+              <UiText text={"Saving..."} />{" "}</>
           ) : (
             <>
               <Save className="w-5 h-5" />
-              Save Store Settings
-            </>
+              <UiText text={"Save Store Settings"} />{" "}</>
           )}
         </button>
       </div>

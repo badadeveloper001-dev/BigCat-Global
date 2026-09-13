@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
@@ -196,8 +198,8 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Sidebar</SheetTitle>
-            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+            <SheetTitle><UiText text={"Sidebar"} /></SheetTitle>
+            <SheetDescription><UiText text={"Displays the mobile sidebar."} /></SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
@@ -274,7 +276,7 @@ function SidebarTrigger({
       {...props}
     >
       <PanelLeftIcon />
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only"><UiText text={"Toggle Sidebar"} /></span>
     </Button>
   )
 }
@@ -283,7 +285,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
   const { toggleSidebar } = useSidebar()
 
   return (
-    <button
+    <UiAttributes><button
       data-sidebar="rail"
       data-slot="sidebar-rail"
       aria-label="Toggle Sidebar"
@@ -300,7 +302,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
         className,
       )}
       {...props}
-    />
+    /></UiAttributes>
   )
 }
 

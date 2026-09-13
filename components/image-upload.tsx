@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState, useRef } from 'react'
 import { Upload, X, Loader2, ImageIcon } from 'lucide-react'
@@ -75,23 +77,22 @@ export function ImageUpload({ images, onImagesChange, maxImages = 4 }: ImageUplo
             key={url}
             className="relative aspect-square rounded-xl overflow-hidden bg-secondary border border-border group"
           >
-            <img
+            <UiAttributes><img
               src={url}
               alt={`Product image ${index + 1}`}
               className="w-full h-full object-cover"
-            />
-            <button
+            /></UiAttributes>
+            <UiAttributes><button
               type="button"
               onClick={() => handleRemoveImage(index)}
               className="absolute top-2 right-2 p-1.5 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
               aria-label="Remove image"
             >
               <X className="w-3.5 h-3.5" />
-            </button>
+            </button></UiAttributes>
             {index === 0 && (
               <div className="absolute bottom-2 left-2 px-2 py-1 bg-primary text-primary-foreground text-xs font-medium rounded-md">
-                Main
-              </div>
+                <UiText text={"Main"} />{" "}</div>
             )}
           </div>
         ))}
@@ -111,7 +112,7 @@ export function ImageUpload({ images, onImagesChange, maxImages = 4 }: ImageUplo
                   <Upload className="w-5 h-5 text-primary" />
                 </div>
                 <span className="text-xs text-muted-foreground">
-                  {images.length === 0 ? 'Add Photos' : 'Add More'}
+                  <UiValue value={images.length === 0 ? 'Add Photos' : 'Add More'} />
                 </span>
               </>
             )}
@@ -129,12 +130,11 @@ export function ImageUpload({ images, onImagesChange, maxImages = 4 }: ImageUplo
       />
 
       {error && (
-        <p className="text-sm text-destructive">{error}</p>
+        <p className="text-sm text-destructive"><UiValue value={error} /></p>
       )}
 
       <p className="text-xs text-muted-foreground">
-        {images.length}/{maxImages} images. JPEG, PNG, WebP or GIF. Max 5MB each.
-      </p>
+        {images.length}/{maxImages} {" "}<UiText text={"images. JPEG, PNG, WebP or GIF. Max 5MB each."} />{" "}</p>
     </div>
   )
 }
@@ -157,7 +157,7 @@ export function ProductImage({ src, alt, className = '' }: ProductImageProps) {
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      <img src={src} alt={alt} className="w-full h-full object-cover" loading="lazy" />
+      <UiAttributes><img src={src} alt={alt} className="w-full h-full object-cover" loading="lazy" /></UiAttributes>
     </div>
   )
 }

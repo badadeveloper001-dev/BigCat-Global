@@ -1,4 +1,7 @@
 "use client"
+import { translateBrowserUiText } from "@/lib/ui-translation"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useEffect, useState } from "react"
 import { useRole } from "@/lib/role-context"
@@ -98,15 +101,15 @@ function ChatListScreen({
     <div className="flex flex-col h-full">
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="flex items-center justify-between p-4">
-          <h1 className="text-xl font-bold text-foreground">Messages</h1>
+          <h1 className="text-xl font-bold text-foreground"><UiText text={"Messages"} /></h1>
           <div className="relative">
-          <button
+          <UiAttributes><button
             onClick={() => setShowMenu((prev) => !prev)}
             className="p-2 hover:bg-secondary rounded-xl transition-colors"
             aria-label="Message options"
           >
             <MoreVertical className="w-5 h-5 text-foreground" />
-          </button>
+          </button></UiAttributes>
             {showMenu && (
               <div className="absolute right-0 mt-2 w-44 rounded-xl border border-border bg-card shadow-lg z-20 overflow-hidden">
                 <button
@@ -116,17 +119,15 @@ function ChatListScreen({
                   }}
                   className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-secondary"
                 >
-                  Refresh messages
-                </button>
+                  <UiText text={"Refresh messages"} />{" "}</button>
                 <button
                   onClick={() => {
-                    alert("For your safety, use in-app chat for all buyer and merchant conversations.")
+                    alert(translateBrowserUiText("For your safety, use in-app chat for all buyer and merchant conversations."))
                     setShowMenu(false)
                   }}
                   className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-secondary"
                 >
-                  Safety tips
-                </button>
+                  <UiText text={"Safety tips"} />{" "}</button>
               </div>
             )}
           </div>
@@ -143,10 +144,9 @@ function ChatListScreen({
             <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <MessageSquare className="w-7 h-7 text-primary" />
             </div>
-            <h3 className="font-semibold text-foreground mb-2">No conversations yet</h3>
+            <h3 className="font-semibold text-foreground mb-2"><UiText text={"No conversations yet"} /></h3>
             <p className="text-sm text-muted-foreground">
-              Tap <strong>Chat Service Provider</strong> on any SME/Merchant page to start messaging.
-            </p>
+              <UiText text={"Tap"} />{" "}<strong><UiText text={"Chat Service Provider"} /></strong> {" "}<UiText text={"on any SME/Merchant page to start messaging."} />{" "}</p>
           </div>
         ) : (
           <div className="flex flex-col divide-y divide-border">
@@ -184,8 +184,7 @@ function ChatListScreen({
 
       <div className="border-t border-border bg-secondary/50 p-3 text-center">
         <p className="text-xs text-muted-foreground">
-          🔒 For your safety, keep all communication within the platform
-        </p>
+          <UiText text={"🔒 For your safety, keep all communication within the platform"} />{" "}</p>
       </div>
     </div>
   )
@@ -439,11 +438,10 @@ function ChatConversationScreen({
         <div className="p-4">
           <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-center">
             <ShieldAlert className="w-8 h-8 text-red-600 mx-auto mb-2" />
-            <p className="font-semibold text-red-700 mb-1">Account Suspended</p>
+            <p className="font-semibold text-red-700 mb-1"><UiText text={"Account Suspended"} /></p>
             <p className="text-sm text-red-700">
-              Your account has been temporarily suspended for violating platform policies.
-            </p>
-            <p className="text-xs text-red-600 mt-2">Strikes: {strikeCount}</p>
+              <UiText text={"Your account has been temporarily suspended for violating platform policies."} />{" "}</p>
+            <p className="text-xs text-red-600 mt-2"><UiText text={"Strikes:"} />{" "}{strikeCount}</p>
             <button
               onClick={() => {
                 resetSafetyState(user?.userId)
@@ -454,8 +452,7 @@ function ChatConversationScreen({
               }}
               className="mt-4 px-4 py-2 rounded-xl bg-white border border-red-200 text-red-700 text-sm font-medium"
             >
-              Reset Strikes (Demo)
-            </button>
+              <UiText text={"Reset Strikes (Demo)"} />{" "}</button>
           </div>
         </div>
       ) : null}
@@ -471,7 +468,7 @@ function ChatConversationScreen({
               <p className="text-xs text-muted-foreground">{conversation.vendorLocation}</p>
             </div>
           </div>
-          <button
+          <UiAttributes><button
             onClick={() => {
               setWarning("Voice calls are disabled. Please continue in-app chat for secure onboarding.")
             }}
@@ -479,14 +476,14 @@ function ChatConversationScreen({
             aria-label="Call merchant"
           >
             <Phone className="w-5 h-5 text-foreground" />
-          </button>
+          </button></UiAttributes>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 flex items-start gap-2">
           <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
-          <span>Buyer safety reminder: always ask for photo or video proof before paying, accepting delivery, or confirming the order.</span>
+          <span><UiText text={"Buyer safety reminder: always ask for photo or video proof before paying, accepting delivery, or confirming the order."} /></span>
         </div>
         {warning && (
           <div className="rounded-xl border border-[#E8D7FF] bg-[#F3E8FF] px-3 py-2 text-sm text-[#6C2BD9]">
@@ -495,7 +492,7 @@ function ChatConversationScreen({
         )}
         {error && (
           <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            {error}
+            <UiValue value={error} />
           </div>
         )}
         {loading ? (
@@ -504,8 +501,7 @@ function ChatConversationScreen({
           </div>
         ) : messages.length === 0 ? (
           <div className="text-center py-12 text-sm text-muted-foreground">
-            No messages yet. Say hello to start the conversation.
-          </div>
+            <UiText text={"No messages yet. Say hello to start the conversation."} />{" "}</div>
         ) : (
           messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.sender === "buyer" ? "justify-end" : "justify-start"}`}>
@@ -516,10 +512,10 @@ function ChatConversationScreen({
                     : "bg-secondary text-foreground rounded-bl-none"
                 }`}
               >
-                <p className="text-sm break-words">{msg.text}</p>
+                <p className="text-sm break-words"><UiValue value={msg.text} /></p>
                 {msg.translated ? (
                   <p className={`mt-1 text-[10px] ${msg.sender === "buyer" ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                    Auto-translated from {msg.sourceLanguage === 'zh' ? 'Chinese' : 'English'}
+                    <UiText text={"Auto-translated from"} />{" "}<UiValue value={msg.sourceLanguage === 'zh' ? 'Chinese' : 'English'} />
                   </p>
                 ) : null}
                 <div
@@ -543,32 +539,32 @@ function ChatConversationScreen({
           {showBillForm && (
             <div className="border-t border-border bg-card px-4 pt-3 pb-4 space-y-3 max-h-[70vh] overflow-y-auto">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-foreground">Send Bill to {conversation.vendorName}</p>
+                <p className="text-sm font-semibold text-foreground"><UiText text={"Send Bill to"} />{" "}{conversation.vendorName}</p>
                 <button onClick={() => { setShowBillForm(false); setBillError('') }} className="p-1 text-muted-foreground"><X className="w-4 h-4" /></button>
               </div>
-              {billError && <p className="text-xs text-destructive">{billError}</p>}
+              {billError && <p className="text-xs text-destructive"><UiValue value={billError} /></p>}
               <div>
-                <input value={billForm.scopeSummary} onChange={(e) => setBillForm((p) => ({ ...p, scopeSummary: e.target.value }))} placeholder="What are you billing for? e.g. Deep house cleaning" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+                <UiAttributes><input value={billForm.scopeSummary} onChange={(e) => setBillForm((p) => ({ ...p, scopeSummary: e.target.value }))} placeholder="What are you billing for? e.g. Deep house cleaning" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" /></UiAttributes>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <input value={billForm.timeline} onChange={(e) => setBillForm((p) => ({ ...p, timeline: e.target.value }))} placeholder="Timeline e.g. 1 day" className="rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+                <UiAttributes><input value={billForm.timeline} onChange={(e) => setBillForm((p) => ({ ...p, timeline: e.target.value }))} placeholder="Timeline e.g. 1 day" className="rounded-xl border border-border bg-background px-3 py-2 text-sm" /></UiAttributes>
                 <input type="date" value={billForm.validUntil} onChange={(e) => setBillForm((p) => ({ ...p, validUntil: e.target.value }))} className="rounded-xl border border-border bg-background px-3 py-2 text-sm" />
               </div>
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-muted-foreground font-medium">Line Items</p>
-                  <button onClick={() => setBillForm((p) => ({ ...p, lineItems: [...p.lineItems, { description: '', quantity: 1, unit_price: 0 }] }))} className="text-xs text-primary font-medium flex items-center gap-1"><Plus className="w-3 h-3" />Add row</button>
+                  <p className="text-xs text-muted-foreground font-medium"><UiText text={"Line Items"} /></p>
+                  <button onClick={() => setBillForm((p) => ({ ...p, lineItems: [...p.lineItems, { description: '', quantity: 1, unit_price: 0 }] }))} className="text-xs text-primary font-medium flex items-center gap-1"><Plus className="w-3 h-3" /><UiText text={"Add row"} /></button>
                 </div>
                 <div className="grid grid-cols-12 gap-1 mb-1">
-                  <p className="col-span-6 text-[10px] text-muted-foreground">Item</p>
-                  <p className="col-span-2 text-[10px] text-muted-foreground text-center">Qty</p>
-                  <p className="col-span-3 text-[10px] text-muted-foreground">Price (₦)</p>
+                  <p className="col-span-6 text-[10px] text-muted-foreground"><UiText text={"Item"} /></p>
+                  <p className="col-span-2 text-[10px] text-muted-foreground text-center"><UiText text={"Qty"} /></p>
+                  <p className="col-span-3 text-[10px] text-muted-foreground"><UiText text={"Price (₦)"} /></p>
                 </div>
                 {billForm.lineItems.map((item, i) => (
                   <div key={i} className="grid grid-cols-12 gap-1 items-center">
-                    <input value={item.description} onChange={(e) => setBillForm((p) => { const li = [...p.lineItems]; li[i] = { ...li[i], description: e.target.value }; return { ...p, lineItems: li } })} placeholder="Description" className="col-span-6 rounded-lg border border-border bg-background px-2 py-1.5 text-xs" />
+                    <UiAttributes><input value={item.description} onChange={(e) => setBillForm((p) => { const li = [...p.lineItems]; li[i] = { ...li[i], description: e.target.value }; return { ...p, lineItems: li } })} placeholder="Description" className="col-span-6 rounded-lg border border-border bg-background px-2 py-1.5 text-xs" /></UiAttributes>
                     <input type="number" min={1} value={item.quantity} onChange={(e) => setBillForm((p) => { const li = [...p.lineItems]; li[i] = { ...li[i], quantity: Number(e.target.value) }; return { ...p, lineItems: li } })} className="col-span-2 rounded-lg border border-border bg-background px-2 py-1.5 text-xs text-center" />
-                    <input type="number" min={0} value={item.unit_price || ''} onChange={(e) => setBillForm((p) => { const li = [...p.lineItems]; li[i] = { ...li[i], unit_price: Number(e.target.value) }; return { ...p, lineItems: li } })} placeholder="0" className="col-span-3 rounded-lg border border-border bg-background px-2 py-1.5 text-xs" />
+                    <UiAttributes><input type="number" min={0} value={item.unit_price || ''} onChange={(e) => setBillForm((p) => { const li = [...p.lineItems]; li[i] = { ...li[i], unit_price: Number(e.target.value) }; return { ...p, lineItems: li } })} placeholder="0" className="col-span-3 rounded-lg border border-border bg-background px-2 py-1.5 text-xs" /></UiAttributes>
                     {billForm.lineItems.length > 1 && (
                       <button onClick={() => setBillForm((p) => ({ ...p, lineItems: p.lineItems.filter((_, j) => j !== i) }))} className="col-span-1 flex justify-center text-muted-foreground hover:text-destructive"><X className="w-3.5 h-3.5" /></button>
                     )}
@@ -576,24 +572,23 @@ function ChatConversationScreen({
                 ))}
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <input type="number" min={0} value={billForm.discountAmount} onChange={(e) => setBillForm((p) => ({ ...p, discountAmount: e.target.value }))} placeholder="Discount (₦)" className="rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+                <UiAttributes><input type="number" min={0} value={billForm.discountAmount} onChange={(e) => setBillForm((p) => ({ ...p, discountAmount: e.target.value }))} placeholder="Discount (₦)" className="rounded-xl border border-border bg-background px-3 py-2 text-sm" /></UiAttributes>
                 <div className="rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Total</span>
+                  <span className="text-xs text-muted-foreground"><UiText text={"Total"} /></span>
                   <span className="text-sm font-bold text-foreground">{formatNaira(Math.max(0, billTotal))}</span>
                 </div>
               </div>
-              <textarea value={billForm.notes} onChange={(e) => setBillForm((p) => ({ ...p, notes: e.target.value }))} placeholder="Notes (optional)" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm min-h-[52px]" />
+              <UiAttributes><textarea value={billForm.notes} onChange={(e) => setBillForm((p) => ({ ...p, notes: e.target.value }))} placeholder="Notes (optional)" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm min-h-[52px]" /></UiAttributes>
               <button onClick={handleSendBill} disabled={sendingBill} className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 text-sm font-semibold disabled:opacity-60 flex items-center justify-center gap-2">
                 {sendingBill ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-                {sendingBill ? 'Sending...' : 'Send Bill'}
+                <UiValue value={sendingBill ? 'Sending...' : 'Send Bill'} />
               </button>
             </div>
           )}
           {!showBillForm && (
             <div className="border-t border-border bg-card px-4 py-2.5">
               <button onClick={() => setShowBillForm(true)} className="w-full flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/5 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors">
-                <FileText className="w-4 h-4" /> Send Bill to Buyer
-              </button>
+                <FileText className="w-4 h-4" /> {" "}<UiText text={"Send Bill to Buyer"} />{" "}</button>
             </div>
           )}
         </>
@@ -606,15 +601,13 @@ function ChatConversationScreen({
                 className="flex items-center justify-center gap-2 p-3 bg-secondary hover:bg-secondary/80 rounded-xl transition-colors text-sm font-medium text-foreground"
               >
                 <Store className="w-4 h-4" />
-                View Store
-              </button>
+                <UiText text={"View Store"} />{" "}</button>
               <button
                 onClick={() => { if (onPlaceOrder) onPlaceOrder(conversation); else window.location.href = "/" }}
                 className="flex items-center justify-center gap-2 p-3 bg-primary hover:bg-primary/90 rounded-xl transition-colors text-sm font-medium text-primary-foreground"
               >
                 <ShoppingCart className="w-4 h-4" />
-                Browse Products
-              </button>
+                <UiText text={"Browse Products"} />{" "}</button>
             </div>
           </div>
         )
@@ -623,7 +616,7 @@ function ChatConversationScreen({
       <div className="border-t border-border bg-card p-4">
         <div className="flex gap-3 items-end">
           <div className="flex-1 flex items-center gap-2 bg-input rounded-2xl px-4 py-2">
-            <input
+            <UiAttributes><input
               type="text"
               value={newMessage}
               onChange={(e) => {
@@ -641,14 +634,14 @@ function ChatConversationScreen({
               placeholder={suspended ? "Messaging disabled due to suspension" : "Type a message..."}
               disabled={suspended}
               className="flex-1 bg-transparent outline-none text-foreground placeholder-muted-foreground text-sm"
-            />
-            <button
+            /></UiAttributes>
+            <UiAttributes><button
               onClick={handleVoiceInput}
               className="p-2 hover:bg-secondary rounded-lg transition-colors"
               aria-label="Voice input"
             >
               <Mic className="w-4 h-4 text-muted-foreground" />
-            </button>
+            </button></UiAttributes>
           </div>
           <button
             onClick={handleSendMessage}
@@ -662,8 +655,7 @@ function ChatConversationScreen({
 
       <div className="border-t border-border bg-secondary/50 p-3 text-center">
         <p className="text-xs text-muted-foreground">
-          🔒 For your safety, keep all communication within the platform
-        </p>
+          <UiText text={"🔒 For your safety, keep all communication within the platform"} />{" "}</p>
       </div>
     </div>
   )
@@ -781,11 +773,10 @@ export function ChatInterface({
       <div className="h-full p-4">
         <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-center">
           <ShieldAlert className="w-8 h-8 text-red-600 mx-auto mb-2" />
-          <p className="font-semibold text-red-700 mb-1">Account Suspended</p>
+          <p className="font-semibold text-red-700 mb-1"><UiText text={"Account Suspended"} /></p>
           <p className="text-sm text-red-700">
-            Your account has been temporarily suspended for violating platform policies.
-          </p>
-          <p className="text-xs text-red-600 mt-2">Strikes: {strikeCount}</p>
+            <UiText text={"Your account has been temporarily suspended for violating platform policies."} />{" "}</p>
+          <p className="text-xs text-red-600 mt-2"><UiText text={"Strikes:"} />{" "}{strikeCount}</p>
           <button
             onClick={() => {
               resetSafetyState(user?.userId)
@@ -794,8 +785,7 @@ export function ChatInterface({
             }}
             className="mt-4 px-4 py-2 rounded-xl bg-white border border-red-200 text-red-700 text-sm font-medium"
           >
-            Reset Strikes (Demo)
-          </button>
+            <UiText text={"Reset Strikes (Demo)"} />{" "}</button>
         </div>
       </div>
     )

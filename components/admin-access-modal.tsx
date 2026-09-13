@@ -1,4 +1,6 @@
 "use client"
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -23,6 +25,7 @@ export function AdminAccessModal({ onClose }: AdminAccessModalProps) {
     try {
       const response = await fetch('/api/admin/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: accessCode }) })
       const result = await response.json()
+      if (response.status === 401) { window.location.assign('/admin-portal'); return }
       if (!response.ok) throw new Error(result.error || 'Access denied.')
       window.location.assign(result.redirect)
     } catch (err) { setError(err instanceof Error ? err.message : 'Access unavailable.') }
@@ -39,8 +42,8 @@ export function AdminAccessModal({ onClose }: AdminAccessModalProps) {
               <Lock className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-bold text-lg text-foreground">Admin Access</h2>
-              <p className="text-xs text-muted-foreground">Enter your access code</p>
+              <h2 className="font-bold text-lg text-foreground"><UiText text={"Admin Access"} /></h2>
+              <p className="text-xs text-muted-foreground"><UiText text={"Enter your access code"} /></p>
             </div>
           </div>
           <button
@@ -55,9 +58,8 @@ export function AdminAccessModal({ onClose }: AdminAccessModalProps) {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">
-              Access Code
-            </label>
-            <input
+              <UiText text={"Access Code"} />{" "}</label>
+            <UiAttributes><input
               type="password"
               value={accessCode}
               onChange={(e) => {
@@ -67,12 +69,12 @@ export function AdminAccessModal({ onClose }: AdminAccessModalProps) {
               placeholder="Enter access code"
               className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
               disabled={isLoading}
-            />
+            /></UiAttributes>
           </div>
 
           {error && (
             <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-sm text-destructive">
-              {error}
+              <UiValue value={error} />
             </div>
           )}
 
@@ -81,14 +83,13 @@ export function AdminAccessModal({ onClose }: AdminAccessModalProps) {
             disabled={isLoading || !accessCode.trim()}
             className="w-full py-3 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
           >
-            {isLoading ? "Verifying..." : "Continue"}
+            <UiValue value={isLoading ? "Verifying..." : "Continue"} />
           </button>
         </form>
 
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground mt-6">
-          Contact your administrator for access
-        </p>
+          <UiText text={"Contact your administrator for access"} />{" "}</p>
       </div>
     </div>
   )

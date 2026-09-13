@@ -1,4 +1,6 @@
 'use client'
+import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
+
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -105,12 +107,12 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         onClick={() => setOpen(!open)}
         className="w-full flex items-start justify-between gap-4 py-4 text-left group"
       >
-        <span className="text-sm font-medium text-white/80 group-hover:text-white transition-colors leading-relaxed">{q}</span>
+        <span className="text-sm font-medium text-white/80 group-hover:text-white transition-colors leading-relaxed"><UiValue value={q} /></span>
         <span className="flex-shrink-0 mt-0.5">
           {open ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}
         </span>
       </button>
-      {open && <p className="text-sm text-gray-400 pb-5 leading-relaxed">{a}</p>}
+      {open && <p className="text-sm text-gray-400 pb-5 leading-relaxed"><UiValue value={a} /></p>}
     </div>
   )
 }
@@ -143,23 +145,22 @@ export default function HelpCenterPage() {
         <div className="relative max-w-3xl mx-auto text-center">
           <Link href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-300 text-sm mb-8 transition-colors">
             <ArrowLeft className="w-4 h-4" />
-            Back to BigCat
-          </Link>
+            <UiText text={"Back to BigCat"} />{" "}</Link>
           <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center"
             style={{ background: "#dc262618", border: "1.5px solid #dc262640" }}>
             <AlertCircle className="w-6 h-6 text-[#dc2626]" />
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black text-white mb-3">Help Center</h1>
-          <p className="text-gray-400 text-lg mb-10">Find answers about trading, payments, and everything BigCat.</p>
+          <h1 className="text-4xl sm:text-5xl font-black text-white mb-3"><UiText text={"Help Center"} /></h1>
+          <p className="text-gray-400 text-lg mb-10"><UiText text={"Find answers about trading, payments, and everything BigCat."} /></p>
           <div className="relative max-w-xl mx-auto">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-            <input
+            <UiAttributes><input
               type="text"
               placeholder="Search for help…"
               value={query}
               onChange={(e) => { setQuery(e.target.value); setActiveCategory(null) }}
               className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white/[0.05] border border-white/[0.08] text-white text-sm placeholder:text-gray-600 outline-none focus:border-white/20 transition-all"
-            />
+            /></UiAttributes>
           </div>
         </div>
       </div>
@@ -172,8 +173,7 @@ export default function HelpCenterPage() {
               onClick={() => setActiveCategory(null)}
               className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${!activeCategory ? 'bg-[#dc2626] text-white' : 'bg-white/[0.05] text-gray-400 hover:text-white border border-white/[0.06]'}`}
             >
-              All Topics
-            </button>
+              <UiText text={"All Topics"} />{" "}</button>
             {CATEGORIES.map((cat) => {
               const Icon = cat.icon
               const isActive = activeCategory === cat.id
@@ -189,7 +189,7 @@ export default function HelpCenterPage() {
                   }}
                 >
                   <Icon className="w-3.5 h-3.5" />
-                  {cat.label}
+                  <UiValue value={cat.label} />
                 </button>
               )
             })}
@@ -200,9 +200,9 @@ export default function HelpCenterPage() {
         {filtered.length === 0 && (
           <div className="text-center py-20">
             <Search className="w-10 h-10 text-gray-700 mx-auto mb-4" />
-            <p className="text-gray-500 text-base mb-2">No results for &ldquo;{query}&rdquo;</p>
-            <p className="text-gray-600 text-sm">Try different keywords or{' '}
-              <Link href="/contact" className="text-[#dc2626] hover:underline">contact support</Link>
+            <p className="text-gray-500 text-base mb-2"><UiText text={"No results for &ldquo;"} />{query}<UiText text={"&rdquo;"} /></p>
+            <p className="text-gray-600 text-sm"><UiText text={"Try different keywords or"} />{' '}
+              <Link href="/contact" className="text-[#dc2626] hover:underline"><UiText text={"contact support"} /></Link>
             </p>
           </div>
         )}
@@ -218,8 +218,8 @@ export default function HelpCenterPage() {
                     <Icon className="w-4 h-4" style={{ color: cat.color }} />
                   </div>
                   <div>
-                    <p className="font-bold text-white text-sm">{cat.label}</p>
-                    <p className="text-gray-600 text-xs">{cat.description}</p>
+                    <p className="font-bold text-white text-sm"><UiValue value={cat.label} /></p>
+                    <p className="text-gray-600 text-xs"><UiValue value={cat.description} /></p>
                   </div>
                 </div>
                 <div className="px-6">
@@ -235,8 +235,8 @@ export default function HelpCenterPage() {
         {/* Journey links */}
         {!query.trim() && !activeCategory && (
           <div className="mt-10 rounded-3xl border border-white/[0.06] bg-white/[0.02] p-8">
-            <h3 className="text-lg font-extrabold text-white mb-1">Understand Your Journey</h3>
-            <p className="text-gray-500 text-sm mb-6">See exactly how BigCat works for your role — step by step.</p>
+            <h3 className="text-lg font-extrabold text-white mb-1"><UiText text={"Understand Your Journey"} /></h3>
+            <p className="text-gray-500 text-sm mb-6"><UiText text={"See exactly how BigCat works for your role — step by step."} /></p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
                 { label: "Buyer Journey", color: "#dc2626", icon: ShoppingBag },
@@ -251,7 +251,7 @@ export default function HelpCenterPage() {
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${j.color}15` }}>
                       <Icon className="w-4 h-4" style={{ color: j.color }} />
                     </div>
-                    <span className="text-xs font-semibold text-gray-400">{j.label}</span>
+                    <span className="text-xs font-semibold text-gray-400"><UiValue value={j.label} /></span>
                   </Link>
                 )
               })}
@@ -263,20 +263,19 @@ export default function HelpCenterPage() {
         <div className="mt-6 rounded-3xl p-8 text-center"
           style={{ background: "linear-gradient(135deg, #dc262612, #7c3aed0a)", border: "1px solid rgba(220,38,38,0.15)" }}>
           <MessageSquare className="w-8 h-8 mx-auto mb-3" style={{ color: "#dc2626" }} />
-          <h3 className="font-extrabold text-white mb-2">Still need help?</h3>
-          <p className="text-gray-500 text-sm mb-6">Support is available Monday – Saturday, 8am – 8pm WAT.</p>
+          <h3 className="font-extrabold text-white mb-2"><UiText text={"Still need help?"} /></h3>
+          <p className="text-gray-500 text-sm mb-6"><UiText text={"Support is available Monday – Saturday, 8am – 8pm WAT."} /></p>
           <Link href="/contact"
             className="inline-flex items-center gap-2 bg-[#dc2626] hover:bg-[#ef4444] text-white text-sm font-bold px-8 py-3 rounded-full transition-all">
-            Contact Support
-          </Link>
+            <UiText text={"Contact Support"} />{" "}</Link>
         </div>
 
         <div className="mt-8 flex items-center justify-center gap-6 flex-wrap text-xs text-gray-600 pb-8">
-          <Link href="/terms" className="hover:text-gray-400 transition-colors">Terms of Service</Link>
+          <Link href="/terms" className="hover:text-gray-400 transition-colors"><UiText text={"Terms of Service"} /></Link>
           <span>·</span>
-          <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy Policy</Link>
+          <Link href="/privacy" className="hover:text-gray-400 transition-colors"><UiText text={"Privacy Policy"} /></Link>
           <span>·</span>
-          <Link href="/contact" className="hover:text-gray-400 transition-colors">Contact</Link>
+          <Link href="/contact" className="hover:text-gray-400 transition-colors"><UiText text={"Contact"} /></Link>
         </div>
       </div>
     </div>
