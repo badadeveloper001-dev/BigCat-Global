@@ -111,10 +111,6 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
 
   // Calculate delivery fee when inputs change
   useEffect(() => {
-    if (hasUnavailableProducts) {
-      setError('Insufficient stock for minimum order')
-      return
-    }
     if (!deliveryAddress.trim()) {
       setDeliveryFee(0)
       return
@@ -511,6 +507,11 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
 
     if (!user?.userId) {
       setError('Please log in to place an order')
+      return
+    }
+
+    if (hasUnavailableProducts) {
+      setError('Insufficient stock for minimum order')
       return
     }
 
@@ -1121,3 +1122,4 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
     </div>
   )
 }
+
