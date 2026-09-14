@@ -1,0 +1,17 @@
+const fs=require('fs'),ts=require('typescript'),vm=require('vm'),assert=require('node:assert/strict')
+const source=fs.readFileSync('lib/order-actions.ts','utf8');const ast=ts.createSourceFile('x.ts',source,ts.ScriptTarget.Latest,true)
+const fn=ast.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name.text==='checkStockAvailability')
+const context={};vm.runInNewContext(ts.transpileModule(fn.getText(ast),{compilerOptions:{target:ts.ScriptTarget.ES2020}}).outputText,context)
+function db(rows,error=null){return {from:()=>({select:()=>({in:()=>({eq:async()=>({data:rows,error})})})})}}
+async function main(){
+ const check=(rows,items=[{productId:'p',quantity:1}],error)=>context.checkStockAvailability(db(rows,error),'m',items)
+ assert.equal((await check([{id:'p',stock:0}])).success,false)
+ assert.equal((await check([{id:'p',stock:null}])).success,false)
+ assert.equal((await check([{id:'p',stock:'invalid'}])).success,false)
+ assert.equal((await check([])).success,false)
+ assert.equal((await check([{id:'p',stock:1}],[{productId:'p',quantity:1},{productId:'p',quantity:1}])).success,false)
+ assert.equal((await check([{id:'p',stock:3,minimum_order_quantity:2}])).success,false)
+ assert.equal((await check([{id:'p',stock:1}])).success,true)
+ assert.equal((await check([],undefined,{message:'database unavailable'})).success,false)
+ console.log('PASS: zero, missing, invalid stock, removed products, combined quantities, MOQ and lookup errors are blocked; available product accepted')
+}main().catch(e=>{console.error(e);process.exitCode=1})

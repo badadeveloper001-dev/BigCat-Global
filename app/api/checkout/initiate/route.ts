@@ -61,8 +61,10 @@ export async function POST(request: NextRequest) {
     const quantity = Number(body.quantity)
     const { data: product, error: productError } = await getSupabaseClient().from('products').select('id, stock, minimum_order_quantity').eq('id', body.productId).single()
     if (productError || !product) return NextResponse.json({ success: false, error: 'Unable to verify product availability.' }, { status: 400 })
+    const stock = Number(product.stock)
+    if (!Number.isSafeInteger(stock) || stock <= 0) return NextResponse.json({ success: false, error: 'Out of stock' }, { status: 409 })
     const minimum = Number(product.minimum_order_quantity ?? 1)
-    if (!Number.isSafeInteger(quantity) || quantity < minimum || quantity > Number(product.stock)) return NextResponse.json({ success: false, error: `Order at least ${minimum} units, within available stock (${product.stock}).` }, { status: 400 })
+    if (!Number.isSafeInteger(minimum) || minimum < 1 || !Number.isSafeInteger(quantity) || quantity < minimum || quantity > Number(product.stock)) return NextResponse.json({ success: false, error: `Order at least ${minimum} units, within available stock (${product.stock}).` }, { status: 400 })
     const idempotencyKey = getInitiationKey(body)
     const now = Date.now()
 

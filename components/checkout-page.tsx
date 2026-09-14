@@ -60,6 +60,8 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
   const [savedAddresses, setSavedAddresses] = useState<Array<{ id: string; label: string; address: string }>>([])
   const [serviceBooking, setServiceBooking] = useState<any>(null)
   const [serviceBillPayment, setServiceBillPayment] = useState<any>(null)
+  const hasUnavailableProducts = !serviceBooking && !serviceBillPayment && items.some(item =>
+    item.stock !== undefined && (!Number.isSafeInteger(Number(item.stock)) || Number(item.stock) <= 0 || item.quantity > Number(item.stock)))
   const savedLocation = [user?.city, user?.state].filter(Boolean).join(', ')
 
   const mapSavedMethodToCheckoutMethod = (type?: string | null): PaymentMethod | null => {
@@ -109,6 +111,10 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
 
   // Calculate delivery fee when inputs change
   useEffect(() => {
+    if (hasUnavailableProducts) {
+      setError('Insufficient stock for minimum order')
+      return
+    }
     if (!deliveryAddress.trim()) {
       setDeliveryFee(0)
       return
@@ -1092,8 +1098,9 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
             </p>
           </div>
           <button
+            title={hasUnavailableProducts ? 'Out of stock' : undefined}
             onClick={handleSubmit}
-            disabled={!pilotAcknowledged || isSubmitting || !deliveryAddress.trim() || isWalletInsufficient || suspended}
+            disabled={hasUnavailableProducts || !pilotAcknowledged || isSubmitting || !deliveryAddress.trim() || isWalletInsufficient || suspended}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed ${
               isWalletPayment
                 ? 'bg-[#6C2BD9] text-white'
