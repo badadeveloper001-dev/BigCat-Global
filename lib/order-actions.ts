@@ -3,7 +3,7 @@ import { requireAdmin } from '@/lib/supabase/require-admin'
 
 import { getRequestAuthUser } from '@/lib/supabase/request-auth'
 import { createClient } from '@/lib/supabase/server'
-import { holdFundsInEscrow, releaseFundsFromEscrow } from '@/lib/escrow-actions'
+import { holdFundsInEscrow, releaseFundsFromEscrow, persistOrderFinancialState } from '@/lib/escrow-actions'
 import { getUserSafetyStatus } from '@/lib/server-trust-safety'
 import { registerOrderForLogistics } from '@/lib/logistics-actions'
 import { dispatchNotification } from '@/lib/notifications'
@@ -167,6 +167,16 @@ function generatePickupToken(orderId: string) {
   const orderPart = String(orderId || '').replace(/-/g, '').slice(0, 4).toUpperCase()
   const randomPart = crypto.randomUUID().replace(/-/g, '').slice(0, 10).toUpperCase()
   return `BCPU${orderPart}${randomPart}`
+}
+
+/**
+ * Generate a collision-resistant, human-readable payment reference for Orchid pilot.
+ * Format: BCG-ORC-XXXXXXXX (8 random hex chars, uppercased).
+ * Server-generated only — never trusted from client input.
+ */
+export function generatePaymentReference(): string {
+  const randomPart = crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()
+  return `BCG-ORC-${randomPart}`
 }
 
 async function recordBuyerWalletRefund(
@@ -467,19 +477,33 @@ export async function createOrder(
       const pickupToken = payload.deliveryType === 'pickup' ? generatePickupToken(orderId) : null
 
       const resolvedPaymentMethod = payload.paymentMethod || 'card'
+      const isOrchidPayment = String(resolvedPaymentMethod).toLowerCase().trim() === 'orchid'
+      const paymentReference = isOrchidPayment ? generatePaymentReference() : null
 
-      const baseOrderInsert = {
+      const baseOrderInsert: Record<string, any> = {
         id: orderId,
         buyer_id: payload.buyerId,
         merchant_id: normalizedMerchantId,
-        status: 'paid',
         grand_total: grandTotal,
         product_total: productTotal,
         delivery_fee: allocatedDeliveryFee,
         delivery_type: payload.deliveryType,
         delivery_address: payload.deliveryAddress,
         payment_method: resolvedPaymentMethod,
-        payment_status: 'completed',
+      }
+
+      if (isOrchidPayment) {
+        // Orchid: order is NOT paid yet. Buyer will pay externally via Orchid.
+        baseOrderInsert.status = 'pending'
+        baseOrderInsert.payment_status = 'pending'
+        baseOrderInsert.payment_provider = 'orchid'
+        baseOrderInsert.payment_reference = paymentReference
+        // Explicitly avoid escrow_status='held' — funds are not yet confirmed by Orchid.
+        baseOrderInsert.escrow_status = 'pending'
+      } else {
+        // Non-Orchid: preserve legacy immediate-payment behavior for pilot.
+        baseOrderInsert.status = 'paid'
+        baseOrderInsert.payment_status = 'completed'
       }
 
       const orderInsertAttempts = [
@@ -573,21 +597,24 @@ export async function createOrder(
         })),
       )
 
-      await holdFundsInEscrow(
-        supabase,
-        {
-          ...(orderResult.data || {}),
-          id: orderResult.data?.id || orderId,
-          merchant_id: normalizedMerchantId,
-          product_total: productTotal,
-          grand_total: grandTotal,
-          total_amount: grandTotal,
-          delivery_fee: allocatedDeliveryFee,
-          payment_method: resolvedPaymentMethod,
-          status: orderResult.data?.status || 'pending',
-        },
-        resolvedPaymentMethod,
-      )
+      // Skip escrow hold for Orchid orders — funds not yet confirmed externally.
+      if (!isOrchidPayment) {
+        await holdFundsInEscrow(
+          supabase,
+          {
+            ...(orderResult.data || {}),
+            id: orderResult.data?.id || orderId,
+            merchant_id: normalizedMerchantId,
+            product_total: productTotal,
+            grand_total: grandTotal,
+            total_amount: grandTotal,
+            delivery_fee: allocatedDeliveryFee,
+            payment_method: resolvedPaymentMethod,
+            status: orderResult.data?.status || 'pending',
+          },
+          resolvedPaymentMethod,
+        )
+      }
 
       const orderIdRef = String(orderResult.data?.id || orderId)
 
@@ -605,21 +632,91 @@ export async function createOrder(
         type: 'order',
         title: 'Your order has been received',
         message: `Order ${orderIdRef} has been received by the merchant.`,
-        e    }
+        eventKey: `order:new:buyer:${orderIdRef}`,
+        emailSubject: 'Order received',
+      })
+
+      return {
+        success: true,
+        data: {
+          ...(orderResult.data || {}),
+          id: orderIdRef,
+          orderId: orderIdRef,
+          orders: [{ id: orderIdRef, merchant_id: normalizedMerchantId, product_total: productTotal, delivery_fee: allocatedDeliveryFee, grand_total: grandTotal }],
+          paymentReference,
+          payment_method: resolvedPaymentMethod,
+          payment_provider: isOrchidPayment ? 'orchid' : undefined,
+        },
+      }
+    })()
+
+    checkoutInFlight.set(idempotencyKey, checkoutPromise)
+
+    try {
+      const result = await checkoutPromise
+      checkoutResultCache.set(idempotencyKey, { expiresAt: Date.now() + CHECKOUT_IDEMPOTENCY_TTL_MS, result })
+      return result
+    } finally {
+      checkoutInFlight.delete(idempotencyKey)
+    }
+  } catch (error: any) {
+    console.error('[createOrder] Error:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+export async function updateOrderStatus(
+  orderId: string,
+  newStatus: string,
+  actorId?: string,
+) {
+  try {
+    const supabase = await createClient()
+    const normalizedStatus = normalizeWorkflowStatus(newStatus)
+
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('id', orderId)
+      .single()
+
+    if (error || !data) {
+      return { success: false, error: 'Order not found' }
+    }
+
+    const order = data as any
+    const buyerId = String(order.buyer_id || '')
+    const merchantId = String(order.merchant_id || '')
+
+    // Verify actor owns this order
+    if (actorId && actorId !== buyerId && actorId !== merchantId) {
+      return { success: false, error: 'You are not authorized to update this order' }
+    }
+
+    if (normalizedStatus === 'cancelled') {
+      const productTotal = Number(order.product_total || 0)
+      const grandTotal = Number(order.grand_total || 0)
+      const GIT_FEE_RATE = 0.015
+      const gitFeeAmount = Math.round(productTotal * GIT_FEE_RATE)
+      const refundAmount = Math.max(0, grandTotal - gitFeeAmount)
+
+      await persistOrderFinancialState(supabase, orderId, 'cancelled', 'refunded', order.escrow_status || 'held', order.payment_method || '')
 
       if (buyerId) {
-        await dispatchNotification({
-          userId: buyerId,
-          type: 'order',
-          title: 'Order cancelled & refund issued',
-          message: refundAmount > 0
-            ? `Order ${orderId} has been cancelled. ₦${refundAmount.toLocaleString('en-NG')} has been credited to your wallet (GIT fee of ₦${gitFeeAmount.toLocaleString('en-NG')} is non-refundable).`
-            : `Order ${orderId} has been cancelled.`,
-          eventKey: `order:cancelled:buyer:${orderId}`,
-          metadata: { orderId, refundAmount },
-          emailSubject: 'Order cancelled',
-        })
+        await recordBuyerWalletRefund(supabase, buyerId, orderId, refundAmount, gitFeeAmount)
       }
+
+      await dispatchNotification({
+        userId: buyerId,
+        type: 'order',
+        title: 'Order cancelled & refund issued',
+        message: refundAmount > 0
+          ? `Order ${orderId} has been cancelled. ₦${refundAmount.toLocaleString('en-NG')} has been credited to your wallet (GIT fee of ₦${gitFeeAmount.toLocaleString('en-NG')} is non-refundable).`
+          : `Order ${orderId} has been cancelled.`,
+        eventKey: `order:cancelled:buyer:${orderId}`,
+        metadata: { orderId, refundAmount },
+        emailSubject: 'Order cancelled',
+      })
       if (merchantId) {
         await dispatchNotification({
           userId: merchantId,
@@ -663,6 +760,9 @@ export async function createOrder(
         disbursement: released?.breakdown || null,
       }
     }
+
+    // Generic status update
+    await persistOrderFinancialState(supabase, orderId, normalizedStatus, order.payment_status || 'pending', order.escrow_status || 'held', order.payment_method || '')
 
     return { success: true, data }
   } catch (error: any) {

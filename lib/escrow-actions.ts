@@ -93,7 +93,7 @@ function buildOrderUpdateAttempts(
   ]
 }
 
-async function persistOrderFinancialState(
+export async function persistOrderFinancialState(
   supabase: any,
   orderId: string,
   orderStatus: string,

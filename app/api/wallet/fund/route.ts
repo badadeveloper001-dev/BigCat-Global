@@ -14,6 +14,12 @@ export async function POST(request: NextRequest) {
     if (!userId || !currency || !amount) {
       return NextResponse.json({ success: false, error: 'userId, currency and amount are required' }, { status: 400 })
     }
+
+    // Ownership check: authenticated user can only fund their own wallet
+    if (auth.user.id !== userId) {
+      return NextResponse.json({ success: false, error: 'You can only fund your own wallet' }, { status: 403 })
+    }
+
     if (!CURRENCIES.includes(currency)) {
       return NextResponse.json({ success: false, error: 'Invalid currency. Use NGN, USD or CNY' }, { status: 400 })
     }

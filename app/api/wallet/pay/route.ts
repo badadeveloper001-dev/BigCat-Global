@@ -30,6 +30,12 @@ export async function POST(request: NextRequest) {
     if (!userId || !payCurrency || !payAmount || !orderId) {
       return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 })
     }
+
+    // Ownership check: authenticated user can only pay from their own wallet
+    if (auth.user.id !== userId) {
+      return NextResponse.json({ success: false, error: 'You can only pay from your own wallet' }, { status: 403 })
+    }
+
     if (!CURRENCIES.includes(payCurrency)) {
       return NextResponse.json({ success: false, error: 'Invalid payment currency' }, { status: 400 })
     }

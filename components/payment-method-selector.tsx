@@ -15,27 +15,28 @@ const paymentMethods = [
   {
     id: 'orchid' as PaymentMethod,
     label: 'Orchid Wallet',
-    description: 'Pay instantly from your Orchid account',
+    description: 'Pay via Orchid settlement',
     icon: Wallet,
     badge: 'Recommended',
     highlighted: true,
   },
-  {
-    id: 'bank' as PaymentMethod,
-    label: 'Bank Transfer',
-    description: 'Transfer funds directly from your bank account',
-    icon: Building2,
-    badge: null,
-    highlighted: false,
-  },
-  {
-    id: 'card' as PaymentMethod,
-    label: 'Credit/Debit Card',
-    description: 'Pay securely with your card',
-    icon: CreditCard,
-    badge: null,
-    highlighted: false,
-  },
+  // Pilot: bank and card are hidden. Underlying code preserved for future use.
+  // {
+  //   id: 'bank' as PaymentMethod,
+  //   label: 'Bank Transfer',
+  //   description: 'Transfer funds directly from your bank account',
+  //   icon: Building2,
+  //   badge: null,
+  //   highlighted: false,
+  // },
+  // {
+  //   id: 'card' as PaymentMethod,
+  //   label: 'Credit/Debit Card',
+  //   description: 'Pay securely with your card',
+  //   icon: CreditCard,
+  //   badge: null,
+  //   highlighted: false,
+  // },
 ]
 
 export function PaymentMethodSelector({ selectedMethod, onSelect }: PaymentMethodSelectorProps) {

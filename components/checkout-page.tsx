@@ -52,10 +52,12 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
   const [topUpError, setTopUpError] = useState('')
   const [suspended, setSuspended] = useState(false)
   const [strikeCount, setStrikeCount] = useState(0)
-  // Multi-currency wallet state
+  // Multi-currency wallet state (retained for future use; hidden during Orchid pilot)
   const [payCurrency, setPayCurrency] = useState<"NGN" | "USD" | "CNY">("NGN")
   const [payRates, setPayRates] = useState<{ USD: number; NGN: number; CNY: number }>({ USD: 1, NGN: 1620, CNY: 7.26 })
   const [payAmountInCurrency, setPayAmountInCurrency] = useState(0)
+  // Orchid pilot: payment reference returned from order creation
+  const [orchidPaymentReference, setOrchidPaymentReference] = useState<string | null>(null)
 
   const [savedAddresses, setSavedAddresses] = useState<Array<{ id: string; label: string; address: string }>>([])
   const [serviceBooking, setServiceBooking] = useState<any>(null)
@@ -535,7 +537,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
     }
 
     const currentWalletBalance = isWalletPayment ? getWalletBalance() : 0
-    if (isWalletPayment && payCurrency === 'NGN' && currentWalletBalance < grandTotal) {
+    if (isWalletPayment && payCurrency === 'NGN' && currentWalletBalance < grandTotal && paymentMethod !== 'orchid') {
       setWalletBalance(currentWalletBalance)
       setError('Insufficient funds in wallet')
       return
@@ -611,7 +613,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
         })
       })
 
-      if (isWalletPayment) {
+      if (isWalletPayment && paymentMethod !== 'orchid') {
         try {
           await finalizeWalletPayment(orderId, grandTotal)
           setSuccess('Test wallet payment recorded. No real funds are held.')
@@ -620,6 +622,10 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
           setIsSubmitting(false)
           return
         }
+      } else if (paymentMethod === 'orchid' && result.data?.paymentReference) {
+        // Orchid pilot: show payment reference. Buyer pays externally via Orchid.
+        setOrchidPaymentReference(result.data.paymentReference)
+        setSuccess(`Order created. Use payment reference ${result.data.paymentReference} when paying via Orchid.`)
       } else {
         setSuccess(
           paymentMethod === 'bank'
@@ -1085,6 +1091,13 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
         {success && (
           <div className="mx-4 mt-3 p-3 bg-[#F3E8FF] border border-[#E8D7FF] rounded-lg">
             <p className="text-sm text-[#6C2BD9] font-medium"><UiValue value={success} /></p>
+            {orchidPaymentReference && (
+              <div className="mt-2 p-2 bg-white rounded-lg border border-[#E8D7FF]">
+                <p className="text-xs text-muted-foreground">Your payment reference</p>
+                <p className="text-lg font-bold text-[#6C2BD9] tracking-wider">{orchidPaymentReference}</p>
+                <p className="text-xs text-muted-foreground mt-1">Quote this reference when making payment via Orchid.</p>
+              </div>
+            )}
           </div>
         )}
       </main>
@@ -1111,11 +1124,13 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
             <CreditCard className="w-5 h-5" />
             <UiValue value={isSubmitting
               ? 'Processing...'
-              : isWalletPayment
-                ? 'Pay with Wallet'
-                : paymentMethod === 'bank'
-                  ? 'Pay via Transfer'
-                  : 'Pay with Card'} />
+              : paymentMethod === 'orchid'
+                ? 'Create Order & Get Reference'
+                : isWalletPayment
+                  ? 'Pay with Wallet'
+                  : paymentMethod === 'bank'
+                    ? 'Pay via Transfer'
+                    : 'Pay with Card'} />
           </button>
         </div>
       </div>

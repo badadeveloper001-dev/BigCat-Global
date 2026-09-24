@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { requireAuthenticatedUser } from '@/lib/supabase/request-auth'
 
 function isMissingTableError(error: any) {
   const message = String(error?.message || '').toLowerCase()
@@ -14,6 +15,10 @@ export async function GET(request: NextRequest) {
   if (!userId) {
     return NextResponse.json({ success: false, error: 'userId is required' }, { status: 400 })
   }
+
+  // Authentication required — users can only read their own wallet
+  const auth = await requireAuthenticatedUser(userId, request)
+  if (auth.response) return auth.response
 
   try {
     const supabase = await createClient()

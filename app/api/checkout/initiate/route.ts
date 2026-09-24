@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
 import { getBestPromotionDiscountForItems, incrementPromotionUsage } from "@/lib/promotion-actions"
+import { requireAuthenticatedUser } from "@/lib/supabase/request-auth"
 
 function getSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -56,6 +57,10 @@ function isMissingColumnError(error: any) {
 }
 
 export async function POST(request: NextRequest) {
+  // Authentication required for checkout initiation
+  const auth = await requireAuthenticatedUser(undefined, request)
+  if (auth.response) return auth.response
+
   try {
     const body = await request.json()
     const quantity = Number(body.quantity)

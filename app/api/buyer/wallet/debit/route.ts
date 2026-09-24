@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-function getSupabaseClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-  if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Missing Supabase credentials')
-  }
-
-  return createClient(supabaseUrl, supabaseKey)
-}
+import { requireAuthenticatedUser } from '@/lib/supabase/request-auth'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuthenticatedUser(undefined, request)
+  if (auth.response) return auth.response
+
   try {
     const body = await request.json()
     const buyerId = String(body?.buyerId || '').trim()
@@ -24,11 +17,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'buyerId is required' }, { status: 400 })
     }
 
+    // Ownership check: authenticated user can only debit their own wallet
+    if (auth.user.id !== buyerId) {
+      return NextResponse.json({ success: false, error: 'You can only debit your own wallet' }, { status: 403 })
+    }
+
     if (!Number.isFinite(amount) || amount <= 0) {
       return NextResponse.json({ success: false, error: 'Invalid amount' }, { status: 400 })
     }
 
-    const supabase = getSupabaseClient()
+    const supabase = await createClient()
 
     // Check current balance before debiting
     const txResult = await supabase
@@ -37,6 +35,11 @@ export async function POST(request: NextRequest) {
       .eq('buyer_id', buyerId)
 
     if (txResult.error) {
+      const message = String(txResult.error?.message || '').toLowerCase()
+      const isMissingTable = message.includes('does not exist') || message.includes('relation') || message.includes('schema cache')
+      if (isMissingTable) {
+        return NextResponse.json({ success: false, error: 'Wallet ledger is not available in this environment' }, { status: 503 })
+      }
       console.error('[buyer/wallet/debit] Balance check error:', txResult.error)
       return NextResponse.json({ success: false, error: 'Could not verify balance' }, { status: 500 })
     }

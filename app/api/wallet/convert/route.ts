@@ -21,6 +21,12 @@ export async function POST(request: NextRequest) {
     if (!userId || !fromCurrency || !toCurrency || !amount) {
       return NextResponse.json({ success: false, error: 'userId, fromCurrency, toCurrency and amount are required' }, { status: 400 })
     }
+
+    // Ownership check: authenticated user can only convert their own currencies
+    if (auth.user.id !== userId) {
+      return NextResponse.json({ success: false, error: 'You can only convert your own wallet currencies' }, { status: 403 })
+    }
+
     if (fromCurrency === toCurrency) {
       return NextResponse.json({ success: false, error: 'Cannot convert to the same currency' }, { status: 400 })
     }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { requireAuthenticatedUser } from '@/lib/supabase/request-auth'
 
 const CURRENCIES = ['NGN', 'USD', 'CNY'] as const
 type Currency = typeof CURRENCIES[number]
@@ -17,6 +18,10 @@ async function ensureWallets(supabase: any, userId: string) {
 export async function GET(request: NextRequest) {
   const userId = request.nextUrl.searchParams.get('userId')?.trim()
   if (!userId) return NextResponse.json({ success: false, error: 'userId required' }, { status: 400 })
+
+  // Authentication required
+  const auth = await requireAuthenticatedUser(userId, request)
+  if (auth.response) return auth.response
 
   try {
     const supabase = await createClient()

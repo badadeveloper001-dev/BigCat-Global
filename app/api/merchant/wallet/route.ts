@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getMerchantWalletOverview, backfillMerchantWalletFromOrders, getMerchantWalletDiagnostics } from '@/lib/merchant-wallet'
+import { requireAuthenticatedUser } from '@/lib/supabase/request-auth'
 
 export async function GET(request: NextRequest) {
   const merchantId = String(request.nextUrl.searchParams.get('merchantId') || '').trim()
   if (!merchantId) {
     return NextResponse.json({ success: false, error: 'merchantId is required' }, { status: 400 })
   }
+
+  // Authentication required — merchant can only read their own wallet
+  const auth = await requireAuthenticatedUser(merchantId, request)
+  if (auth.response) return auth.response
 
   // Backfill any delivered orders that were never credited to the wallet ledger.
   // This is idempotent - orders already credited are skipped.
