@@ -49,8 +49,14 @@ function main() {
 
   console.log('Payment Reference Generation:')
 
-  test('generatePaymentReference function exists in order-actions.ts', () => {
-    assert.ok(orderSource.includes('export function generatePaymentReference'))
+  test('generatePaymentReference exists as a private helper in the server module', () => {
+    assert.ok(orderSource.includes('function generatePaymentReference(): string'), 'Function declaration must exist')
+    assert.ok(!/export\s+function\s+generatePaymentReference/.test(orderSource), 'Must not be exported from the use server module')
+    assert.ok(orderSource.includes("'use server'"), 'Must be declared in a server module')
+    assert.ok(
+      orderSource.includes('isOrchidPayment ? generatePaymentReference()'),
+      'Must be generated server-side during order creation, never accepted from the client'
+    )
   })
 
   test('generatePaymentReference returns BCG-ORC-XXXXXXXX format', () => {

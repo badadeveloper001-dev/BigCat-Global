@@ -174,7 +174,7 @@ function generatePickupToken(orderId: string) {
  * Format: BCG-ORC-XXXXXXXX (8 random hex chars, uppercased).
  * Server-generated only — never trusted from client input.
  */
-export function generatePaymentReference(): string {
+function generatePaymentReference(): string {
   const randomPart = crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()
   return `BCG-ORC-${randomPart}`
 }
@@ -647,6 +647,7 @@ export async function createOrder(
           payment_method: resolvedPaymentMethod,
           payment_provider: isOrchidPayment ? 'orchid' : undefined,
         },
+      }
       }
     })()
 
