@@ -1114,7 +1114,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
           <button
             title={hasUnavailableProducts ? 'Out of stock' : undefined}
             onClick={handleSubmit}
-            disabled={hasUnavailableProducts || !pilotAcknowledged || isSubmitting || !deliveryAddress.trim() || isWalletInsufficient || suspended}
+            disabled={hasUnavailableProducts || !pilotAcknowledged || isSubmitting || !deliveryAddress.trim() || (isWalletInsufficient && paymentMethod !== 'orchid') || suspended}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed ${
               isWalletPayment
                 ? 'bg-[#6C2BD9] text-white'
