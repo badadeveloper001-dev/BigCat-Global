@@ -147,6 +147,21 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (!session) {
+        try {
+          const response = await fetch('/api/auth/oauth-profile', { cache: 'no-store' })
+          const result = await response.json()
+          if (result.success && result.data && isActive) {
+            const profile = result.data
+            const role = profile.role || 'buyer'
+            setRoleState(role)
+            setUserState(sessionProfile(profile, profile.email))
+            localStorage.setItem('userRole', role)
+            localStorage.setItem('userData', JSON.stringify(sessionProfile(profile, profile.email)))
+            setIsLoading(false)
+            return
+          }
+        } catch {}
+
         clearLocalAuthState()
         setRoleState(null)
         setUserState(null)
