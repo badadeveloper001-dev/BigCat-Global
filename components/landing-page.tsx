@@ -261,8 +261,15 @@ export function LandingPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#f87171]/60 mb-8">
             <UiText text={"Trusted & Backed By"} />{" "}</p>
           <div className="flex items-center justify-center gap-10 sm:gap-16 flex-wrap">
-            <div className="rounded-2xl border border-white/20 px-4 py-2.5 text-sm font-semibold text-white/90">
-              <UiText text={"Orchid Payments"} />{" "}</div>
+            <div className="flex h-16 w-32 items-center justify-center rounded-2xl bg-white px-2.5 py-1 shadow-md">
+              <Image
+                src="/orchid-logo.svg"
+                alt="Orchid — Effortless Financial Control"
+                width={118}
+                height={80}
+                className="h-13 w-auto object-contain"
+              />
+            </div>
             <div className="bg-white rounded-2xl px-3 py-2 shadow-md opacity-90 hover:opacity-100 transition-opacity">
               <UiAttributes><Image src="/image.png" alt="BigCat Global" width={72} height={36} className="object-contain" /></UiAttributes>
             </div>
