@@ -83,8 +83,10 @@ export function MarketplaceApp() {
     return <Onboarding onGuestBrowse={() => setGuestBrowsing(true)} />
   }
 
-  if (role === "merchant" && merchantVerificationStatus === "submitted") {
-    return <MerchantDashboard verificationStatus={merchantVerificationStatus} />
+  if (role === "merchant" && (merchantVerificationStatus === "submitted" || merchantVerificationStatus === "verified")) {
+    return merchantVerificationStatus === "verified"
+      ? <MerchantDashboard />
+      : <MerchantDashboard verificationStatus={merchantVerificationStatus} />
   }
 
   // Handle merchant setup flow - only show if setup not completed
