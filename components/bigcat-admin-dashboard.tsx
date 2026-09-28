@@ -27,6 +27,9 @@ export function BigcatAdminDashboard() {
   const [selectedVerification, setSelectedVerification] = useState<any | null>(null)
   const [reviewDocument, setReviewDocument] = useState<any | null>(null)
   const [reviewDocumentLoading, setReviewDocumentLoading] = useState(false)
+  const [verificationDecisionLoading, setVerificationDecisionLoading] = useState(false)
+  const [rejectionReason, setRejectionReason] = useState("")
+  const [verificationDecisionMessage, setVerificationDecisionMessage] = useState<string | null>(null)
 
   const [stats, setStats] = useState<PlatformStats>({
     totalUsers: 0,
@@ -123,6 +126,49 @@ export function BigcatAdminDashboard() {
     } finally {
       setVerificationAccessLoading(false)
       setReviewDocumentLoading(false)
+    }
+  }
+
+  const handleVerificationDecision = async (action: "approve" | "reject") => {
+    if (!selectedVerification?.id) return
+    if (action === "reject" && !rejectionReason.trim()) {
+      setVerificationDecisionMessage("Enter a reason before rejecting this submission.")
+      return
+    }
+
+    setVerificationDecisionLoading(true)
+    setVerificationDecisionMessage(null)
+    try {
+      const response = await fetch("/api/admin/merchant-verification/document", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          verificationId: selectedVerification.id,
+          action,
+          rejectionReason: action === "reject" ? rejectionReason.trim() : undefined,
+        }),
+      })
+      const result = await response.json()
+      if (!response.ok || !result?.success) {
+        setVerificationDecisionMessage(result?.error || "Unable to update verification.")
+        return
+      }
+
+      setVerificationSubmissions((current) =>
+        current.filter((item) => item.id !== selectedVerification.id),
+      )
+      setReviewDocument(null)
+      setSelectedVerification(null)
+      setRejectionReason("")
+      setVerificationDecisionMessage(
+        action === "approve"
+          ? "Merchant business verification approved."
+          : "Merchant business verification rejected.",
+      )
+    } catch {
+      setVerificationDecisionMessage("Unable to update verification.")
+    } finally {
+      setVerificationDecisionLoading(false)
     }
   }
 
@@ -279,7 +325,7 @@ export function BigcatAdminDashboard() {
                     {reviewDocument.documentType === "cac_certificate" ? "CAC Certificate" : "Business License"} · {reviewDocument.country === "NG" ? "Nigeria" : "China"}
                   </p>
                 </div>
-                <button onClick={() => { setReviewDocument(null); setSelectedVerification(null) }} className="rounded-lg border border-border px-3 py-2 text-sm">
+                <button onClick={() => { setReviewDocument(null); setSelectedVerification(null); setRejectionReason(""); setVerificationDecisionMessage(null) }} className="rounded-lg border border-border px-3 py-2 text-sm">
                   <UiText text={"Close"} />
                 </button>
               </div>
@@ -295,6 +341,37 @@ export function BigcatAdminDashboard() {
               </div>
               <div className="mt-5 rounded-xl border border-border overflow-hidden bg-background">
                 <iframe src={reviewDocument.signedUrl} title="Merchant verification document" className="w-full h-[65vh]" />
+              </div>
+              {verificationDecisionMessage ? (
+                <p className="mt-3 text-sm text-muted-foreground">{verificationDecisionMessage}</p>
+              ) : null}
+              <div className="mt-5 rounded-xl border border-border p-4">
+                <p className="text-sm font-medium"><UiText text={"Verification decision"} /></p>
+                <p className="text-xs text-muted-foreground mt-1"><UiText text={"Approving unlocks the merchant account. Rejecting requires a reason and allows the merchant to correct and resubmit."} /></p>
+                <textarea
+                  value={rejectionReason}
+                  onChange={(event) => setRejectionReason(event.target.value)}
+                  placeholder="Reason for rejection (required only when rejecting)"
+                  rows={3}
+                  maxLength={1000}
+                  className="mt-3 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30"
+                />
+                <div className="mt-3 flex flex-wrap justify-end gap-2">
+                  <button
+                    onClick={() => handleVerificationDecision("reject")}
+                    disabled={verificationDecisionLoading || !rejectionReason.trim()}
+                    className="rounded-lg border border-destructive/40 px-3 py-2 text-sm disabled:opacity-50"
+                  >
+                    {verificationDecisionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UiText text={"Reject"} />}
+                  </button>
+                  <button
+                    onClick={() => handleVerificationDecision("approve")}
+                    disabled={verificationDecisionLoading}
+                    className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+                  >
+                    {verificationDecisionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UiText text={"Approve Business"} />}
+                  </button>
+                </div>
               </div>
               <p className="mt-3 text-xs text-muted-foreground">
                 <UiText text={"This private preview link expires after 5 minutes. The merchant verification remains protected."} />
