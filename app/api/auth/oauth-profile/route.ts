@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createAdminClient } from '@/lib/supabase/server'
 import { getRequestAuthUser } from '@/lib/supabase/request-auth'
+import { getUserProfile } from '@/lib/user-actions'
 
 export async function POST(request: NextRequest) {
   const { user, error: authError } = await getRequestAuthUser(request)
@@ -74,4 +75,31 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+
+export async function GET(request: NextRequest) {
+  const { user, error: authError } = await getRequestAuthUser(request)
+
+  if (!user) {
+    return NextResponse.json(
+      { success: false, error: authError || 'Authentication required' },
+      { status: 401 }
+    )
+  }
+
+  const result = await getUserProfile(user.id)
+  if (!result.success) {
+    return NextResponse.json({
+      success: true,
+      data: {
+        userId: user.id,
+        email: user.email || '',
+        name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || '',
+        role: 'buyer',
+      },
+    })
+  }
+
+  return NextResponse.json({ success: true, data: result.data })
 }
