@@ -31,7 +31,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const response = NextResponse.redirect(new URL(`/auth/callback-complete?next=${encodeURIComponent(next)}&role=${encodeURIComponent(requestedRole)}`, requestUrl.origin))
+    const response = NextResponse.redirect(new URL(next, requestUrl.origin))
     const supabase = await createOAuthServerClient(response)
     const { data: exchangeData, error: exchangeError } =
       await supabase.auth.exchangeCodeForSession(code)
