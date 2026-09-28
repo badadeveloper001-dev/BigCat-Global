@@ -267,7 +267,7 @@ export function LandingPage() {
                 alt="Orchid — Effortless Financial Control"
                 width={118}
                 height={80}
-                className="h-13 w-auto object-contain"
+                className="h-12 w-auto object-contain"
               />
             </div>
             <div className="bg-white rounded-2xl px-3 py-2 shadow-md opacity-90 hover:opacity-100 transition-opacity">
