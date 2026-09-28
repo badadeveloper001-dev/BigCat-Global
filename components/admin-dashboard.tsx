@@ -41,12 +41,15 @@ export function AdminDashboard() {
   const [verificationAccessCode, setVerificationAccessCode] = useState("")
   const [verificationAccessLoading, setVerificationAccessLoading] = useState(false)
   const [verificationAccessMessage, setVerificationAccessMessage] = useState<string | null>(null)
+  const [verificationSubmissions, setVerificationSubmissions] = useState<any[]>([])
+  const [loadingVerificationSubmissions, setLoadingVerificationSubmissions] = useState(true)
 
   useEffect(() => {
     loadStats()
     loadApprovals()
     loadUsers()
     loadAllMerchants()
+    loadVerificationSubmissions()
   }, [])
 
   const loadStats = async () => {
@@ -107,6 +110,19 @@ export function AdminDashboard() {
       console.error("Error loading users:", error)
     } finally {
       setLoadingUsers(false)
+    }
+  }
+
+  const loadVerificationSubmissions = async () => {
+    setLoadingVerificationSubmissions(true)
+    try {
+      const res = await fetch('/api/admin/merchant-verification?status=submitted', { cache: 'no-store' })
+      const result = await res.json()
+      if (result.success && result.data) setVerificationSubmissions(result.data)
+    } catch (error) {
+      console.error("Error loading merchant verification submissions:", error)
+    } finally {
+      setLoadingVerificationSubmissions(false)
     }
   }
 
@@ -292,6 +308,62 @@ export function AdminDashboard() {
                   <p className="text-xs text-muted-foreground"><UiValue value={stat.label} /></p>
                 </div>
               ))}
+            </div>
+          )}
+        </section>
+
+        {/* Business Verification */}
+        <section className="px-4 mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold text-foreground flex items-center gap-2">
+              <Shield className="w-4 h-4 text-primary" />
+              <UiText text={"Business Verification"} />
+            </h2>
+            <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">{verificationSubmissions.length} <UiText text={"submitted"} /></span>
+          </div>
+          {loadingVerificationSubmissions ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
+            </div>
+          ) : verificationSubmissions.length === 0 ? (
+            <div className="p-8 text-center bg-card border border-border rounded-xl">
+              <CheckCircle className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground"><UiText text={"No submitted business verifications"} /></p>
+            </div>
+          ) : (
+            <div className="bg-card border border-border rounded-xl overflow-hidden">
+              {verificationSubmissions.map((verification, index) => {
+                const merchant = Array.isArray(verification.auth_users) ? verification.auth_users[0] : verification.auth_users
+                const name = merchant?.business_name || merchant?.full_name || merchant?.email || "Unknown merchant"
+                const country = verification.country === "NG" ? "Nigeria" : verification.country === "CN" ? "China" : verification.country
+                const document = verification.document_type === "cac_certificate" ? "CAC Certificate" : "Business License"
+                return (
+                  <div key={verification.id} className={`p-4 ${index !== verificationSubmissions.length - 1 ? "border-b border-border" : ""}`}>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground truncate">{name}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{country} · {document}</p>
+                        <p className="text-xs text-muted-foreground mt-1 font-mono break-all">{verification.registration_number}</p>
+                        {verification.submitted_at && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Submitted {new Date(verification.submitted_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => {
+                          setVerificationAccessMessage(null)
+                          setVerificationAccessCode("")
+                          setShowVerificationAccess(true)
+                        }}
+                        className="shrink-0 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity"
+                      >
+                        <UiText text={"Review Document"} />
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           )}
         </section>
