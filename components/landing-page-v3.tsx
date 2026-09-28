@@ -859,7 +859,7 @@ export function LandingPageV3() {
             </button>
           </div>
         </div>
-      )
+      )}
       <HeroSection />
       <ExperienceSection />
       <WhySection />
