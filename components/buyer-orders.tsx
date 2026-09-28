@@ -528,6 +528,16 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
                     </span>
                   </div>
 
+                  {/* Payment Reference */}
+                  {order.payment_reference && (
+                    <div className="mb-3 rounded-lg border border-border bg-muted/30 px-3 py-2">
+                      <p className="text-xs text-muted-foreground"><UiText text={"Payment Reference"} /></p>
+                      <p className="mt-0.5 font-mono text-sm font-semibold text-foreground">
+                        {String(order.payment_reference)}
+                      </p>
+                    </div>
+                  )}
+
                   {/* Order Items */}
                   <div className="space-y-2 mb-3">
                     {(order.order_items || order.items || []).map((item: any) => (
