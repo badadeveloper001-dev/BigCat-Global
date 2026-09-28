@@ -736,14 +736,14 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
 
       <main className="mx-auto max-w-xl px-4 py-6">
         <section className="rounded-3xl border border-[#E8D7FF] bg-gradient-to-br from-[#F3E8FF] via-white to-white p-6 shadow-sm">
-          <div className="flex items-start gap-4">
-            <div className="flex h-14 w-24 shrink-0 items-center justify-center rounded-2xl border border-[#eadcf7] bg-white px-2">
+          <div className="flex flex-col items-start">
+            <div className="mb-5">
               <Image
                 src="/orchid-logo.svg"
                 alt="Orchid — Effortless Financial Control"
-                width={96}
-                height={66}
-                className="h-11 w-auto object-contain"
+                width={140}
+                height={96}
+                className="h-16 w-auto object-contain"
               />
             </div>
 
