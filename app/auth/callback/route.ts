@@ -37,7 +37,15 @@ export async function GET(request: NextRequest) {
     const googleId = metadata.sub || user.identities?.[0]?.identity_data?.sub || null
     const { data: existing, error: lookupError } = await admin.from('auth_users').select('id, role').eq('id', user.id).maybeSingle()
     if (lookupError) throw lookupError
+
     if (existing) {
+      if (existing.role !== requestedRole) {
+        await supabase.auth.signOut()
+        const accountType = existing.role === 'merchant' ? 'merchant' : 'buyer'
+        const message = `This Gmail is already registered as a ${accountType} account. Please use the ${accountType} portal or a different Gmail.`
+        return NextResponse.redirect(new URL('/?oauth_error=' + encodeURIComponent(message), url.origin))
+      }
+
       const { error: updateError } = await admin.from('auth_users').update({ name, full_name: name, avatar_url: avatarUrl, google_id: googleId, updated_at: new Date().toISOString() }).eq('id', user.id)
       if (updateError) throw updateError
     } else {
