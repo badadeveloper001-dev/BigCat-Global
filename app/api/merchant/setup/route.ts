@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
       category,
       location,
       logoUrl,
+      setupCompleted = true,
     } = await request.json()
 
     if (!userId || !businessName || !businessDescription || !category || !location) {
@@ -31,6 +32,7 @@ export async function POST(request: NextRequest) {
       location,
       smedanId,
       logoUrl,
+      setupCompleted: Boolean(setupCompleted),
     })
 
     return NextResponse.json(result)
