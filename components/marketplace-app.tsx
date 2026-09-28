@@ -20,11 +20,29 @@ export function MarketplaceApp() {
   const [setupComplete, setSetupComplete] = useState(false)
   const [storeSettingsComplete, setStoreSettingsComplete] = useState(false)
   const [guestBrowsing, setGuestBrowsing] = useState(false)
+  const [merchantVerificationStatus, setMerchantVerificationStatus] = useState<string | null>(null)
 
   const merchantSetupCompleted = Boolean(
     user?.merchantProfile?.setup_completed ?? (user as any)?.setup_completed
   )
   const merchantSmedanId = user?.merchantProfile?.smedan_id || (user as any)?.smedan_id || ""
+
+  useEffect(() => {
+    if (role !== "merchant" || !user?.userId) {
+      setMerchantVerificationStatus(null)
+      return
+    }
+    let cancelled = false
+    fetch(`/api/merchant/verification?userId=${encodeURIComponent(user.userId)}`, { cache: "no-store" })
+      .then(async (response) => response.ok ? response.json() : null)
+      .then((result) => {
+        if (!cancelled) setMerchantVerificationStatus(result?.success ? result.data?.status || null : null)
+      })
+      .catch(() => {
+        if (!cancelled) setMerchantVerificationStatus(null)
+      })
+    return () => { cancelled = true }
+  }, [role, user?.userId])
 
   // Check if merchant setup and store settings are already completed
   useEffect(() => {
@@ -65,6 +83,10 @@ export function MarketplaceApp() {
     return <Onboarding onGuestBrowse={() => setGuestBrowsing(true)} />
   }
 
+  if (role === "merchant" && merchantVerificationStatus && merchantVerificationStatus !== "verified") {
+    return <MerchantDashboard verificationStatus={merchantVerificationStatus} />
+  }
+
   // Handle merchant setup flow - only show if setup not completed
   const needsSetup = role === "merchant" && !merchantSetupCompleted && !setupComplete
   
@@ -77,6 +99,7 @@ export function MarketplaceApp() {
         onBack={() => setRole(null)}
         userId={user?.userId || ""}
         smedanId={merchantSmedanId}
+        onVerificationSubmitted={(verification) => setMerchantVerificationStatus(verification?.status || "submitted")}
         onComplete={(profile) => {
           // Update user context with completed profile
           if (user) {
