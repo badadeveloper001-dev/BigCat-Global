@@ -1093,25 +1093,46 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
           </div>
         )}
 
-        {success && (
-          <div className="mx-4 mt-3 p-3 bg-[#F3E8FF] border border-[#E8D7FF] rounded-lg">
-            <p className="text-sm text-[#6C2BD9] font-medium"><UiValue value={success} /></p>
-            {orchidPaymentReference && (
-              <div className="mt-2 p-2 bg-white rounded-lg border border-[#E8D7FF]">
-                <p className="text-xs text-muted-foreground">Your payment reference</p>
-                <p className="text-lg font-bold text-[#6C2BD9] tracking-wider">{orchidPaymentReference}</p>
-                <p className="text-xs text-muted-foreground mt-1">Payment has not been confirmed. Quote this reference when making payment via Orchid.</p>
+        {success && orchidPaymentReference && successOrderId && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="orchid-payment-reference-title"
+              className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl"
+            >
+              <div className="mb-4 flex items-start justify-between gap-4">
+                <div>
+                  <p id="orchid-payment-reference-title" className="text-lg font-bold text-foreground">
+                    Order created successfully
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Payment has not been confirmed yet.
+                  </p>
+                </div>
+                <div className="rounded-full bg-[#F3E8FF] p-2 text-[#6C2BD9]">
+                  <CheckCircle2 className="h-5 w-5" />
+                </div>
               </div>
-            )}
-            {orchidPaymentReference && successOrderId && (
+
+              <div className="rounded-xl border border-[#E8D7FF] bg-[#F3E8FF] p-4">
+                <p className="text-xs font-medium text-muted-foreground">Orchid payment reference</p>
+                <p className="mt-1 text-xl font-bold tracking-wider text-[#6C2BD9]">
+                  {orchidPaymentReference}
+                </p>
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                  Quote this reference when making payment via Orchid.
+                </p>
+              </div>
+
               <button
                 type="button"
                 onClick={() => onSuccess(successOrderId)}
-                className="mt-3 w-full rounded-lg bg-[#6C2BD9] px-4 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
+                className="mt-4 w-full rounded-xl bg-[#6C2BD9] px-4 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
               >
                 Continue to My Orders
               </button>
-            )}
+            </div>
           </div>
         )}
       </main>
