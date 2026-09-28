@@ -39,22 +39,45 @@ export function MerchantSetup({ userId, smedanId, onComplete, onVerificationSubm
   const [verificationRegistrationNumber, setVerificationRegistrationNumber] = useState('')
   useEffect(() => {
     let cancelled = false
-    fetch(`/api/merchant/verification?userId=${encodeURIComponent(userId)}`)
-      .then(async (response) => {
-        if (!response.ok) return null
-        const result = await response.json()
-        return result.success ? result.data : null
+
+    Promise.all([
+      fetch(`/api/merchant/verification?userId=${encodeURIComponent(userId)}`, { cache: 'no-store' }),
+      fetch(`/api/user/profile?userId=${encodeURIComponent(userId)}`, { cache: 'no-store' }),
+    ])
+      .then(async ([verificationResponse, profileResponse]) => {
+        const [verificationResult, profileResult] = await Promise.all([
+          verificationResponse.ok ? verificationResponse.json() : null,
+          profileResponse.ok ? profileResponse.json() : null,
+        ])
+        return {
+          verification: verificationResult?.success ? verificationResult.data : null,
+          profile: profileResult?.success ? profileResult.data : null,
+        }
       })
-      .then((data) => {
-        if (!cancelled) {
-          setVerification(data)
-          if (data) {
-            setVerificationCountry(data.country || 'NG')
-            setVerificationRegistrationNumber(data.registration_number || '')
+      .then(({ verification: data, profile }) => {
+        if (cancelled) return
+
+        setVerification(data)
+        if (data) {
+          setVerificationCountry(data.country || 'NG')
+          setVerificationRegistrationNumber(data.registration_number || '')
+        }
+
+        if (profile) {
+          setFormData(prev => ({
+            ...prev,
+            businessName: profile.business_name || '',
+            businessDescription: profile.business_description || '',
+            category: profile.business_category || '',
+            location: profile.location || '',
+          }))
+          if (profile.logo_url || profile.avatar_url) {
+            setLogoPreview(profile.logo_url || profile.avatar_url)
           }
         }
       })
       .catch(() => undefined)
+
     return () => { cancelled = true }
   }, [userId])
 
@@ -191,7 +214,7 @@ export function MerchantSetup({ userId, smedanId, onComplete, onVerificationSubm
         return
       }
 
-      if (!verification || verification.status === "pending") {
+      if (!verification || verification.status === "pending" || verification.status === "rejected") {
         if (!verificationRegistrationNumber.trim()) {
           setError("Business registration or license number is required before completing setup")
           setLoading(false)
@@ -377,12 +400,20 @@ export function MerchantSetup({ userId, smedanId, onComplete, onVerificationSubm
                       Complete your business verification before your store can be set up. Your account remains unverified until review.
                     </p>
                   </div>
+                  {verification?.status === "rejected" && (
+                    <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4">
+                      <p className="text-sm font-semibold text-destructive">Business verification rejected</p>
+                      <p className="mt-1 text-sm leading-5 text-destructive/90">
+                        {verification.rejection_reason || "Your previous verification submission was not approved. Please upload a corrected document."}
+                      </p>
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-foreground">Operating Country</label>
                     <select
                       value={verificationCountry}
                       onChange={(e) => setVerificationCountry(e.target.value)}
-                      disabled={verification?.status === "submitted"}
+                      disabled={verification?.status === "submitted" || verification?.status === "rejected"}
                       className="w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground"
                     >
                       <option value="NG">Nigeria</option>
