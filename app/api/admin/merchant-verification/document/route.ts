@@ -32,7 +32,7 @@ function requireReviewAccess(token: string) {
 
 export async function GET(request: NextRequest) {
   try {
-    const adminId = await requireAdmin('bigcat')
+    await requireAdmin('bigcat')
     requireReviewAccess((await cookies()).get(REVIEW_COOKIE)?.value || '')
 
     const verificationId = new URL(request.url).searchParams.get('verificationId')
