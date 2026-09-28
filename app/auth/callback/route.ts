@@ -26,7 +26,7 @@ export async function GET(request: Request) {
       || 'Google did not return an authorization code.'
 
     return NextResponse.redirect(
-      new URL(`/auth/auth-code-error?message=${encodeURIComponent(error)}`, requestUrl.origin),
+      new URL(`/marketplace?oauth_error=${encodeURIComponent(error)}`, requestUrl.origin),
     )
   }
 
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
       console.error('[auth/callback] OAuth code exchange failed:', exchangeError)
       return NextResponse.redirect(
         new URL(
-          `/auth/auth-code-error?message=${encodeURIComponent(exchangeError?.message || 'Unable to exchange external code.')}`,
+          `/marketplace?oauth_error=${encodeURIComponent(exchangeError?.message || 'Unable to exchange external code.')}`,
           requestUrl.origin,
         ),
       )
@@ -111,7 +111,7 @@ export async function GET(request: Request) {
 
     return NextResponse.redirect(
       new URL(
-        `/auth/auth-code-error?message=${encodeURIComponent(error?.message || 'Google sign-in could not be completed.')}`,
+        `/marketplace?oauth_error=${encodeURIComponent(error?.message || 'Google sign-in could not be completed.')}`,
         requestUrl.origin,
       ),
     )
