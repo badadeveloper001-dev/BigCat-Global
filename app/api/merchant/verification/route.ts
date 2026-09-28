@@ -15,9 +15,20 @@ export async function GET(request: NextRequest) {
     if (auth.response) return NextResponse.json({ success: false, error: 'Authentication failed' }, { status: auth.response.status })
 
     const admin = createClient()
+    const { data: merchant, error: merchantError } = await admin
+      .from('auth_users')
+      .select('role')
+      .eq('id', userId)
+      .maybeSingle()
+
+    if (merchantError) throw merchantError
+    if (merchant?.role !== 'merchant') {
+      return NextResponse.json({ success: false, error: 'A merchant account is required' }, { status: 403 })
+    }
+
     const { data, error } = await admin
       .from('merchant_verifications')
-      .select('id, country, registration_number, document_type, document_url, status, submitted_at, rejection_reason')
+      .select('id, country, registration_number, document_type, status, submitted_at, rejection_reason')
       .eq('merchant_id', userId)
       .maybeSingle()
 
@@ -37,6 +48,18 @@ export async function POST(request: NextRequest) {
     const auth = await requireAuthenticatedUser(userId, request)
     if (auth.response) return NextResponse.json({ success: false, error: 'Authentication failed' }, { status: auth.response.status })
 
+    const admin = createClient()
+    const { data: merchant, error: merchantError } = await admin
+      .from('auth_users')
+      .select('role')
+      .eq('id', userId)
+      .maybeSingle()
+
+    if (merchantError) throw merchantError
+    if (merchant?.role !== 'merchant') {
+      return NextResponse.json({ success: false, error: 'A merchant account is required' }, { status: 403 })
+    }
+
     const formData = await request.formData()
     const country = String(formData.get('country') || '').trim().toUpperCase()
     const registrationNumber = String(formData.get('registrationNumber') || '').trim()
@@ -53,7 +76,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Only PDF, JPG, and PNG documents are accepted' }, { status: 400 })
     }
 
-    const admin = createClient()
+    const bytes = new Uint8Array(await file.arrayBuffer())
+    const isPdf = file.type === 'application/pdf'
+      && bytes.length >= 5
+      && bytes[0] === 0x25
+      && bytes[1] === 0x50
+      && bytes[2] === 0x44
+      && bytes[3] === 0x46
+      && bytes[4] === 0x2d
+    const isPng = file.type === 'image/png'
+      && bytes.length >= 8
+      && bytes[0] === 0x89
+      && bytes[1] === 0x50
+      && bytes[2] === 0x4e
+      && bytes[3] === 0x47
+      && bytes[4] === 0x0d
+      && bytes[5] === 0x0a
+      && bytes[6] === 0x1a
+      && bytes[7] === 0x0a
+    const isJpeg = file.type === 'image/jpeg'
+      && bytes.length >= 3
+      && bytes[0] === 0xff
+      && bytes[1] === 0xd8
+      && bytes[2] === 0xff
+
+    if (!isPdf && !isPng && !isJpeg) {
+      return NextResponse.json({ success: false, error: 'The document content does not match its declared file type' }, { status: 400 })
+    }
+
     const { data: verification, error: lookupError } = await admin
       .from('merchant_verifications')
       .select('id, country, document_type, status')
@@ -61,7 +111,12 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (lookupError) throw lookupError
-    if (verification?.status === 'verified') return NextResponse.json({ success: false, error: 'This business is already verified' }, { status: 409 })
+    if (verification?.status === 'verified') {
+      return NextResponse.json({ success: false, error: 'This business is already verified' }, { status: 409 })
+    }
+    if (verification?.status === 'submitted') {
+      return NextResponse.json({ success: false, error: 'This verification is already submitted and awaiting review' }, { status: 409 })
+    }
 
     const documentType = country === 'CN' ? 'business_license' : 'cac_certificate'
     if (verification && verification.document_type !== documentType) {
@@ -70,28 +125,49 @@ export async function POST(request: NextRequest) {
 
     const extension = file.type === 'application/pdf' ? 'pdf' : file.type === 'image/png' ? 'png' : 'jpg'
     const path = `${userId}/${documentType}-${crypto.randomUUID()}.${extension}`
-    const bytes = await file.arrayBuffer()
-
     const { error: uploadError } = await admin.storage.from(BUCKET).upload(path, bytes, {
       contentType: file.type,
       upsert: false,
     })
     if (uploadError) throw uploadError
 
+    const now = new Date().toISOString()
     const verificationUpdate = {
       country,
       registration_number: registrationNumber,
       document_type: documentType,
       document_url: path,
       status: 'submitted',
-        submitted_at: new Date().toISOString(),
+      submitted_at: now,
       rejection_reason: null,
-      updated_at: new Date().toISOString(),
+      updated_at: now,
     }
 
-    const { error: verificationError } = verification
-      ? await admin.from('merchant_verifications').update(verificationUpdate).eq('merchant_id', userId)
-      : await admin.from('merchant_verifications').insert({ merchant_id: userId, ...verificationUpdate })
+    const verificationError = verification
+      ? (await admin
+          .from('merchant_verifications')
+          .update(verificationUpdate)
+          .eq('merchant_id', userId)
+          .in('status', ['pending', 'rejected'])
+          .select('id')
+          .maybeSingle()).error
+      : (await admin
+          .from('merchant_verifications')
+          .insert({ merchant_id: userId, ...verificationUpdate })).error
+
+    if (verification && !verificationError) {
+      const { data: persisted } = await admin
+        .from('merchant_verifications')
+        .select('id')
+        .eq('merchant_id', userId)
+        .eq('status', 'submitted')
+        .maybeSingle()
+
+      if (!persisted) {
+        await admin.storage.from(BUCKET).remove([path])
+        return NextResponse.json({ success: false, error: 'Verification changed before the document could be submitted. Please refresh and try again.' }, { status: 409 })
+      }
+    }
 
     if (verificationError) {
       await admin.storage.from(BUCKET).remove([path])
