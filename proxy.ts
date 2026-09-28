@@ -41,9 +41,7 @@ function isRateLimited(ip: string, path: string): { limited: boolean; remaining:
 }
 
 function copySupabaseCookies(source: NextResponse, target: NextResponse) {
-  source.cookies.getAll().forEach((cookie) => {
-    target.cookies.set(cookie)
-  })
+  target.cookies.setAll(source.cookies.getAll())
 
   for (const header of ['cache-control', 'expires', 'pragma']) {
     const value = source.headers.get(header)
@@ -64,11 +62,14 @@ export async function proxy(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      auth: {
+        flowType: 'pkce',
+      },
       cookies: {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet, headers) {
+        setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
 
           supabaseResponse = NextResponse.next({
@@ -78,18 +79,16 @@ export async function proxy(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) => {
             supabaseResponse.cookies.set(name, value, options)
           })
-
-          Object.entries(headers).forEach(([key, value]) => {
-            supabaseResponse.headers.set(key, value)
-          })
         },
       },
     },
   )
 
-  // Keep the Supabase session cookie pair synchronized between the request
-  // and response. Supabase recommends getClaims() for this proxy step.
+  // Refresh/validate the SSR auth session using the API supported by the
+  // installed @supabase/ssr version.
   await supabase.auth.getClaims()
+
+  supabaseResponse.headers.set('Cache-Control', 'private, no-store')
 
   const hostname = request.headers.get('host') || ''
   const { pathname } = request.nextUrl
