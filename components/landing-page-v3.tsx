@@ -348,6 +348,13 @@ function HeroSection() {
               <UiText text={"Buyer & seller protection"} />{" "}</div>
           </div>
 
+          <div className="mb-7 flex items-center justify-center lg:justify-start">
+            <div className="inline-flex items-center gap-3 rounded-2xl border border-white/20 bg-white px-4 py-2.5 shadow-lg shadow-black/10">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6b5a64]">Payments powered by</span>
+              <Image src="/orchid-logo.svg" alt="Orchid — Effortless Financial Control" width={104} height={72} className="h-10 w-auto object-contain" />
+            </div>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Link
               href="/marketplace?view=services"
