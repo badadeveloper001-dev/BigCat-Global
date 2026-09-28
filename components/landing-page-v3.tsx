@@ -828,8 +828,38 @@ function FooterSection() {
 
 /* ─── Main Export ────────────────────────────────────────── */
 export function LandingPageV3() {
+  const [oauthError, setOauthError] = useState("")
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const error = params.get("oauth_error")
+    if (error) {
+      setOauthError(error)
+      window.history.replaceState({}, "", window.location.pathname)
+    }
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#fff2f2] overflow-x-hidden text-[#1f1412]">
+      {oauthError && (
+        <div className="fixed top-4 left-1/2 z-[100] w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 rounded-2xl border border-red-200 bg-white p-4 shadow-2xl">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-[#1f1412]">Google sign-in could not be completed</p>
+              <p className="mt-1 text-sm leading-relaxed text-[#5f4b46]">{oauthError}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setOauthError("")}
+              className="text-[#5f4b46] hover:text-[#1f1412]"
+              aria-label="Dismiss error"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )
       <HeroSection />
       <ExperienceSection />
       <WhySection />
