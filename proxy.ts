@@ -1,3 +1,4 @@
+import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
 
 // In-memory rate limit store per edge instance.
@@ -39,7 +40,47 @@ function isRateLimited(ip: string, path: string): { limited: boolean; remaining:
   return { limited: entry.count > max, remaining, resetAt: entry.resetAt }
 }
 
-export function proxy(request: NextRequest) {
+function copySupabaseCookies(source: NextResponse, target: NextResponse) {
+  source.cookies.getAll().forEach((cookie) => {
+    target.cookies.set(cookie)
+  })
+
+  for (const header of ['cache-control', 'expires', 'pragma']) {
+    const value = source.headers.get(header)
+    if (value) {
+      target.headers.set(header, value)
+    }
+  }
+
+  return target
+}
+
+export async function proxy(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value)
+            supabaseResponse.cookies.set(name, value, options)
+          })
+        },
+      },
+    },
+  )
+
+  // Refresh/validate the SSR auth session on every matched request.
+  // This keeps the Supabase cookie session available to both the browser
+  // and subsequent server-side requests.
+  await supabase.auth.getUser()
+
   const hostname = request.headers.get('host') || ''
   const { pathname } = request.nextUrl
 
@@ -51,7 +92,9 @@ export function proxy(request: NextRequest) {
   if ((isAdminHost || isAgentHost) && pathname === '/') {
     const url = request.nextUrl.clone()
     url.pathname = isAdminHost ? '/admin-portal' : '/marketplace'
-    return NextResponse.rewrite(url)
+
+    const response = NextResponse.rewrite(url)
+    return copySupabaseCookies(supabaseResponse, response)
   }
 
   // --- Rate limiting (API routes only) ---
@@ -60,7 +103,7 @@ export function proxy(request: NextRequest) {
     const { limited, remaining, resetAt } = isRateLimited(ip, pathname)
 
     if (limited) {
-      return new NextResponse(
+      const response = new NextResponse(
         JSON.stringify({ error: 'Too many requests. Please slow down.' }),
         {
           status: 429,
@@ -71,14 +114,15 @@ export function proxy(request: NextRequest) {
           },
         }
       )
+      return copySupabaseCookies(supabaseResponse, response)
     }
 
-    const response = NextResponse.next()
+    const response = NextResponse.next({ request })
     response.headers.set('X-RateLimit-Remaining', String(remaining))
-    return response
+    return copySupabaseCookies(supabaseResponse, response)
   }
 
-  return NextResponse.next()
+  return supabaseResponse
 }
 
 export const config = {
