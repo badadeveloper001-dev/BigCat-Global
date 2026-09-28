@@ -44,8 +44,15 @@ export default function AdminPortalPage() {
           </div>
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3"><UiText text={"Powered By"} /></p>
           <div className="flex items-center justify-center gap-6 mb-6">
-            <div className="rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground">
-              <UiText text={"Orchid Payments"} />{" "}</div>
+            <div className="flex h-14 w-28 items-center justify-center rounded-xl border border-border bg-white px-2">
+              <Image
+                src="/orchid-logo.svg"
+                alt="Orchid — Effortless Financial Control"
+                width={104}
+                height={72}
+                className="h-11 w-auto object-contain"
+              />
+            </div>
             <UiAttributes><Image
               src="/image.png"
               alt="BigCat logo"
