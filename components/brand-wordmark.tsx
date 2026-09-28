@@ -35,7 +35,7 @@ export function PoweredByMarquee() {
     {
       src: '/orchid-logo.svg',
       alt: 'Orchid — Effortless Financial Control',
-      className: 'h-6 w-[88px] object-contain',
+      className: 'h-6 w-auto object-contain',
       wrapperClassName: 'bg-white border-border px-2.5',
     },
     {
@@ -54,7 +54,7 @@ export function PoweredByMarquee() {
             <div key={`${logo.alt}-${index}`} className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="font-medium"><UiText text={"powered by"} /></span>
               {logo.src ? (
-                <div className={`h-7 rounded-full border flex items-center ${logo.wrapperClassName}`}>
+                <div className={`h-7 rounded-full border flex items-center justify-center ${logo.wrapperClassName}`}>
                   <UiAttributes><Image src={logo.src} alt={logo.alt} width={72} height={20} className={logo.className} /></UiAttributes>
                 </div>
               ) : (
