@@ -21,9 +21,11 @@ function reviewSecret() {
   return value
 }
 
-function signReviewToken() {
+function signReviewToken(adminSessionToken: string) {
+  const sessionBinding = createHash('sha256').update(adminSessionToken).digest('base64url')
   const payload = Buffer.from(JSON.stringify({
     purpose: 'merchant-verification-review',
+    sessionBinding,
     expires: Date.now() + REVIEW_TTL_SECONDS * 1000,
   })).toString('base64url')
   const signature = createHmac('sha256', reviewSecret()).update('review:' + payload).digest('base64url')
@@ -67,8 +69,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Invalid BigCat Admin access code.' }, { status: 403 })
     }
 
+    const adminSessionToken = (await cookies()).get('bigcat_admin_session')?.value || ''
+    if (!adminSessionToken) {
+      return NextResponse.json({ success: false, error: 'Admin access required.' }, { status: 401 })
+    }
+
     const response = NextResponse.json({ success: true, expiresIn: REVIEW_TTL_SECONDS })
-    response.cookies.set(REVIEW_COOKIE, signReviewToken(), {
+    response.cookies.set(REVIEW_COOKIE, signReviewToken(adminSessionToken), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
