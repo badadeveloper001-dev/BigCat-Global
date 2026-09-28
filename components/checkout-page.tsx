@@ -13,7 +13,6 @@ import { formatCurrency, convertCurrency } from "@/lib/currency-utils"
 import { PaymentMethodSelector, type PaymentMethod } from "@/components/payment-method-selector"
 import { getUserStrikeCount, isUserSuspended, resetSafetyState } from "@/lib/trust-safety"
 import { createEscrowRecord } from "@/lib/escrow"
-import { MultiCurrencyWallet } from "@/components/multi-currency-wallet"
 import { sendOrderToLogistics } from "@/lib/logistics"
 
 function trackCheckout(event: string) {
@@ -898,19 +897,6 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
           </label>
           <PaymentMethodSelector selectedMethod={paymentMethod} onSelect={setPaymentMethod} />
 
-          {isWalletPayment && user?.userId && (
-            <div className="rounded-xl border border-border overflow-hidden">
-              <MultiCurrencyWallet
-                userId={user.userId}
-                orderAmountNGN={grandTotal}
-                onPaymentSelect={(currency, amount, rates) => {
-                  setPayCurrency(currency)
-                  setPayAmountInCurrency(amount)
-                  setPayRates(rates)
-                }}
-              />
-            </div>
-          )}
         </section>
 
         {suspended && (
