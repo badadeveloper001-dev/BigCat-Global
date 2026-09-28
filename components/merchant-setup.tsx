@@ -2,7 +2,7 @@
 import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
 
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Store, FileText, MapPin, Tag, Image, Loader2, Check, AlertCircle } from "lucide-react"
 
 interface MerchantSetupProps {
@@ -31,6 +31,68 @@ export function MerchantSetup({ userId, smedanId, onComplete, onBack }: Merchant
   const [error, setError] = useState<string>("")
   const [success, setSuccess] = useState(false)
   const [logoPreview, setLogoPreview] = useState<string>("")
+  const [verification, setVerification] = useState<any>(null)
+  const [verificationFile, setVerificationFile] = useState<File | null>(null)
+  const [verificationUploading, setVerificationUploading] = useState(false)
+  useEffect(() => {
+    let cancelled = false
+    fetch(`/api/merchant/verification?userId=${encodeURIComponent(userId)}`)
+      .then(async (response) => {
+        if (!response.ok) return null
+        const result = await response.json()
+        return result.success ? result.data : null
+      })
+      .then((data) => {
+        if (!cancelled) setVerification(data)
+      })
+      .catch(() => undefined)
+    return () => { cancelled = true }
+  }, [userId])
+
+  const handleVerificationFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const allowed = new Set(["application/pdf", "image/jpeg", "image/png"])
+    if (!allowed.has(file.type)) {
+      setError("Verification document must be a PDF, JPG, or PNG file")
+      return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError("Verification document must be less than 10MB")
+      return
+    }
+    setVerificationFile(file)
+    setError("")
+  }
+
+  const uploadVerificationDocument = async () => {
+    if (!verificationFile) return false
+    setVerificationUploading(true)
+    setError("")
+    try {
+      const body = new FormData()
+      body.append("document", verificationFile)
+      const response = await fetch("/api/merchant/verification", {
+        method: "POST",
+        headers: { "x-user-id": userId },
+        body,
+      })
+      const result = await response.json()
+      if (!response.ok || !result.success) {
+        setError(result.error || "Unable to submit verification document")
+        return false
+      }
+      setVerification((current: any) => ({ ...current, status: "submitted", document_type: result.data.documentType }))
+      setVerificationFile(null)
+      return true
+    } catch {
+      setError("Unable to submit verification document")
+      return false
+    } finally {
+      setVerificationUploading(false)
+    }
+  }
+
   const [formData, setFormData] = useState({
     businessName: "",
     businessDescription: "",
@@ -108,6 +170,19 @@ export function MerchantSetup({ userId, smedanId, onComplete, onBack }: Merchant
         setError("Location is required")
         setLoading(false)
         return
+      }
+
+      if (verification?.status === "pending") {
+        if (!verificationFile) {
+          setError("Please upload your business verification document before completing setup")
+          setLoading(false)
+          return
+        }
+        const submitted = await uploadVerificationDocument()
+        if (!submitted) {
+          setLoading(false)
+          return
+        }
       }
 
       // For now, use the preview URL as logo (in production, upload to Vercel Blob)
@@ -241,6 +316,28 @@ export function MerchantSetup({ userId, smedanId, onComplete, onBack }: Merchant
                   </label>
                 </div>
               </div>
+
+              {/* Business Verification */}
+              {verification && verification.status !== "verified" && (
+                <div className="space-y-3 rounded-2xl border border-border bg-secondary/30 p-5">
+                  <div>
+                    <h3 className="font-semibold text-foreground">Business Verification</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {verification.document_type === "business_license" ? "Upload your business license." : "Upload your CAC certificate."} PDF, JPG, or PNG up to 10MB. Your account remains unverified until review.
+                    </p>
+                  </div>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                    onChange={handleVerificationFile}
+                    className="block w-full text-sm text-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:font-semibold file:text-primary-foreground"
+                    aria-label="Upload business verification document"
+                  />
+                  {verification.status === "submitted" && !verificationFile && (
+                    <p className="text-sm text-muted-foreground">Document submitted. Verification is pending review.</p>
+                  )}
+                </div>
+              )}
 
               {/* Business Name */}
               <div className="space-y-2">
