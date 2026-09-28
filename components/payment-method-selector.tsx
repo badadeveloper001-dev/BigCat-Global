@@ -14,8 +14,8 @@ interface PaymentMethodSelectorProps {
 const paymentMethods = [
   {
     id: 'orchid' as PaymentMethod,
-    label: 'Orchid Wallet',
-    description: 'Pay via Orchid settlement',
+    label: 'Orchid Payment',
+    description: 'Pay securely through Orchid using your BigCat payment reference',
     icon: Wallet,
     badge: 'Recommended',
     highlighted: true,
