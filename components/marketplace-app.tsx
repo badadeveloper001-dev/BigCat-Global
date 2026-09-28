@@ -83,7 +83,7 @@ export function MarketplaceApp() {
     return <Onboarding onGuestBrowse={() => setGuestBrowsing(true)} />
   }
 
-  if (role === "merchant" && merchantVerificationStatus && merchantVerificationStatus !== "verified") {
+  if (role === "merchant" && merchantVerificationStatus === "submitted") {
     return <MerchantDashboard verificationStatus={merchantVerificationStatus} />
   }
 
