@@ -10,6 +10,7 @@ interface MerchantSetupData {
   location: string
   smedanId?: string
   logoUrl?: string
+  setupCompleted?: boolean
 }
 
 export async function saveMerchantSetup(userId: string, setup: MerchantSetupData) {
@@ -23,7 +24,7 @@ export async function saveMerchantSetup(userId: string, setup: MerchantSetupData
       location: setup.location,
       smedan_id: setup.smedanId,
       avatar_url: setup.logoUrl,
-      setup_completed: true,
+      setup_completed: setup.setupCompleted !== false,
     }
 
     const { data, error } = await supabase
