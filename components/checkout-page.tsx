@@ -58,6 +58,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
   const [payAmountInCurrency, setPayAmountInCurrency] = useState(0)
   // Orchid pilot: payment reference returned from order creation
   const [orchidPaymentReference, setOrchidPaymentReference] = useState<string | null>(null)
+  const [successOrderId, setSuccessOrderId] = useState<string | null>(null)
 
   const [savedAddresses, setSavedAddresses] = useState<Array<{ id: string; label: string; address: string }>>([])
   const [serviceBooking, setServiceBooking] = useState<any>(null)
@@ -623,9 +624,11 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
           return
         }
       } else if (paymentMethod === 'orchid' && result.data?.paymentReference) {
-        // Orchid pilot: show payment reference. Buyer pays externally via Orchid.
+        // Orchid pilot: show the reference and wait for the buyer to continue manually.
+        // The order is created, but payment is not confirmed by BigCat at this point.
         setOrchidPaymentReference(result.data.paymentReference)
-        setSuccess(`Order created. Use payment reference ${result.data.paymentReference} when paying via Orchid.`)
+        setSuccess(`Order created. Payment has not been confirmed. Use reference ${result.data.paymentReference} when paying via Orchid.`)
+        setSuccessOrderId(orderId)
       } else {
         setSuccess(
           paymentMethod === 'bank'
@@ -635,9 +638,11 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
       }
       trackCheckout('goods_checkout_completed')
       clearCart()
-      setTimeout(() => {
-        onSuccess(orderId)
-      }, 700)
+      if (paymentMethod !== 'orchid') {
+        setTimeout(() => {
+          onSuccess(orderId)
+        }, 700)
+      }
     } else {
       await Promise.all(
         merchantIdsInCart.map((merchantId) =>
@@ -1095,8 +1100,17 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
               <div className="mt-2 p-2 bg-white rounded-lg border border-[#E8D7FF]">
                 <p className="text-xs text-muted-foreground">Your payment reference</p>
                 <p className="text-lg font-bold text-[#6C2BD9] tracking-wider">{orchidPaymentReference}</p>
-                <p className="text-xs text-muted-foreground mt-1">Quote this reference when making payment via Orchid.</p>
+                <p className="text-xs text-muted-foreground mt-1">Payment has not been confirmed. Quote this reference when making payment via Orchid.</p>
               </div>
+            )}
+            {orchidPaymentReference && successOrderId && (
+              <button
+                type="button"
+                onClick={() => onSuccess(successOrderId)}
+                className="mt-3 w-full rounded-lg bg-[#6C2BD9] px-4 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
+              >
+                Continue to My Orders
+              </button>
             )}
           </div>
         )}
@@ -1137,4 +1151,3 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
     </div>
   )
 }
-
