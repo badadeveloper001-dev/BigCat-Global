@@ -1,4 +1,5 @@
 "use client"
+import Image from "next/image"
 import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
 
 
@@ -1088,13 +1089,24 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
               className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl"
             >
               <div className="mb-4 flex items-start justify-between gap-4">
-                <div>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-20 items-center justify-center rounded-xl border border-[#eadcf7] bg-white px-1.5">
+                    <Image
+                      src="/orchid-logo.svg"
+                      alt="Orchid"
+                      width={88}
+                      height={60}
+                      className="h-9 w-auto object-contain"
+                    />
+                  </div>
+                  <div>
                   <p id="orchid-payment-reference-title" className="text-lg font-bold text-foreground">
                     Order created successfully
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     Payment has not been confirmed yet.
                   </p>
+                  </div>
                 </div>
                 <div className="rounded-full bg-[#F3E8FF] p-2 text-[#6C2BD9]">
                   <CheckCircle2 className="h-5 w-5" />
