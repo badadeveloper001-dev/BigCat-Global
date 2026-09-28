@@ -37,6 +37,10 @@ export function AdminDashboard() {
   const [loadingMerchants, setLoadingMerchants] = useState(true)
   const [showNotifications, setShowNotifications] = useState(false)
   const [notificationCount, setNotificationCount] = useState(0)
+  const [showVerificationAccess, setShowVerificationAccess] = useState(false)
+  const [verificationAccessCode, setVerificationAccessCode] = useState("")
+  const [verificationAccessLoading, setVerificationAccessLoading] = useState(false)
+  const [verificationAccessMessage, setVerificationAccessMessage] = useState<string | null>(null)
 
   useEffect(() => {
     loadStats()
@@ -139,6 +143,30 @@ export function AdminDashboard() {
       console.error("Error approving merchant:", error)
     } finally {
       setProcessingApproval(null)
+    }
+  }
+
+  const handleVerificationAccess = async () => {
+    setVerificationAccessLoading(true)
+    setVerificationAccessMessage(null)
+    try {
+      const res = await fetch('/api/admin/merchant-verification/review-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: verificationAccessCode }),
+      })
+      const result = await res.json()
+      if (!res.ok || !result.success) {
+        setVerificationAccessMessage(result.error || "Unable to verify admin access.")
+        return
+      }
+      setVerificationAccessMessage("Review access granted for 10 minutes.")
+      setVerificationAccessCode("")
+    } catch (error) {
+      console.error("Error verifying merchant review access:", error)
+      setVerificationAccessMessage("Unable to verify admin access.")
+    } finally {
+      setVerificationAccessLoading(false)
     }
   }
 
@@ -466,6 +494,26 @@ export function AdminDashboard() {
             </div>
             
             <div className="bg-card border border-border rounded-2xl p-4 mb-4">
+              <h3 className="font-semibold text-foreground mb-2"><UiText text={"Merchant Verification Review"} /></h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                <UiText text={"Enter the BigCat Admin access code to unlock merchant document review for 10 minutes."} />
+              </p>
+              <button
+                onClick={() => {
+                  setVerificationAccessMessage(null)
+                  setVerificationAccessCode("")
+                  setShowVerificationAccess(true)
+                }}
+                className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity"
+              >
+                <UiText text={"Verify Review Access"} />
+              </button>
+              {verificationAccessMessage && (
+                <p className="mt-3 text-sm text-muted-foreground">{verificationAccessMessage}</p>
+              )}
+            </div>
+
+            <div className="bg-card border border-border rounded-2xl p-4 mb-4">
               <h3 className="font-semibold text-foreground mb-4"><UiText text={"Security Status"} /></h3>
               <div className="space-y-3">
                 {[
@@ -558,6 +606,58 @@ export function AdminDashboard() {
         </div>
       </nav>
     </div>
+      {showVerificationAccess && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-5 shadow-2xl">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h3 className="font-semibold text-foreground"><UiText text={"BigCat Admin Verification"} /></h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  <UiText text={"Enter your BigCat Admin access code to unlock merchant document review."} />
+                </p>
+              </div>
+              <button
+                onClick={() => setShowVerificationAccess(false)}
+                className="text-muted-foreground hover:text-foreground"
+                disabled={verificationAccessLoading}
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+
+            <input
+              type="password"
+              value={verificationAccessCode}
+              onChange={(event) => setVerificationAccessCode(event.target.value)}
+              placeholder="Admin access code"
+              autoComplete="off"
+              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30"
+              disabled={verificationAccessLoading}
+            />
+
+            {verificationAccessMessage && (
+              <p className="mt-3 text-sm text-muted-foreground">{verificationAccessMessage}</p>
+            )}
+
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => setShowVerificationAccess(false)}
+                disabled={verificationAccessLoading}
+                className="flex-1 rounded-xl border border-border px-4 py-3 text-sm font-medium text-foreground hover:bg-secondary/50 disabled:opacity-50"
+              >
+                <UiText text={"Cancel"} />
+              </button>
+              <button
+                onClick={handleVerificationAccess}
+                disabled={verificationAccessLoading || !verificationAccessCode}
+                className="flex-1 rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+              >
+                {verificationAccessLoading ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : <UiText text={"Verify & Continue"} />}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
