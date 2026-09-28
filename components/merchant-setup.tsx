@@ -34,6 +34,8 @@ export function MerchantSetup({ userId, smedanId, onComplete, onBack }: Merchant
   const [verification, setVerification] = useState<any>(null)
   const [verificationFile, setVerificationFile] = useState<File | null>(null)
   const [verificationUploading, setVerificationUploading] = useState(false)
+  const [verificationCountry, setVerificationCountry] = useState('NG')
+  const [verificationRegistrationNumber, setVerificationRegistrationNumber] = useState('')
   useEffect(() => {
     let cancelled = false
     fetch(`/api/merchant/verification?userId=${encodeURIComponent(userId)}`)
@@ -43,7 +45,13 @@ export function MerchantSetup({ userId, smedanId, onComplete, onBack }: Merchant
         return result.success ? result.data : null
       })
       .then((data) => {
-        if (!cancelled) setVerification(data)
+        if (!cancelled) {
+          setVerification(data)
+          if (data) {
+            setVerificationCountry(data.country || 'NG')
+            setVerificationRegistrationNumber(data.registration_number || '')
+          }
+        }
       })
       .catch(() => undefined)
     return () => { cancelled = true }
@@ -72,6 +80,8 @@ export function MerchantSetup({ userId, smedanId, onComplete, onBack }: Merchant
     try {
       const body = new FormData()
       body.append("document", verificationFile)
+      body.append("country", verificationCountry)
+      body.append("registrationNumber", verificationRegistrationNumber.trim())
       const response = await fetch("/api/merchant/verification", {
         method: "POST",
         headers: { "x-user-id": userId },
@@ -172,7 +182,12 @@ export function MerchantSetup({ userId, smedanId, onComplete, onBack }: Merchant
         return
       }
 
-      if (verification?.status === "pending") {
+      if (!verification || verification.status === "pending") {
+        if (!verificationRegistrationNumber.trim()) {
+          setError("Business registration or license number is required before completing setup")
+          setLoading(false)
+          return
+        }
         if (!verificationFile) {
           setError("Please upload your business verification document before completing setup")
           setLoading(false)
@@ -318,23 +333,52 @@ export function MerchantSetup({ userId, smedanId, onComplete, onBack }: Merchant
               </div>
 
               {/* Business Verification */}
-              {verification && verification.status !== "verified" && (
-                <div className="space-y-3 rounded-2xl border border-border bg-secondary/30 p-5">
+              {(!verification || verification.status !== "verified") && (
+                <div className="space-y-4 rounded-2xl border border-border bg-secondary/30 p-5">
                   <div>
                     <h3 className="font-semibold text-foreground">Business Verification</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      {verification.document_type === "business_license" ? "Upload your business license." : "Upload your CAC certificate."} PDF, JPG, or PNG up to 10MB. Your account remains unverified until review.
+                      Complete your business verification before your store can be set up. Your account remains unverified until review.
                     </p>
                   </div>
-                  <input
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-                    onChange={handleVerificationFile}
-                    className="block w-full text-sm text-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:font-semibold file:text-primary-foreground"
-                    aria-label="Upload business verification document"
-                  />
-                  {verification.status === "submitted" && !verificationFile && (
-                    <p className="text-sm text-muted-foreground">Document submitted. Verification is pending review.</p>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Operating Country</label>
+                    <select
+                      value={verificationCountry}
+                      onChange={(e) => setVerificationCountry(e.target.value)}
+                      disabled={verification?.status === "submitted"}
+                      className="w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground"
+                    >
+                      <option value="NG">Nigeria</option>
+                      <option value="CN">China</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">
+                      {verificationCountry === "CN" ? "Business Registration / License Number" : "CAC Registration Number"}
+                    </label>
+                    <input
+                      type="text"
+                      value={verificationRegistrationNumber}
+                      onChange={(e) => setVerificationRegistrationNumber(e.target.value)}
+                      disabled={verification?.status === "submitted"}
+                      placeholder={verificationCountry === "CN" ? "Enter business registration or license number" : "Enter CAC registration number"}
+                      className="w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground"
+                    />
+                  </div>
+                  {verification?.status !== "submitted" && (
+                    <input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                      onChange={handleVerificationFile}
+                      className="block w-full text-sm text-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:font-semibold file:text-primary-foreground"
+                      aria-label="Upload business verification document"
+                    />
+                  )}
+                  {verification?.status === "submitted" && (
+                    <p className="text-sm text-muted-foreground">
+                      {verification.document_type === "business_license" ? "Business license" : "CAC certificate"} submitted. Verification is pending review.
+                    </p>
                   )}
                 </div>
               )}
