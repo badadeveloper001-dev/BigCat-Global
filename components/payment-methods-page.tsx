@@ -3,6 +3,7 @@ import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
 
 
 import { useEffect, useState } from "react"
+import Image from "next/image"
 import { ArrowLeft, Loader2, Wallet, Landmark, RefreshCw, ArrowDownLeft, ArrowUpRight, Plus, Trash2, CreditCard, ShoppingBag, Eye, EyeOff, Copy, Check, Building2, Send, X, Shield, Gift, BadgeCheck, Unlock, RotateCcw } from "lucide-react"
 import { useRole } from "@/lib/role-context"
 import { formatNaira } from "@/lib/currency-utils"
@@ -736,8 +737,14 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
       <main className="mx-auto max-w-xl px-4 py-6">
         <section className="rounded-3xl border border-[#E8D7FF] bg-gradient-to-br from-[#F3E8FF] via-white to-white p-6 shadow-sm">
           <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#6C2BD9] text-white">
-              <Shield className="h-6 w-6" />
+            <div className="flex h-14 w-24 shrink-0 items-center justify-center rounded-2xl border border-[#eadcf7] bg-white px-2">
+              <Image
+                src="/orchid-logo.svg"
+                alt="Orchid — Effortless Financial Control"
+                width={96}
+                height={66}
+                className="h-11 w-auto object-contain"
+              />
             </div>
 
             <div className="min-w-0">
