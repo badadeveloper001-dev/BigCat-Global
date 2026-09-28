@@ -822,6 +822,13 @@ function FooterSection() {
           ))}
         </div>
 
+        <div className="mb-8 flex justify-center sm:justify-end">
+          <div className="inline-flex items-center gap-3 rounded-xl border border-red-100 bg-white px-3 py-2 shadow-sm">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b5a64]">Financial partner</span>
+            <Image src="/orchid-logo.svg" alt="Orchid — Effortless Financial Control" width={96} height={66} className="h-9 w-auto object-contain" />
+          </div>
+        </div>
+
         <div className="border-t border-red-100 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-[#5f4b46] text-xs"><UiText text={"© 2026 BigCat Global. All rights reserved."} /></p>
           <div className="flex items-center gap-2 text-xs text-[#5f4b46]">
