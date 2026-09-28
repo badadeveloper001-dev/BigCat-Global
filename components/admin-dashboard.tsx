@@ -333,7 +333,7 @@ export function AdminDashboard() {
           ) : (
             <div className="bg-card border border-border rounded-xl overflow-hidden">
               {verificationSubmissions.map((verification, index) => {
-                const merchant = Array.isArray(verification.auth_users) ? verification.auth_users[0] : verification.auth_users
+                const merchant = verification.merchant
                 const name = merchant?.business_name || merchant?.full_name || merchant?.email || "Unknown merchant"
                 const country = verification.country === "NG" ? "Nigeria" : verification.country === "CN" ? "China" : verification.country
                 const document = verification.document_type === "cac_certificate" ? "CAC Certificate" : "Business License"
