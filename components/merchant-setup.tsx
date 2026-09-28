@@ -202,6 +202,30 @@ export function MerchantSetup({ userId, smedanId, onComplete, onVerificationSubm
           setLoading(false)
           return
         }
+        const profileResponse = await fetch('/api/merchant/setup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId,
+            smedanId,
+            businessName: formData.businessName,
+            businessDescription: formData.businessDescription,
+            category: formData.category,
+            location: formData.location,
+            logoUrl: logoPreview || undefined,
+            setupCompleted: false,
+          }),
+        })
+        const profileResult = await profileResponse.json()
+
+        if (!profileResponse.ok || !profileResult.success) {
+          setError(profileResult.error || "Failed to save your business information")
+          setLoading(false)
+          return
+        }
+
         const submitted = await uploadVerificationDocument()
         if (!submitted) {
           setLoading(false)
