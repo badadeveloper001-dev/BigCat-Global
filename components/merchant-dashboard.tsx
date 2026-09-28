@@ -87,7 +87,7 @@ function formatMonthValue(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
 }
 
-export function MerchantDashboard() {
+export function MerchantDashboard({ verificationStatus }: { verificationStatus?: string } = {}) {
   const { setRole, setUser, user, isLoading } = useRole()
   const [activeTab, setActiveTab] = useState("home")
     const [showMoreMenu, setShowMoreMenu] = useState(false)
@@ -97,6 +97,27 @@ export function MerchantDashboard() {
   const [showSettings, setShowSettings] = useState(false)
   const [showPaymentMethods, setShowPaymentMethods] = useState(false)
   const [showWithdrawal, setShowWithdrawal] = useState(false)
+  if (verificationStatus && verificationStatus !== "verified") {
+    const pending = verificationStatus === "pending" || verificationStatus === "submitted"
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="max-w-xl w-full rounded-3xl border border-border bg-card p-8 text-center shadow-xl">
+          <div className="mx-auto mb-5 h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
+            <ClipboardList className="h-7 w-7 text-primary" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">
+            {pending ? "Business Verification Pending" : "Business Verification Required"}
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            {pending
+              ? "Your business documents have been submitted and are being reviewed. Your merchant account features will become available once your business is approved."
+              : "Your business verification needs attention before your merchant account features can be made available."}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   
   // Real data states
   const [stats, setStats] = useState<any[]>([])
