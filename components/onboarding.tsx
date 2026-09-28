@@ -47,35 +47,33 @@ export function Onboarding({ onGuestBrowse }: { onGuestBrowse?: () => void } = {
       <div className="w-full max-w-md">
         {/* Logos */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center bg-gray-900 rounded-2xl px-6 py-3 mb-4 shadow-md">
+          <div className="flex justify-center mb-5 px-4">
             <UiAttributes><Image
               src="/image.png"
               alt="BigCat Global logo"
-              width={72}
-              height={72}
-              className="object-contain"
+              width={150}
+              height={100}
+              className="h-24 w-auto object-contain mix-blend-multiply dark:mix-blend-screen"
               priority
             /></UiAttributes>
           </div>
 
           {/* Secondary partners */}
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3"><UiText text={"Powered By"} /></p>
-          <div className="flex items-center justify-center gap-6 mb-6">
-            <div className="flex h-14 w-28 items-center justify-center rounded-xl border border-border bg-white px-2">
-              <Image
-                src="/orchid-logo.svg"
-                alt="Orchid — Effortless Financial Control"
-                width={104}
-                height={72}
-                className="h-11 w-auto object-contain"
-              />
-            </div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4"><UiText text={"Powered By"} /></p>
+          <div className="flex items-center justify-center gap-8 mb-7 px-4">
+            <Image
+              src="/orchid-logo.svg"
+              alt="Orchid — Effortless Financial Control"
+              width={118}
+              height={80}
+              className="h-16 w-auto object-contain"
+            />
             <UiAttributes><Image
               src="/image.png"
               alt="BigCat logo"
-              width={80}
-              height={70}
-              className="object-contain mix-blend-multiply dark:mix-blend-screen"
+              width={110}
+              height={90}
+              className="h-16 w-auto object-contain mix-blend-multiply dark:mix-blend-screen"
               priority
             /></UiAttributes>
           </div>
