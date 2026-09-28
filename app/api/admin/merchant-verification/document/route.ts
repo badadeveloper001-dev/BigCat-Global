@@ -32,7 +32,7 @@ function requireReviewAccess(token: string) {
 
 export async function GET(request: NextRequest) {
   try {
-    await requireAdmin('bigcat')
+    const adminId = await requireAdmin('bigcat')
     requireReviewAccess((await cookies()).get(REVIEW_COOKIE)?.value || '')
 
     const verificationId = new URL(request.url).searchParams.get('verificationId')
@@ -110,12 +110,24 @@ export async function PATCH(request: NextRequest) {
         status: nextStatus,
         rejection_reason: action === 'reject' ? rejectionReason : null,
         reviewed_at: new Date().toISOString(),
+        reviewed_by: null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', verificationId)
       .eq('status', 'submitted')
 
     if (updateError) throw updateError
+
+    if (action === 'approve') {
+      const { error: merchantUpdateError } = await supabase
+        .from('auth_users')
+        .update({ setup_completed: true })
+        .eq('id', verification.merchant_id)
+        .eq('role', 'merchant')
+
+      if (merchantUpdateError) throw merchantUpdateError
+    }
+
     return NextResponse.json({ success: true, data: { status: nextStatus } })
   } catch (error: any) {
     const message = error?.message || 'Unable to update business verification.'
