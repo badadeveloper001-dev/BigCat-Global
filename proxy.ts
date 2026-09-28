@@ -56,7 +56,9 @@ function copySupabaseCookies(source: NextResponse, target: NextResponse) {
 }
 
 export async function proxy(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
+  let supabaseResponse = NextResponse.next({
+    request,
+  })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -66,20 +68,28 @@ export async function proxy(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, headers) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+
+          supabaseResponse = NextResponse.next({
+            request,
+          })
+
           cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value)
             supabaseResponse.cookies.set(name, value, options)
+          })
+
+          Object.entries(headers).forEach(([key, value]) => {
+            supabaseResponse.headers.set(key, value)
           })
         },
       },
     },
   )
 
-  // Refresh/validate the SSR auth session on every matched request.
-  // This keeps the Supabase cookie session available to both the browser
-  // and subsequent server-side requests.
-  await supabase.auth.getUser()
+  // Keep the Supabase session cookie pair synchronized between the request
+  // and response. Supabase recommends getClaims() for this proxy step.
+  await supabase.auth.getClaims()
 
   const hostname = request.headers.get('host') || ''
   const { pathname } = request.nextUrl
