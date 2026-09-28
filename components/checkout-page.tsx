@@ -1125,13 +1125,23 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={() => onSuccess(successOrderId)}
-                className="mt-4 w-full rounded-xl bg-[#6C2BD9] px-4 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
-              >
-                Continue to My Orders
-              </button>
+              <div className="mt-4 grid gap-2">
+                <a
+                  href="https://app.orchid.ch/auth/realms/FrontOffice/protocol/openid-connect/registrations?client_id=userToOrchidFrontoffice&redirect_uri=https%3A%2F%2Fapp.orchid.ch%2F&response_type=code&scope=openid&skip_prescore=true&referral=BCGold&utm_medium=orchid.referral&utm_source=BCGold"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full items-center justify-center rounded-xl bg-[#6C2BD9] px-4 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
+                >
+                  Pay securely with Orchid
+                </a>
+                <button
+                  type="button"
+                  onClick={() => onSuccess(successOrderId)}
+                  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+                >
+                  Continue to My Orders
+                </button>
+              </div>
             </div>
           </div>
         )}
