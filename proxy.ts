@@ -42,7 +42,9 @@ function isRateLimited(ip: string, path: string): { limited: boolean; remaining:
 }
 
 function copySupabaseCookies(source: NextResponse, target: NextResponse) {
-  target.cookies.setAll(source.cookies.getAll())
+  source.cookies.getAll().forEach(({ name, value, ...options }) => {
+    target.cookies.set(name, value, options)
+  })
 
   for (const header of ['cache-control', 'expires', 'pragma']) {
     const value = source.headers.get(header)
@@ -81,8 +83,6 @@ export async function proxy(request: NextRequest) {
     },
   )
 
-  // getUser() is supported by the installed Supabase client and validates
-  // the current session while allowing SSR cookies to be refreshed.
   await supabase.auth.getUser()
 
   supabaseResponse.headers.set('Cache-Control', 'private, no-store')
