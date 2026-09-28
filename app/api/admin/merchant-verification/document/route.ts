@@ -19,21 +19,34 @@ function reviewSecret() {
   return value
 }
 
-function requireReviewAccess(token: string) {
+function requireReviewAccess(token: string, adminSessionToken: string) {
   const [payload, signature, extra] = token.split('.')
   if (!payload || !signature || extra) throw new Error('Review access required.')
   const expected = createHmac('sha256', reviewSecret()).update('review:' + payload).digest('base64url')
   if (!equalSecret(signature, expected)) throw new Error('Review access required.')
   const session = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'))
-  if (session?.purpose !== 'merchant-verification-review' || !Number.isFinite(session?.expires) || session.expires <= Date.now()) {
-    throw new Error('Review access has expired. Verify again to continue.')
+  const expectedSessionBinding = createHash('sha256').update(adminSessionToken).digest('base64url')
+  if (
+    session?.purpose !== 'merchant-verification-review'
+    || session?.sessionBinding !== expectedSessionBinding
+    || !Number.isFinite(session?.expires)
+    || session.expires <= Date.now()
+  ) {
+    throw new Error('Review access has expired or is no longer bound to this admin session. Verify again to continue.')
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
     await requireAdmin('bigcat')
-    requireReviewAccess((await cookies()).get(REVIEW_COOKIE)?.value || '')
+    const cookieStore = await cookies()
+    const adminSessionToken = cookieStore.get('bigcat_admin_session')?.value || ''
+    if (!adminSessionToken) throw new Error('Admin access required.')
+    requireReviewAccess(cookieStore.get(REVIEW_COOKIE)?.value || '', adminSessionToken)
+
+    if (request.headers.get('origin') !== request.nextUrl.origin) {
+      return NextResponse.json({ success: false, error: 'Invalid origin.' }, { status: 403 })
+    }
 
     const verificationId = new URL(request.url).searchParams.get('verificationId')
     if (!verificationId) return NextResponse.json({ success: false, error: 'Verification ID is required.' }, { status: 400 })
@@ -77,7 +90,10 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     await requireAdmin('bigcat')
-    requireReviewAccess((await cookies()).get(REVIEW_COOKIE)?.value || '')
+    const cookieStore = await cookies()
+    const adminSessionToken = cookieStore.get('bigcat_admin_session')?.value || ''
+    if (!adminSessionToken) throw new Error('Admin access required.')
+    requireReviewAccess(cookieStore.get(REVIEW_COOKIE)?.value || '', adminSessionToken)
 
     if (request.headers.get('origin') !== request.nextUrl.origin) {
       return NextResponse.json({ success: false, error: 'Invalid origin.' }, { status: 403 })
