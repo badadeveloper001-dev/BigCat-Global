@@ -33,10 +33,10 @@ export function PoweredByMarquee() {
       wrapperClassName: 'bg-white border-border px-2.5',
     },
     {
-      src: '',
-      alt: 'Orchid',
-      className: 'h-5 w-auto',
-      wrapperClassName: 'bg-background border-border px-3',
+      src: '/orchid-logo.svg',
+      alt: 'Orchid — Effortless Financial Control',
+      className: 'h-6 w-[88px] object-contain',
+      wrapperClassName: 'bg-white border-border px-2.5',
     },
     {
       src: '/image.png',
