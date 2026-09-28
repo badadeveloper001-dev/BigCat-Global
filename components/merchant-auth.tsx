@@ -137,6 +137,7 @@ export function MerchantAuth({
     governmentIdNumber: "",
     bankVerificationRef: "",
     chineseVerificationNote: "",
+    registrationNumber: "",
   })
 
   const loadMerchantProfile = async (userId: string, accessToken: string) => {
@@ -189,6 +190,7 @@ export function MerchantAuth({
         country: formData.country,
         governmentIdNumber: formData.governmentIdNumber,
         bankVerificationRef: formData.bankVerificationRef,
+        registrationNumber: formData.registrationNumber,
         verificationModule: formData.country === 'CN' ? 'Chinese Business Verification' : 'Nigerian Merchant Verification',
       }),
     })
@@ -279,6 +281,7 @@ export function MerchantAuth({
             country: formData.country,
             governmentIdNumber: formData.governmentIdNumber,
             bankVerificationRef: formData.bankVerificationRef,
+            registrationNumber: formData.registrationNumber,
             verificationModule: formData.country === 'CN' ? 'Chinese Business Verification' : 'Nigerian Merchant Verification',
           }),
         }).then(r => r.json())
@@ -622,78 +625,31 @@ export function MerchantAuth({
                   {formData.country === 'NG' ? (
                     <>
                       <div className="space-y-2">
-                        <div className="relative">
-                          <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                          <UiAttributes><input
-                            type="text"
-                            name="smedanId"
-                            placeholder="SMEDAN registration ID (optional)"
-                            value={formData.smedanId}
-                            onChange={handleChange}
-                            className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
-                          /></UiAttributes>
-                        </div>
+                        <label className="text-sm font-medium text-foreground"><UiText text={"CAC Registration Number"} /></label>
+                        <UiAttributes><input type="text" name="cacId" placeholder="Enter CAC registration number" value={formData.cacId} onChange={handleChange} className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-xl" required /></UiAttributes>
+                        <p className="text-xs text-muted-foreground">Required for all Nigerian merchants.</p>
                       </div>
-
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">
-                          <UiText text={"CAC Registration ID"} />{" "}<UiValue value={merchantType === 'services' ? '(optional for service merchants)' : ''} />
-                        </label>
-                        <div className="relative">
-                          <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                          <UiAttributes><input
-                            type="text"
-                            name="cacId"
-                            placeholder={merchantType === 'services' ? 'Enter CAC registration ID (optional)' : 'Enter CAC registration ID'}
-                            value={formData.cacId}
-                            onChange={handleChange}
-                            className="w-full pl-11 pr-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
-                            required={merchantType !== 'services'}
-                          /></UiAttributes>
-                        </div>
+                        <label className="text-sm font-medium text-foreground"><UiText text={"SMEDAN Registration ID"} /> <span className="text-muted-foreground">(optional)</span></label>
+                        <UiAttributes><input type="text" name="smedanId" placeholder="Enter SMEDAN registration ID" value={formData.smedanId} onChange={handleChange} className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-xl" /></UiAttributes>
                       </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground"><UiText text={"Government-issued ID"} /></label>
-                        <UiAttributes><input
-                          type="text"
-                          name="governmentIdNumber"
-                          placeholder="Enter ID number"
-                          value={formData.governmentIdNumber}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
-                          required
-                        /></UiAttributes>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground"><UiText text={"Bank Verification Reference"} /></label>
-                        <UiAttributes><input
-                          type="text"
-                          name="bankVerificationRef"
-                          placeholder="Enter bank verification reference"
-                          value={formData.bankVerificationRef}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-foreground placeholder:text-muted-foreground"
-                          required
-                        /></UiAttributes>
+                      <div className="rounded-xl border border-border/60 bg-secondary/30 p-4">
+                        <p className="text-sm font-semibold text-foreground">CAC certificate</p>
+                        <p className="text-xs text-muted-foreground mt-1">Document upload will be added in the next verification phase. Your account will remain pending until it is submitted.</p>
                       </div>
                     </>
                   ) : (
-                    <div className="rounded-xl border border-border/60 bg-secondary/30 p-4 space-y-2">
-                      <p className="text-sm font-semibold text-foreground"><UiText text={"Chinese Business Verification"} /></p>
-                      <p className="text-xs text-muted-foreground">
-                        <UiText text={"Placeholder module enabled. Full requirements will be connected after Orchid API discussions."} />{" "}</p>
-                      <UiAttributes><textarea
-                        name="chineseVerificationNote"
-                        value={formData.chineseVerificationNote}
-                        onChange={(e) => setFormData({ ...formData, chineseVerificationNote: e.target.value })}
-                        className="w-full min-h-[72px] px-3 py-2 bg-background border border-border rounded-xl text-sm"
-                        placeholder="Add any current business verification notes (optional)"
-                      /></UiAttributes>
-                    </div>
-                  )}
-                </>
+                    <>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground"><UiText text={"Business Registration / License Number"} /></label>
+                        <UiAttributes><input type="text" name="registrationNumber" placeholder="Enter business registration or license number" value={formData.registrationNumber} onChange={handleChange} className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-xl" required /></UiAttributes>
+                      </div>
+                      <div className="rounded-xl border border-border/60 bg-secondary/30 p-4">
+                        <p className="text-sm font-semibold text-foreground">Business license</p>
+                        <p className="text-xs text-muted-foreground mt-1">Document upload will be added in the next verification phase. Your account will remain pending until it is submitted.</p>
+                      </div>
+                    </>
+                  )}                </>
               )}
 
               <div className="space-y-2">
