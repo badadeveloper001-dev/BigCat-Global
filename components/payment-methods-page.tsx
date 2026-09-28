@@ -773,7 +773,7 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
             </div>
 
             <a
-              href="https://orchid.ch/"
+              href="https://app.orchid.ch/auth/realms/FrontOffice/protocol/openid-connect/registrations?client_id=userToOrchidFrontoffice&redirect_uri=https%3A%2F%2Fapp.orchid.ch%2F&response_type=code&scope=openid&skip_prescore=true&referral=BCGold&utm_medium=orchid.referral&utm_source=BCGold"
               target="_blank"
               rel="noopener noreferrer"
               className="flex w-full items-center justify-center rounded-2xl bg-[#6C2BD9] px-4 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
