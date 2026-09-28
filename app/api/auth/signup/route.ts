@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
       governmentIdNumber,
       bankVerificationRef,
       verificationModule,
+      registrationNumber,
     } = await request.json()
     const normalizedCity = typeof city === 'string' ? city.trim() : ''
     const normalizedState = typeof state === 'string' ? state.trim() : ''
@@ -43,30 +44,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (role === 'merchant' && normalizedCountry === 'NG' && normalizedMerchantType !== 'services' && !cacId) {
+    if (role === 'merchant' && normalizedCountry === 'NG' && !cacId) {
       return NextResponse.json(
-        { success: false, error: 'CAC ID is required for merchant accounts' },
+        { success: false, error: 'CAC registration number is required for Nigerian merchant accounts' },
         { status: 400 }
       )
     }
 
-    if (role === 'merchant' && normalizedCountry === 'NG' && !governmentIdNumber) {
+    if (role === 'merchant' && normalizedCountry === 'CN' && !registrationNumber) {
       return NextResponse.json(
-        { success: false, error: 'Government-issued ID is required for Nigerian merchant verification' },
-        { status: 400 }
-      )
-    }
-
-    if (role === 'merchant' && normalizedCountry === 'NG' && !bankVerificationRef) {
-      return NextResponse.json(
-        { success: false, error: 'Bank verification reference is required for Nigerian merchant verification' },
-        { status: 400 }
-      )
-    }
-
-    if (role === 'merchant' && normalizedCountry === 'CN' && verificationModule !== 'Chinese Business Verification') {
-      return NextResponse.json(
-        { success: false, error: 'Chinese merchants must use the Chinese Business Verification module placeholder' },
+        { success: false, error: 'Business registration or license number is required for Chinese merchant accounts' },
         { status: 400 }
       )
     }
@@ -85,6 +72,7 @@ export async function POST(request: NextRequest) {
       country: normalizedCountry,
       governmentIdNumber,
       bankVerificationRef,
+      registrationNumber,
       verificationModule: role === 'merchant' && normalizedCountry === 'CN' ? 'Chinese Business Verification' : 'Nigerian Merchant Verification',
       verificationStatus: role === 'merchant' && normalizedCountry === 'CN' ? 'placeholder_pending_api' : 'pending_review',
     })
