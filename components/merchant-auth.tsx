@@ -725,6 +725,7 @@ export function MerchantAuth({
                     governmentIdNumber: "",
                     bankVerificationRef: "",
                     chineseVerificationNote: "",
+                    registrationNumber: "",
                   })
                 }}
                 className="text-primary hover:text-primary/80 font-medium transition-colors"
