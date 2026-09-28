@@ -405,30 +405,6 @@ export async function getPlatformStats() {
   }
 }
 
-export async function approveMerchant(merchantId: string) {
-  try {
-    await requireAdmin()
-    const supabase = await createClient()
-    const { error } = await supabase.from('auth_users').update({ setup_completed: true }).eq('id', merchantId).eq('role', 'merchant')
-    if (error) throw error
-    return { success: true }
-  } catch (error: any) {
-    return { success: false, error: error.message }
-  }
-}
-
-export async function rejectMerchant(merchantId: string) {
-  try {
-    await requireAdmin()
-    const supabase = await createClient()
-    const { error } = await supabase.from('auth_users').update({ setup_completed: false }).eq('id', merchantId).eq('role', 'merchant')
-    if (error) throw error
-    return { success: true }
-  } catch (error: any) {
-    return { success: false, error: error.message }
-  }
-}
-
 export async function getRecentUsers() {
   try {
     await requireAdmin()
