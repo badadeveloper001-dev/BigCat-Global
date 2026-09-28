@@ -38,6 +38,11 @@ export async function POST(request: NextRequest) {
     if (auth.response) return NextResponse.json({ success: false, error: 'Authentication failed' }, { status: auth.response.status })
 
     const formData = await request.formData()
+    const country = String(formData.get('country') || '').trim().toUpperCase()
+    const registrationNumber = String(formData.get('registrationNumber') || '').trim()
+    if (!['NG', 'CN'].includes(country)) return NextResponse.json({ success: false, error: 'A supported business country is required' }, { status: 400 })
+    if (!registrationNumber) return NextResponse.json({ success: false, error: 'Business registration number is required' }, { status: 400 })
+
     const file = formData.get('document')
     if (!(file instanceof File)) return NextResponse.json({ success: false, error: 'Verification document is required' }, { status: 400 })
 
@@ -56,11 +61,15 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (lookupError) throw lookupError
-    if (!verification) return NextResponse.json({ success: false, error: 'Merchant verification record not found' }, { status: 404 })
-    if (verification.status === 'verified') return NextResponse.json({ success: false, error: 'This business is already verified' }, { status: 409 })
+    if (verification?.status === 'verified') return NextResponse.json({ success: false, error: 'This business is already verified' }, { status: 409 })
+
+    const documentType = country === 'CN' ? 'business_license' : 'cac_certificate'
+    if (verification && verification.document_type !== documentType) {
+      return NextResponse.json({ success: false, error: 'Business country does not match the existing verification record' }, { status: 409 })
+    }
 
     const extension = file.type === 'application/pdf' ? 'pdf' : file.type === 'image/png' ? 'png' : 'jpg'
-    const path = `${userId}/${verification.document_type}-${crypto.randomUUID()}.${extension}`
+    const path = `${userId}/${documentType}-${crypto.randomUUID()}.${extension}`
     const bytes = await file.arrayBuffer()
 
     const { error: uploadError } = await admin.storage.from(BUCKET).upload(path, bytes, {
@@ -69,23 +78,27 @@ export async function POST(request: NextRequest) {
     })
     if (uploadError) throw uploadError
 
-    const { error: updateError } = await admin
-      .from('merchant_verifications')
-      .update({
-        document_url: path,
-        status: 'submitted',
+    const verificationUpdate = {
+      country,
+      registration_number: registrationNumber,
+      document_type: documentType,
+      document_url: path,
+      status: 'submitted',
         submitted_at: new Date().toISOString(),
-        rejection_reason: null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('merchant_id', userId)
-
-    if (updateError) {
-      await admin.storage.from(BUCKET).remove([path])
-      throw updateError
+      rejection_reason: null,
+      updated_at: new Date().toISOString(),
     }
 
-    return NextResponse.json({ success: true, data: { status: 'submitted', documentType: verification.document_type } })
+    const { error: verificationError } = verification
+      ? await admin.from('merchant_verifications').update(verificationUpdate).eq('merchant_id', userId)
+      : await admin.from('merchant_verifications').insert({ merchant_id: userId, ...verificationUpdate })
+
+    if (verificationError) {
+      await admin.storage.from(BUCKET).remove([path])
+      throw verificationError
+    }
+
+    return NextResponse.json({ success: true, data: { status: 'submitted', documentType, country, registrationNumber } })
   } catch (error) {
     console.error('Merchant verification upload error:', error)
     return NextResponse.json({ success: false, error: 'Unable to submit verification document' }, { status: 500 })
