@@ -657,7 +657,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
     }
   }
 
-  if (items.length === 0 && !isServiceCheckout) {
+  if (items.length === 0 && !isServiceCheckout && !orchidPaymentReference) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
         <Package className="w-16 h-16 text-muted-foreground mb-4" />
