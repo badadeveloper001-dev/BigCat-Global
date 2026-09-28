@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -12,7 +12,7 @@ function safeNextPath(value: string | null) {
   return value
 }
 
-export default function OAuthCallbackPage() {
+function OAuthCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [error, setError] = useState('')
@@ -86,5 +86,19 @@ export default function OAuthCallbackPage() {
     <main className="min-h-screen bg-background flex items-center justify-center p-6">
       <p className="text-sm text-muted-foreground">Completing Google sign-in…</p>
     </main>
+  )
+}
+
+export default function OAuthCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-background flex items-center justify-center p-6">
+          <p className="text-sm text-muted-foreground">Completing Google sign-in…</p>
+        </main>
+      }
+    >
+      <OAuthCallbackContent />
+    </Suspense>
   )
 }
