@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 613" role="img" aria-labelledby="title desc">
+<title id="title">Orchid</title><desc id="desc">Orchid financial services partner logo</desc>
+<defs>
+ <linearGradient id="petal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f32b8f"/><stop offset=".55" stop-color="#c20b72"/><stop offset="1" stop-color="#65064f"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset=".5" stop-color="#f5b51b"/><stop offset="1" stop-color="#b66b08"/></linearGradient>
+</defs>
+<g transform="translate(450 20)">
+ <path d="M0 0 C-78 48 -105 116 -74 183 C-47 225 0 231 0 231 C0 231 47 225 74 183 C105 116 78 48 0 0Z" fill="url(#petal)" stroke="url(#gold)" stroke-width="9"/>
+ <path d="M-5 112 C-142 51 -241 86 -281 167 C-294 226 -250 283 -180 286 C-105 286 -47 236 -5 190Z" fill="url(#petal)" stroke="url(#gold)" stroke-width="9"/>
+ <path d="M5 112 C142 51 241 86 281 167 C294 226 250 283 180 286 C105 286 47 236 5 190Z" fill="url(#petal)" stroke="url(#gold)" stroke-width="9"/>
+ <path d="M-205 267 C-170 327 -90 343 0 278 C90 343 170 327 205 267 C149 298 83 297 0 250 C-83 297 -149 298 -205 267Z" fill="url(#petal)" stroke="url(#gold)" stroke-width="8"/>
+ <circle cx="0" cy="194" r="24" fill="url(#gold)"/>
+ <path d="M0 210 C-34 229 -61 258 -55 286 C-45 306 -18 311 0 292 C18 311 45 306 55 286 C61 258 34 229 0 210Z" fill="url(#gold)"/>
+ <path d="M-17 242 C-54 224 -85 241 -94 273 C-90 298 -66 308 -39 295 C-19 285 -8 264 -17 242Z" fill="#6b0a52" stroke="url(#gold)" stroke-width="6"/>
+ <path d="M17 242 C54 224 85 241 94 273 C90 298 66 308 39 295 C19 285 8 264 17 242Z" fill="#6b0a52" stroke="url(#gold)" stroke-width="6"/>
+</g>
+<text x="450" y="450" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="112" font-weight="700" letter-spacing="18" fill="#5d0b55">ORCHID</text>
+<text x="450" y="520" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="600" letter-spacing="1" fill="#5d0b55">Effortless Financial Control</text>
+</svg>
