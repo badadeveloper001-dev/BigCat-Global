@@ -10,6 +10,7 @@ interface MerchantSetupProps {
   smedanId: string
   onBack?: () => void
   onComplete: (profile: any) => void
+  onVerificationSubmitted?: (verification: any) => void
 }
 
 const CATEGORIES = [
@@ -26,7 +27,7 @@ const CATEGORIES = [
   'Other'
 ]
 
-export function MerchantSetup({ userId, smedanId, onComplete, onBack }: MerchantSetupProps) {
+export function MerchantSetup({ userId, smedanId, onComplete, onVerificationSubmitted, onBack }: MerchantSetupProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>("")
   const [success, setSuccess] = useState(false)
@@ -92,8 +93,16 @@ export function MerchantSetup({ userId, smedanId, onComplete, onBack }: Merchant
         setError(result.error || "Unable to submit verification document")
         return false
       }
-      setVerification((current: any) => ({ ...current, status: "submitted", document_type: result.data.documentType }))
+      const nextVerification = {
+        ...(verification || {}),
+        status: "submitted",
+        document_type: result.data.documentType,
+        country: result.data.country,
+        registration_number: result.data.registrationNumber,
+      }
+      setVerification(nextVerification)
       setVerificationFile(null)
+      onVerificationSubmitted?.(nextVerification)
       return true
     } catch {
       setError("Unable to submit verification document")
@@ -198,6 +207,9 @@ export function MerchantSetup({ userId, smedanId, onComplete, onBack }: Merchant
           setLoading(false)
           return
         }
+
+        setLoading(false)
+        return
       }
 
       // For now, use the preview URL as logo (in production, upload to Vercel Blob)
