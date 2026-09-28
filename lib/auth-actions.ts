@@ -160,6 +160,7 @@ export async function signupEnhanced(params: {
   bankVerificationRef?: string
   verificationModule?: string
   verificationStatus?: string
+  registrationNumber?: string
 }) {
   try {
     const admin = createClient()
@@ -179,6 +180,7 @@ export async function signupEnhanced(params: {
       bankVerificationRef,
       verificationModule,
       verificationStatus,
+      registrationNumber,
     } = params
     if (role !== 'buyer' && role !== 'merchant') return { success: false, error: 'Choose buyer or merchant.' }
     const normalizedCity = city?.trim() || null
@@ -239,6 +241,29 @@ export async function signupEnhanced(params: {
     if (error) {
       await admin.auth.admin.deleteUser(supabaseUserId)
       return { success: false, error: mapSignupProfileInsertError(error) }
+    }
+
+    if (role === 'merchant') {
+      const verificationCountry = country === 'CN' ? 'CN' : 'NG'
+      const verificationDocumentType = verificationCountry === 'CN' ? 'business_license' : 'cac_certificate'
+      const verificationRegistrationNumber = (verificationCountry === 'CN' ? registrationNumber : cacId)?.trim()
+
+      const { error: verificationError } = await admin
+        .from('merchant_verifications')
+        .insert({
+          merchant_id: supabaseUserId,
+          country: verificationCountry,
+          registration_number: verificationRegistrationNumber || '',
+          document_type: verificationDocumentType,
+          status: 'pending',
+        })
+
+      if (verificationError) {
+        await admin.from('auth_users').delete().eq('id', supabaseUserId)
+        await admin.auth.admin.deleteUser(supabaseUserId)
+        console.error('Merchant verification record creation failed:', verificationError)
+        return { success: false, error: 'Merchant verification setup could not be completed. Please try again.' }
+      }
     }
 
     return { success: true, data }
