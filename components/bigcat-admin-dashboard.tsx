@@ -24,6 +24,9 @@ export function BigcatAdminDashboard() {
   const [verificationAccessCode, setVerificationAccessCode] = useState("")
   const [verificationAccessLoading, setVerificationAccessLoading] = useState(false)
   const [verificationAccessMessage, setVerificationAccessMessage] = useState<string | null>(null)
+  const [selectedVerification, setSelectedVerification] = useState<any | null>(null)
+  const [reviewDocument, setReviewDocument] = useState<any | null>(null)
+  const [reviewDocumentLoading, setReviewDocumentLoading] = useState(false)
 
   const [stats, setStats] = useState<PlatformStats>({
     totalUsers: 0,
@@ -93,12 +96,33 @@ export function BigcatAdminDashboard() {
         setVerificationAccessMessage(result?.error || "Unable to verify admin access.")
         return
       }
-      setVerificationAccessMessage("Review access granted for 10 minutes.")
+
       setVerificationAccessCode("")
+      if (!selectedVerification?.id) {
+        setVerificationAccessMessage("Review access granted for 10 minutes.")
+        return
+      }
+
+      setReviewDocumentLoading(true)
+      const documentResponse = await fetch(
+        `/api/admin/merchant-verification/document?verificationId=${encodeURIComponent(selectedVerification.id)}`,
+        { cache: "no-store" },
+      )
+      const documentResult = await documentResponse.json()
+
+      if (!documentResponse.ok || !documentResult?.success) {
+        setVerificationAccessMessage(documentResult?.error || "Unable to open the verification document.")
+        return
+      }
+
+      setReviewDocument(documentResult.data)
+      setShowVerificationAccess(false)
+      setVerificationAccessMessage(null)
     } catch {
-      setVerificationAccessMessage("Unable to verify admin access.")
+      setVerificationAccessMessage("Unable to open the verification document.")
     } finally {
       setVerificationAccessLoading(false)
+      setReviewDocumentLoading(false)
     }
   }
 
@@ -188,6 +212,8 @@ export function BigcatAdminDashboard() {
                       </div>
                       <button
                         onClick={() => {
+                          setSelectedVerification(verification)
+                          setReviewDocument(null)
                           setVerificationAccessMessage(null)
                           setVerificationAccessCode("")
                           setShowVerificationAccess(true)
@@ -242,6 +268,40 @@ export function BigcatAdminDashboard() {
         </section>
 
         {loading ? <p className="text-sm text-muted-foreground"><UiText text={"Refreshing platform stats..."} /></p> : null}
+
+        {reviewDocument ? (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+            <div className="w-full max-w-3xl max-h-[90vh] overflow-auto rounded-2xl border border-border bg-card p-6 shadow-2xl">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-semibold"><UiText text={"Merchant Verification Document"} /></h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {reviewDocument.documentType === "cac_certificate" ? "CAC Certificate" : "Business License"} · {reviewDocument.country === "NG" ? "Nigeria" : "China"}
+                  </p>
+                </div>
+                <button onClick={() => { setReviewDocument(null); setSelectedVerification(null) }} className="rounded-lg border border-border px-3 py-2 text-sm">
+                  <UiText text={"Close"} />
+                </button>
+              </div>
+              <div className="mt-4 grid sm:grid-cols-2 gap-3 text-sm">
+                <div className="rounded-lg border border-border p-3">
+                  <p className="text-xs text-muted-foreground"><UiText text={"Registration Number"} /></p>
+                  <p className="mt-1 font-mono break-all">{reviewDocument.registrationNumber}</p>
+                </div>
+                <div className="rounded-lg border border-border p-3">
+                  <p className="text-xs text-muted-foreground"><UiText text={"Submitted"} /></p>
+                  <p className="mt-1">{reviewDocument.submittedAt ? new Date(reviewDocument.submittedAt).toLocaleString() : "—"}</p>
+                </div>
+              </div>
+              <div className="mt-5 rounded-xl border border-border overflow-hidden bg-background">
+                <iframe src={reviewDocument.signedUrl} title="Merchant verification document" className="w-full h-[65vh]" />
+              </div>
+              <p className="mt-3 text-xs text-muted-foreground">
+                <UiText text={"This private preview link expires after 5 minutes. The merchant verification remains protected."} />
+              </p>
+            </div>
+          </div>
+        ) : null}
 
         {showVerificationAccess ? (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
