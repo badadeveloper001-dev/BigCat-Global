@@ -23,7 +23,7 @@ export function createClient() {
       } as any
     }
 
-    supabaseClient = createBrowserClient(url, key)
+    supabaseClient = createBrowserClient(url, key, {\n      auth: {\n        flowType: 'pkce',\n      },\n    })
   }
 
   return supabaseClient
