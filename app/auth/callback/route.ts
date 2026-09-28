@@ -31,7 +31,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    const supabase = await createOAuthServerClient()
+    const response = NextResponse.redirect(new URL(next, requestUrl.origin))
+    const supabase = await createOAuthServerClient(response)
     const { data: exchangeData, error: exchangeError } =
       await supabase.auth.exchangeCodeForSession(code)
 
@@ -105,7 +106,7 @@ export async function GET(request: Request) {
       }
     }
 
-    return NextResponse.redirect(new URL(next, requestUrl.origin))
+    return response
   } catch (error: any) {
     console.error('[auth/callback] OAuth completion failed:', error)
 
