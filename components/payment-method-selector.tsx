@@ -2,6 +2,7 @@
 import { UiText, UiValue, UiAttributes } from "@/components/ui-language"
 
 
+import Image from 'next/image'
 import { CreditCard, Wallet, Building2, Check } from 'lucide-react'
 
 export type PaymentMethod = 'orchid' | 'bank' | 'card'
@@ -56,9 +57,21 @@ export function PaymentMethodSelector({ selectedMethod, onSelect }: PaymentMetho
           >
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-3">
-                <div className={`p-2 rounded-lg ${method.highlighted ? 'bg-[#F3E8FF]' : 'bg-secondary'}`}>
-                  <method.icon className={`w-5 h-5 ${method.highlighted ? 'text-[#6C2BD9]' : 'text-muted-foreground'}`} />
-                </div>
+                {method.id === 'orchid' ? (
+                  <div className="flex h-11 w-20 shrink-0 items-center justify-center rounded-lg border border-[#eadcf7] bg-white px-1.5">
+                    <Image
+                      src="/orchid-logo.svg"
+                      alt="Orchid"
+                      width={88}
+                      height={60}
+                      className="h-9 w-auto object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className={`p-2 rounded-lg ${method.highlighted ? 'bg-[#F3E8FF]' : 'bg-secondary'}`}>
+                    <method.icon className={`w-5 h-5 ${method.highlighted ? 'text-[#6C2BD9]' : 'text-muted-foreground'}`} />
+                  </div>
+                )}
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="font-medium text-foreground"><UiValue value={method.label} /></p>
