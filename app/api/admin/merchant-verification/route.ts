@@ -14,15 +14,36 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Invalid verification status.' }, { status: 400 })
     }
 
-    const { data, error } = await supabase
+    const { data: verifications, error: verificationError } = await supabase
       .from('merchant_verifications')
-      .select('id, merchant_id, country, registration_number, document_type, status, submitted_at, rejection_reason, created_at, updated_at, auth_users!merchant_verifications_merchant_id_fkey(business_name, full_name, email)')
+      .select('id, merchant_id, country, registration_number, document_type, document_url, status, submitted_at, rejection_reason, created_at, updated_at')
       .eq('status', status)
       .order('submitted_at', { ascending: false, nullsFirst: false })
 
-    if (error) throw error
+    if (verificationError) throw verificationError
 
-    return NextResponse.json({ success: true, data: data || [] })
+    const merchantIds = (verifications || []).map((verification) => verification.merchant_id)
+    let merchants: any[] = []
+
+    if (merchantIds.length > 0) {
+      const { data, error } = await supabase
+        .from('auth_users')
+        .select('id, business_name, full_name, email')
+        .in('id', merchantIds)
+        .eq('role', 'merchant')
+
+      if (error) throw error
+      merchants = data || []
+    }
+
+    const merchantById = new Map(merchants.map((merchant) => [merchant.id, merchant]))
+
+    const data = (verifications || []).map((verification) => ({
+      ...verification,
+      merchant: merchantById.get(verification.merchant_id) || null,
+    }))
+
+    return NextResponse.json({ success: true, data })
   } catch (error: any) {
     console.error('Admin merchant verification GET error:', error)
     return NextResponse.json(
