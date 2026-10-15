@@ -425,6 +425,17 @@ export async function createOrder(
         return acc
       }, {})
 
+      // B2.3A safety gate: this flow creates orders through separate writes without
+      // a transaction or durable cross-merchant idempotency. Until a transactional
+      // multi-merchant checkout exists, reject mixed carts before any order writes.
+      if (Object.keys(groupedItems).length > 1) {
+        return {
+          success: false,
+          code: 'MULTI_MERCHANT_CHECKOUT_UNAVAILABLE',
+          error: 'Checkout currently supports one merchant at a time. Please place separate orders for each merchant.',
+        }
+      }
+
       // Validate the entire cart before creating any merchant's order.
       for (const [merchantId, merchantItems] of Object.entries(groupedItems)) {
         const availability = await checkStockAvailability(supabase, merchantId, merchantItems)

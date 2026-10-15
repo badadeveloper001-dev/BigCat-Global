@@ -1,0 +1,13 @@
+/** B2.3A safety regression guard. Run: node tests/multi-merchant-checkout-b23a.cjs */
+const assert = require('node:assert/strict')
+const fs = require('node:fs')
+const source = fs.readFileSync('lib/order-actions.ts', 'utf8')
+const grouping = source.indexOf('const groupedItems =')
+const gate = source.indexOf("code: 'MULTI_MERCHANT_CHECKOUT_UNAVAILABLE'", grouping)
+const firstWrite = source.indexOf(".from('orders')", grouping)
+assert.ok(grouping >= 0, 'Checkout must group items by merchant')
+assert.ok(gate > grouping, 'Mixed carts must be rejected explicitly')
+assert.ok(firstWrite > gate, 'Safety gate must precede all order writes')
+assert.match(source.slice(grouping, firstWrite), /Object\.keys\(groupedItems\)\.length\s*>\s*1/, 'Only multi-merchant carts should be blocked')
+assert.match(source.slice(grouping, firstWrite), /Please place separate orders for each merchant/, 'Buyer must receive actionable error')
+console.log('B2.3A checkout safety regression checks passed')
