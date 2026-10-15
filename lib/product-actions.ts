@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { isPilotBuyer } from '@/lib/demo-access'
 import { convertCurrency } from '@/lib/currency-utils'
 import { searchFilterValue } from '@/lib/discovery-utils'
 import { validateMoq } from '@/lib/product-moq'
@@ -319,11 +320,18 @@ export async function getAllProducts(options: {
     const page = Math.max(Number(options.page) || 1, 1)
     const offset = (page - 1) * pageSize
 
+    const { data: demoRows, error: demoError } = await supabase.from('bigcat_demo_products').select('product_id')
+    if (demoError) throw demoError
+    const demoIds = (demoRows || []).map(row => String(row.product_id))
+    const canSeeDemo = await isPilotBuyer()
+
     let query = supabase
       .from('products')
       .select('*, merchant_profiles:auth_users!merchant_id(id, business_name, business_category, business_description, name, city, state, location, avatar_url)', { count: 'exact' })
       .eq('is_active', true)
       .order('created_at', { ascending: false })
+
+    if (!canSeeDemo && demoIds.length) query = (query as any).not('id', 'in', '(' + demoIds.join(',') + ')')
 
     // Push category filter to DB — avoid loading products just to discard them
     if (options.category && options.category !== 'All') {
@@ -366,6 +374,10 @@ export async function getProductById(productId: string) {
       .eq('id', productId)
       .single()
     if (error) throw error
+
+    const { data: demoMarker, error: markerError } = await supabase.from('bigcat_demo_products').select('product_id').eq('product_id', productId).maybeSingle()
+    if (markerError) throw markerError
+    if (demoMarker && !(await isPilotBuyer())) return { success: false, error: 'Product not found' }
 
     const normalized = normalizeProduct(data)
     if (normalized.status === 'deleted' || normalized.is_active === false) {
