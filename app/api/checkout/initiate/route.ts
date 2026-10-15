@@ -63,6 +63,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
+    const { data: demoMarker, error: demoError } = await getSupabaseClient()
+      .from('bigcat_demo_products').select('product_id').eq('product_id', String(body.productId || '')).maybeSingle()
+    if (demoError) return NextResponse.json({ success: false, error: 'Checkout temporarily unavailable.' }, { status: 503 })
+    if (demoMarker) return NextResponse.json({ success: false, code: 'DEMO_CHECKOUT_DISABLED', error: 'Demo products cannot initiate payments.' }, { status: 403 })
     const quantity = Number(body.quantity)
     const { data: product, error: productError } = await getSupabaseClient().from('products').select('id, stock, minimum_order_quantity').eq('id', body.productId).single()
     if (productError || !product) return NextResponse.json({ success: false, error: 'Unable to verify product availability.' }, { status: 400 })
