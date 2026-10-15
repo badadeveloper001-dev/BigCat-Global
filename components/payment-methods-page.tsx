@@ -9,6 +9,7 @@ import { useRole } from "@/lib/role-context"
 import { formatNaira } from "@/lib/currency-utils"
 import { MerchantWithdrawal } from "@/components/merchant-withdrawal"
 import { MultiCurrencyWallet } from "@/components/multi-currency-wallet"
+import { MerchantPaymentAccounts } from "@/components/merchant-payment-accounts"
 
 interface PaymentMethodsPageProps {
   onBack: () => void
@@ -799,6 +800,7 @@ export function PaymentMethodsPage({ onBack }: PaymentMethodsPageProps) {
             />
           </p>
         </section>
+        {isMerchant && <MerchantPaymentAccounts />}
       </main>
     </div>
   )
