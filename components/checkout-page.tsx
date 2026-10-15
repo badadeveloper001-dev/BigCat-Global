@@ -59,6 +59,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
   // Orchid pilot: payment reference returned from order creation
   const [orchidPaymentReference, setOrchidPaymentReference] = useState<string | null>(null)
   const [successOrderId, setSuccessOrderId] = useState<string | null>(null)
+  const [successMerchantName, setSuccessMerchantName] = useState<string | null>(null)
 
   const [savedAddresses, setSavedAddresses] = useState<Array<{ id: string; label: string; address: string }>>([])
   const [serviceBooking, setServiceBooking] = useState<any>(null)
@@ -642,6 +643,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
         setOrchidPaymentReference(result.data.paymentReference)
         setSuccess(`Order created. Payment has not been confirmed. Use reference ${result.data.paymentReference} when paying via Orchid.`)
         setSuccessOrderId(orderId)
+        setSuccessMerchantName(items.find(item => String(item.merchantId) === String(createdOrders[0]?.merchant_id))?.merchantName?.trim() || null)
       } else {
         setSuccess(
           paymentMethod === 'bank'
@@ -730,6 +732,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                 <div key={item.productId} className="flex justify-between items-center">
                   <div className="flex-1">
                     <p className="font-medium text-foreground">{item.name}</p>
+                    <p className="text-sm text-muted-foreground"><UiText text={"Sold by:"} />{" "}<UiValue value={item.merchantName?.trim() || "Merchant"} /></p>
                     <p className="text-sm text-muted-foreground"><UiText text={"Qty:"} />{" "}{item.quantity}</p>
                   </div>
                   <p className="font-medium text-foreground">
@@ -1127,6 +1130,9 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
               </div>
 
               <div className="rounded-xl border border-[#E8D7FF] bg-[#F3E8FF] p-4">
+                {successMerchantName && (
+                  <p className="mb-2 text-sm text-foreground">Merchant: <span className="font-semibold"><UiValue value={successMerchantName} /></span></p>
+                )}
                 <p className="text-xs font-medium text-muted-foreground">Orchid payment reference</p>
                 <p className="mt-1 text-xl font-bold tracking-wider text-[#6C2BD9]">
                   {orchidPaymentReference}
