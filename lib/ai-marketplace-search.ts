@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { isPilotBuyer } from '@/lib/demo-access'
 
 export type SearchType = 'products' | 'vendors' | 'services' | 'both'
 export type AssistantMode = 'buyer' | 'merchant'
@@ -1168,6 +1169,13 @@ export async function searchMarketplace(params: {
     }
   }
 
+  const { data: markedProducts, error: markedProductError } = await supabase.from('bigcat_demo_products').select('product_id')
+  const { data: markedMerchants, error: markedMerchantError } = await supabase.from('bigcat_demo_merchants').select('merchant_id')
+  if (markedProductError || markedMerchantError) throw markedProductError || markedMerchantError
+  const canSeePilot = await isPilotBuyer()
+  const hiddenProductIds = canSeePilot ? [] : (markedProducts || []).map(row => String(row.product_id))
+  const hiddenMerchantIds = canSeePilot ? [] : (markedMerchants || []).map(row => String(row.merchant_id))
+
   const runProductSearch = async (searchTerm: string): Promise<ProductSearchResult[]> => {
     const safeQuery = escapeLike(searchTerm)
     const pattern = `%${safeQuery}%`
@@ -1178,6 +1186,8 @@ export async function searchMarketplace(params: {
       .select('id, name, description, category, price, stock, image_url, merchant_id, merchant_profiles:auth_users!merchant_id(business_name, name, location, avatar_url)')
       .eq('is_active', true)
       .limit(limit)
+
+    if (hiddenProductIds.length) request = request.not('id', 'in', '(' + hiddenProductIds.join(',') + ')')
 
     if (tokens.length >= 2) {
       const tokenOr = buildTokenOrPattern(tokens, ['name', 'description', 'category'])
@@ -1218,6 +1228,8 @@ export async function searchMarketplace(params: {
       .eq('role', 'merchant')
       .eq('setup_completed', true)
       .limit(limit)
+
+    if (hiddenMerchantIds.length) request = request.not('id', 'in', '(' + hiddenMerchantIds.join(',') + ')')
 
     if (tokens.length >= 2) {
       const tokenOr = buildTokenOrPattern(tokens, [
@@ -1314,11 +1326,13 @@ export async function searchMarketplace(params: {
   }
 
   const runProductFallback = async (): Promise<ProductSearchResult[]> => {
-    const { data, error } = await supabase
+    let fallbackQuery = supabase
       .from('products')
       .select('id, name, description, category, price, stock, image_url, merchant_id, merchant_profiles:auth_users!merchant_id(business_name, name, location, avatar_url)')
       .eq('is_active', true)
       .limit(limit)
+    if (hiddenProductIds.length) fallbackQuery = fallbackQuery.not('id', 'in', '(' + hiddenProductIds.join(',') + ')')
+    const { data, error } = await fallbackQuery
 
     if (error) throw error
 
@@ -1340,12 +1354,14 @@ export async function searchMarketplace(params: {
   }
 
   const runVendorFallback = async (): Promise<VendorSearchResult[]> => {
-    const { data, error } = await supabase
+    let fallbackVendors = supabase
       .from('auth_users')
       .select('id, business_name, name, business_category, location, business_description, avatar_url, setup_completed')
       .eq('role', 'merchant')
       .eq('setup_completed', true)
       .limit(limit)
+    if (hiddenMerchantIds.length) fallbackVendors = fallbackVendors.not('id', 'in', '(' + hiddenMerchantIds.join(',') + ')')
+    const { data, error } = await fallbackVendors
 
     if (error) throw error
 
