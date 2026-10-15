@@ -18,8 +18,9 @@ ALTER TABLE public.bigcat_demo_products ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS private_demo_products_select_guard ON public.products;
 CREATE POLICY private_demo_products_select_guard ON public.products
   AS RESTRICTIVE FOR SELECT TO anon, authenticated
-  USING (NOT EXISTS (
-    SELECT 1 FROM public.bigcat_demo_products AS fixture
-    WHERE fixture.product_id = products.id
+  USING (merchant_id NOT IN (
+    'b23b0000-0000-4000-8000-000000000001'::uuid,
+    'b23b0000-0000-4000-8000-000000000002'::uuid,
+    'b23b0000-0000-4000-8000-000000000003'::uuid
   ));
 COMMIT;
