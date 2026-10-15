@@ -87,7 +87,11 @@ export async function DELETE(request: NextRequest) {
  const db = createClient()
  const {data:owned} = await db.from(table).select('id,is_default').eq('id',id).eq('merchant_id',auth.id).maybeSingle()
  if (!owned) return NextResponse.json({success:false,error:'Account not found'}, {status:404})
- if (owned.is_default) return NextResponse.json({success:false,error:'Select another default account before deleting this one'}, {status:409})
+ if (owned.is_default) {
+  const {count,error:countError} = await db.from(table).select('id',{count:'exact',head:true}).eq('merchant_id',auth.id)
+  if (countError) return NextResponse.json({success:false,error:'Could not check remaining accounts'}, {status:500})
+  if ((count || 0) > 1) return NextResponse.json({success:false,error:'Select another default account before deleting this one'}, {status:409})
+ }
  const {error} = await db.from(table).delete().eq('id',id).eq('merchant_id',auth.id)
  if (error) return NextResponse.json({success:false,error:'Could not remove account'}, {status:500})
  return NextResponse.json({success:true})
