@@ -547,6 +547,12 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
     setIsSubmitting(true)
     const merchantIdsInCart = Array.from(new Set(items.map((item) => String(item.merchantId || '').trim()).filter(Boolean)))
 
+    if (merchantIdsInCart.length > 1) {
+      setIsSubmitting(false)
+      setError('Checkout currently supports one merchant at a time. Please place separate orders for each merchant.')
+      return
+    }
+
     const tokenChargeResponse = await fetch('/api/merchant/tokens/charge-order', {
       method: 'POST',
       headers: {
