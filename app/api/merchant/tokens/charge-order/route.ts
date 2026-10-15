@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { deductMerchantTokens, TOKEN_COST_ORDER } from "@/lib/merchant-tokens"
 import { requireAuthenticatedUser } from "@/lib/supabase/request-auth"
+import { createClient } from "@/lib/supabase/server"
 
 export async function POST(request: NextRequest) {
   const auth = await requireAuthenticatedUser()
@@ -12,6 +13,17 @@ export async function POST(request: NextRequest) {
 
   if (merchantIds.length === 0) {
     return NextResponse.json({ success: false, error: "merchantIds are required" }, { status: 400 })
+  }
+
+  if (merchantIds.length > 1) {
+    return NextResponse.json({ success: false, code: "MULTI_MERCHANT_CHECKOUT_UNAVAILABLE", error: "Checkout currently supports one merchant at a time." }, { status: 409 })
+  }
+
+  const supabase = createClient()
+  const { data: demoRows, error: demoError } = await supabase.from("bigcat_demo_merchants").select("merchant_id").in("merchant_id", merchantIds)
+  if (demoError) return NextResponse.json({ success: false, error: "Unable to validate merchant eligibility." }, { status: 503 })
+  if ((demoRows || []).length > 0) {
+    return NextResponse.json({ success: false, code: "DEMO_CHECKOUT_DISABLED", error: "Demo merchants cannot be charged." }, { status: 403 })
   }
 
   const failed: Array<{ merchantId: string; error: string; balance: number }> = []
