@@ -1,0 +1,12 @@
+/** B2.3A structural regression guard. Run: node tests/multi-merchant-checkout-b23a.cjs */
+const assert = require('node:assert/strict')
+const fs = require('node:fs')
+const source = fs.readFileSync('lib/order-actions.ts', 'utf8')
+const start = source.indexOf('const groupedItems =')
+const loop = source.indexOf('for (const [merchantId, merchantItems] of Object.entries(groupedItems))', start + 100)
+const end = source.indexOf('checkoutInFlight.set', loop)
+assert.ok(start >= 0 && loop >= 0 && end > loop, 'Expected merchant grouping and checkout loop')
+const body = source.slice(loop, end)
+assert.ok(body.includes('createdOrders'), 'Checkout should accumulate merchant-specific orders')
+assert.ok(!/return\s*\{\s*success:\s*true\s*,\s*data:/.test(body), 'Do not return successful checkout from within the merchant loop')
+console.log('Multi-merchant checkout structural checks passed')
