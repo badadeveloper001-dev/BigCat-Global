@@ -514,7 +514,8 @@ export async function createOrder(
       const allocatedDeliveryFee = payload.deliveryType === 'pickup' ? 0 : (createdOrders.length === 0 ? Number(payload.deliveryFee || 0) : 0)
       const GIT_FEE_RATE = 0.015 // Goods in Transit (GIT) fee: 1.5%
       const gitFeeAmount = Math.round(discountedProductTotal * GIT_FEE_RATE)
-      const subtotal = discountedProductTotal + allocatedDeliveryFee + gitFeeAmount
+      const platformFeeAmount = Math.round(discountedProductTotal * 0.05)
+      const subtotal = discountedProductTotal + platformFeeAmount + allocatedDeliveryFee + gitFeeAmount
       
       // Apply coupon discount (only on first order for multi-merchant orders)
       const requestedCouponDiscount = createdOrders.length === 0 && payload.appliedCoupon
@@ -691,7 +692,7 @@ export async function createOrder(
           ...(orderResult.data || {}),
           id: orderIdRef,
           orderId: orderIdRef,
-          orders: [{ id: orderIdRef, merchant_id: normalizedMerchantId, product_total: productTotal, delivery_fee: allocatedDeliveryFee, grand_total: grandTotal }],
+          orders: [{ id: orderIdRef, merchant_id: normalizedMerchantId, product_total: productTotal, platform_fee: platformFeeAmount, delivery_fee: allocatedDeliveryFee, grand_total: grandTotal }],
           paymentReference,
           payment_method: resolvedPaymentMethod,
           payment_provider: isOrchidPayment ? 'orchid' : undefined,
