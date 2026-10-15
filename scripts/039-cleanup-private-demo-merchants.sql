@@ -37,6 +37,23 @@ BEGIN
    RAISE EXCEPTION 'Unexpected fixture product ID; cleanup aborted';
  END IF;
 
+ -- Fail closed if any non-fixture product belongs to a fixture merchant.
+ IF EXISTS (
+   SELECT 1 FROM public.products p
+   JOIN public.bigcat_demo_merchants dm ON dm.merchant_id = p.merchant_id
+   LEFT JOIN public.bigcat_demo_products dp ON dp.product_id = p.id AND dp.fixture_batch = 'b23b-pilot'
+   WHERE dm.fixture_batch = 'b23b-pilot' AND dp.product_id IS NULL
+ ) THEN
+   RAISE EXCEPTION 'Demo merchant owns unmarked products; cleanup aborted';
+ END IF;
+ IF EXISTS (
+   SELECT 1 FROM public.bigcat_demo_products dp
+   JOIN public.products p ON p.id = dp.product_id
+   WHERE dp.fixture_batch = 'b23b-pilot' AND dp.merchant_id <> p.merchant_id
+ ) THEN
+   RAISE EXCEPTION 'Demo product merchant mismatch; cleanup aborted';
+ END IF;
+
  -- Block cleanup if any other public table references fixture users or products.
  -- Dynamic checks use actual FK metadata and include future schema additions.
  DECLARE
