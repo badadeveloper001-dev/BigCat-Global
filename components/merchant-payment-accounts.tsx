@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type FormEvent } from "react"
 import { Landmark, Plus, Loader2, Trash2, Pencil, Star, X } from "lucide-react"
 
 type Account = { id:string; country_code:"NG"|"CN"; currency_code:string; institution_name:string; account_holder_name:string; account_number_last4:string; branch_name:string|null; routing_code_type:string|null; routing_code:string|null; is_default:boolean }
@@ -48,7 +48,7 @@ export function MerchantPaymentAccounts() {
   }catch(e){setError(e instanceof Error?e.message:"Request failed")}
   finally{setBusy(false)}
  }
- function save(e:React.FormEvent) {
+ function save(e:FormEvent) {
   e.preventDefault()
   if(editing&&!form.account_number.trim()){setError("Enter the full account number to save changes. Stored numbers cannot be retrieved.");return}
   void action(editing?"PATCH":"POST",editing?{...form,id:editing}:form)
