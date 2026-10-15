@@ -372,7 +372,10 @@ export async function getPlatformStats() {
     await requireAdmin()
     const supabase = await createClient()
     const { count: userCount } = await supabase.from('auth_users').select('*', { count: 'exact', head: true })
-    const { count: merchantCount } = await supabase.from('auth_users').select('*', { count: 'exact', head: true }).eq('role', 'merchant')
+    const { count: merchantCount, error: merchantCountError } = await supabase.from('auth_users').select('*', { count: 'exact', head: true }).eq('role', 'merchant')
+    if (merchantCountError) throw merchantCountError
+    const { count: demoMerchantCount, error: demoCountError } = await supabase.from('bigcat_demo_merchants').select('*', { count: 'exact', head: true })
+    if (demoCountError) throw demoCountError
     const { count: orderCount } = await supabase.from('orders').select('*', { count: 'exact', head: true })
 
     const orderAttempts = ['total_amount, grand_total', 'grand_total', 'total_amount']
@@ -397,8 +400,8 @@ export async function getPlatformStats() {
     return {
       success: true,
       stats: {
-        totalUsers: userCount || 0,
-        totalMerchants: merchantCount || 0,
+        totalUsers: Math.max(0, (userCount || 0) - (demoMerchantCount || 0)),
+        totalMerchants: Math.max(0, (merchantCount || 0) - (demoMerchantCount || 0)),
         totalOrders: orderCount || 0,
         totalRevenue,
         activeNow: 0,
