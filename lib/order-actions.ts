@@ -259,6 +259,22 @@ export async function getBuyerOrders(buyerId: string) {
       }
     }
 
+    const merchantIds = [...new Set((data || []).map((order: any) => String(order.merchant_id || '').trim()).filter(Boolean))]
+    let merchantNamesById = new Map<string, string>()
+    if (merchantIds.length > 0) {
+      const merchantsResult = await supabase.from('auth_users')
+        .select('id, business_name, name')
+        .in('id', merchantIds)
+      if (merchantsResult.error) {
+        console.error('[getBuyerOrders] Merchant name lookup failed:', merchantsResult.error)
+      } else {
+        merchantNamesById = new Map((merchantsResult.data || []).map((merchant: any) => [
+          String(merchant.id),
+          String(merchant.business_name || merchant.name || '').trim(),
+        ]))
+      }
+    }
+
     const enriched = (data || []).map((order: any) => {
       const assignment = assignmentByOrderId.get(String(order.id || '').trim())
       const rider = assignment?.rider_id ? riderById.get(String(assignment.rider_id || '').trim()) : null
@@ -266,6 +282,7 @@ export async function getBuyerOrders(buyerId: string) {
       return {
         ...order,
         tracking_id: getTrackingId(String(order.id || '')),
+        merchant_name: merchantNamesById.get(String(order.merchant_id || '')) || 'Merchant',
         logistics_status: String(assignment?.logistics_status || ''),
         rider_id: assignment?.rider_id || null,
         logistics_assigned_at: assignment?.assigned_at || null,

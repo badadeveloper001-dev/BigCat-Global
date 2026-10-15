@@ -528,6 +528,8 @@ export function BuyerOrders({ onBack, onOpenCart }: BuyerOrdersProps) {
                     </span>
                   </div>
 
+                  <p className="mb-3 text-sm text-muted-foreground"><UiText text={"Merchant:"} />{" "}<UiValue value={order.merchant_name || "Merchant"} /></p>
+
                   {/* Payment Reference */}
                   {order.payment_reference && (
                     <div className="mb-3 rounded-lg border border-border bg-muted/30 px-3 py-2">
