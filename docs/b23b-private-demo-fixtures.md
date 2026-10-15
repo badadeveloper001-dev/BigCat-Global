@@ -3,7 +3,7 @@
 Status: preparation only; no production data changes.
 
 ## Authorized test buyer
-- Email supplied by pilot lead: badaadewunmi04@gmail.com
+- Authorized email must be supplied through server-only `BIGCAT_DEMO_BUYER_EMAIL`; do not commit personal addresses.
 - Resolve this email to the authenticated buyer UUID on the server. Never trust a buyer email or UUID supplied in a request.
 - Fail closed if the email does not resolve to exactly one eligible buyer.
 
@@ -12,7 +12,7 @@ Status: preparation only; no production data changes.
 - Use dedicated marker table with merchant UUID, fixture batch ID and created_at. Do not rely on merchant names to identify demo data.
 - Fixture merchants use no login password, Google ID, phone, bank account, CAC, or verification claim.
 - Products are marked through a dedicated fixture-product table; preserve existing production product schema.
-- Seed and cleanup must be idempotent, transactional and scoped to the fixture batch. Never delete unrelated orders, real merchants, or real products.
+- Seed is deliberately one-shot and transactional: re-running it must fail safely. Cleanup must be transactional and scoped to the fixture batch. Never delete unrelated orders, real merchants, or real products.
 
 ## Mandatory isolation
 - Existing lib/supabase/server.ts uses a service-role key; therefore RLS alone will NOT protect demo visibility.
@@ -28,3 +28,10 @@ Status: preparation only; no production data changes.
 3. Implement migration, seed, access checks, payment guard and targeted tests in this branch.
 4. Review code and deployment requirements; obtain explicit approval before merging or executing seed.
 5. Validate only via approved main-to-production Vercel deployment, not Preview.
+
+## Branch comparison and release gates
+- Last reviewed: branch 27 commits ahead of `main`, zero behind; no merge performed.
+- Migration 037 must precede app deployment; application relies on marker tables existing.
+- Verify anonymous and authenticated direct REST reads hide fixtures while existing active products remain visible.
+- Validate buyer-only visibility, AI search, admin totals, demo checkout rejection, normal checkout, and token balances in production before seeding.
+- Review cleanup FK cascade dependencies before executing cleanup 039. Never remove the restrictive RLS policy while fixtures exist.
