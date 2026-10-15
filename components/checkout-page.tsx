@@ -156,11 +156,12 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
     : Number(serviceBooking?.basePrice || 0)
   const effectivePromotionDiscount = isServiceCheckout ? 0 : Math.min(promotionDiscount, productTotal)
   const discountedProductTotal = isServiceCheckout ? serviceTotal : Math.max(0, productTotal - effectivePromotionDiscount)
+  const platformFeeAmount = isServiceCheckout ? 0 : Math.round(discountedProductTotal * 0.05)
   const gitFeeBase = isServiceCheckout ? serviceTotal : discountedProductTotal // GIT fee applies to goods/services, not delivery
   const gitFeeAmount = isServiceBillCheckout ? 0 : Math.round(gitFeeBase * GIT_FEE_RATE)
   const subtotalAfterPromotion = isServiceCheckout ? serviceTotal : (discountedProductTotal + deliveryFee)
-  const effectiveCouponDiscount = isServiceCheckout ? 0 : Math.min(Number(appliedCoupon?.discount || 0), subtotalAfterPromotion + gitFeeAmount)
-  const grandTotal = Math.max(0, subtotalAfterPromotion + gitFeeAmount - effectiveCouponDiscount)
+  const effectiveCouponDiscount = isServiceCheckout ? 0 : Math.min(Number(appliedCoupon?.discount || 0), subtotalAfterPromotion + gitFeeAmount + platformFeeAmount)
+  const grandTotal = Math.max(0, subtotalAfterPromotion + gitFeeAmount + platformFeeAmount - effectiveCouponDiscount)
   const isWalletPayment = paymentMethod === 'orchid'
   const isWalletInsufficient = isWalletPayment && (isServiceCheckout || deliveryAddress.trim()) && walletBalance < grandTotal
   const walletShortfall = isWalletInsufficient ? grandTotal - walletBalance : 0
@@ -984,7 +985,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                             action: 'validate',
                             couponCode: couponCode.trim().toUpperCase(),
                             buyerId: user.userId,
-                            cartTotal: subtotalAfterPromotion + gitFeeAmount,
+                            cartTotal: subtotalAfterPromotion + gitFeeAmount + platformFeeAmount,
                           }),
                         })
                         const validateData = await validateRes.json()
@@ -1062,6 +1063,10 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                   <span className="font-medium text-foreground">
                     {deliveryAddress.trim() ? formatCheckoutAmount(deliveryFee) : '--'}
                   </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">BigCat Platform Fee (5%)</span>
+                  <span className="font-medium text-foreground">{formatCheckoutAmount(platformFeeAmount)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground"><UiText text={"GIT Fee (1.5%)"} /></span>
@@ -1175,7 +1180,7 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                     <p className="break-all">Account: <strong>{merchantAccount.accountNumber}</strong></p>
                     <button type="button" onClick={() => void copyPaymentField(merchantAccount.accountNumber!, "account")} className="rounded-lg border px-2 py-1 text-xs font-semibold">{copiedField === "account" ? "Copied!" : "Copy number"}</button>
                   </div>
-                  <p className="text-xs text-amber-800">This is a registered merchant account, not a verified Orchid escrow destination. Confirm the approved payment destination before transferring funds.</p>
+                  <p className="text-xs text-amber-800">For your protection, make payment only through Orchid using the merchant account details and your unique payment reference. Under the agreed escrow process, Orchid holds your payment until your order is delivered and confirmed. Do not pay through your regular banking app.</p>
                 </> : !merchantAccountMessage ? <p className="text-amber-800">No default account registered. Contact support before paying.</p> : null}
               </div>
               <div className="mt-4 grid gap-2">
