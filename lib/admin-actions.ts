@@ -218,6 +218,9 @@ export async function getMerchants(options: { buyerLat?: number | null; buyerLng
     ])
 
     if (error) throw error
+    const { data: demoMerchantRows, error: demoMerchantError } = await supabase.from('bigcat_demo_merchants').select('merchant_id')
+    if (demoMerchantError) throw demoMerchantError
+    const demoMerchantIds = new Set((demoMerchantRows || []).map(row => String(row.merchant_id)))
     if (orderRowsResult.error) throw orderRowsResult.error
 
     const orderRows = orderRowsResult.data || []
@@ -237,6 +240,7 @@ export async function getMerchants(options: { buyerLat?: number | null; buyerLng
     const merchantInventoryCostMap = new Map<string, number>()
 
     for (const product of productRows || []) {
+      if (demoMerchantIds.has(String((product as any)?.merchant_id || ''))) continue
       const productId = String((product as any)?.id || '')
       const merchantId = String((product as any)?.merchant_id || '')
       const costPrice = toAmount((product as any)?.cost_price ?? extractFallbackCostPrice((product as any)?.images))
@@ -275,7 +279,7 @@ export async function getMerchants(options: { buyerLat?: number | null; buyerLng
     }
 
     let merchants = await Promise.all(
-      (data || []).map(async (merchant: any) => {
+      (data || []).filter((merchant: any) => !demoMerchantIds.has(String(merchant?.id || ''))).map(async (merchant: any) => {
         const merchantId = String(merchant?.id || '')
         const metrics = merchantOrderMetrics.get(merchantId) || { totalSales: 0, profitLoss: 0, orders: 0 }
         const inventoryCost = merchantInventoryCostMap.get(merchantId) || 0
