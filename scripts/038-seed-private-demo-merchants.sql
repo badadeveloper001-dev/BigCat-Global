@@ -1,19 +1,17 @@
 -- Private pilot fixture identities; run only after the application is ready.
 BEGIN;
--- Reject existing records with pilot IDs unless they are the expected fixtures.
+-- One-shot seed: abort if any reserved pilot ID already exists.
 DO $pilot$
 BEGIN
   IF EXISTS (
     SELECT 1 FROM public.auth_users
     WHERE id IN ('b23b0000-0000-4000-8000-000000000001', 'b23b0000-0000-4000-8000-000000000002', 'b23b0000-0000-4000-8000-000000000003')
-      AND email NOT IN ('pilot-electronics@example.invalid', 'pilot-fashion@example.invalid', 'pilot-home@example.invalid')
   ) THEN
     RAISE EXCEPTION 'Pilot merchant identifier collision';
   END IF;
   IF EXISTS (
     SELECT 1 FROM public.products
     WHERE id IN ('b23b1000-0000-4000-8000-000000000001', 'b23b1000-0000-4000-8000-000000000002', 'b23b1000-0000-4000-8000-000000000003', 'b23b1000-0000-4000-8000-000000000004', 'b23b1000-0000-4000-8000-000000000005', 'b23b1000-0000-4000-8000-000000000006')
-      AND merchant_id NOT IN ('b23b0000-0000-4000-8000-000000000001', 'b23b0000-0000-4000-8000-000000000002', 'b23b0000-0000-4000-8000-000000000003')
   ) THEN
     RAISE EXCEPTION 'Pilot product identifier collision';
   END IF;
