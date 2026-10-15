@@ -35,6 +35,41 @@ DO $$ BEGIN
  ) THEN
    RAISE EXCEPTION 'Unexpected fixture product ID; cleanup aborted';
  END IF;
+
+ -- Block cleanup if any other public table references fixture users or products.
+ -- Dynamic checks use actual FK metadata and include future schema additions.
+ DECLARE
+   dependency RECORD;
+   found_reference BOOLEAN;
+ BEGIN
+   FOR dependency IN
+     SELECT child_ns.nspname AS schema_name, child.relname AS table_name,
+            child_col.attname AS column_name, parent.relname AS parent_table
+     FROM pg_constraint fk
+     JOIN pg_class child ON child.oid = fk.conrelid
+     JOIN pg_namespace child_ns ON child_ns.oid = child.relnamespace
+     JOIN pg_class parent ON parent.oid = fk.confrelid
+     JOIN pg_namespace parent_ns ON parent_ns.oid = parent.relnamespace
+     JOIN LATERAL unnest(fk.conkey, fk.confkey) AS cols(child_attnum, parent_attnum) ON true
+     JOIN pg_attribute child_col ON child_col.attrelid = child.oid AND child_col.attnum = cols.child_attnum
+     WHERE fk.contype = 'f' AND array_length(fk.conkey, 1) = 1
+       AND parent_ns.nspname = 'public' AND child_ns.nspname = 'public'
+       AND parent.relname IN ('auth_users', 'products')
+       AND child.relname NOT IN ('products', 'bigcat_demo_merchants', 'bigcat_demo_products')
+   LOOP
+     EXECUTE format(
+       'SELECT EXISTS (SELECT 1 FROM %I.%I WHERE %I IN (SELECT %s FROM public.%s WHERE fixture_batch = %L))',
+       dependency.schema_name, dependency.table_name, dependency.column_name,
+       CASE WHEN dependency.parent_table = 'products' THEN 'product_id' ELSE 'merchant_id' END,
+       CASE WHEN dependency.parent_table = 'products' THEN 'bigcat_demo_products' ELSE 'bigcat_demo_merchants' END,
+       'b23b-pilot'
+     ) INTO found_reference;
+     IF found_reference THEN
+       RAISE EXCEPTION 'Dependent records in %.% column %; manual review required',
+         dependency.schema_name, dependency.table_name, dependency.column_name;
+     END IF;
+   END LOOP;
+ END;
 END $$;
 DELETE FROM public.products WHERE id IN (SELECT product_id FROM public.bigcat_demo_products WHERE fixture_batch = 'b23b-pilot');
 DELETE FROM public.auth_users WHERE id IN (SELECT merchant_id FROM public.bigcat_demo_merchants WHERE fixture_batch = 'b23b-pilot');
