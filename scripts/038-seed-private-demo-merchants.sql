@@ -1,7 +1,7 @@
 -- Private pilot fixture identities; run only after the application is ready.
 BEGIN;
 -- Reject existing records with pilot IDs unless they are the expected fixtures.
-DO $
+DO $pilot$
 BEGIN
   IF EXISTS (
     SELECT 1 FROM public.auth_users
@@ -17,7 +17,7 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'Pilot product identifier collision';
   END IF;
-END $;
+END $pilot$;
 INSERT INTO public.auth_users (id, email, name, role, business_name, setup_completed)
 VALUES
   ('b23b0000-0000-4000-8000-000000000001', 'pilot-electronics@example.invalid', 'Pilot Electronics', 'merchant', 'BigCat Demo Electronics', true),
