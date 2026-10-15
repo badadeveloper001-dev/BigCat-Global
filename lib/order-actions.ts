@@ -819,3 +819,37 @@ export async function updateOrderStatus(
     return { success: false, error: error.message }
   }
 }
+
+/**
+ * Buyer-only Orchid pilot payment details. The order ownership check must
+ * precede access to the merchant's sensitive account number.
+ */
+export async function getBuyerOrchidPaymentDetails(orderId: string) {
+  const buyerId = await requireOrderUser()
+  if (!/^[0-9a-f-]{36}$/i.test(String(orderId || ''))) return { success: false as const, error: 'Invalid order ID' }
+  const db = createClient()
+  const { data: order, error: orderError } = await db.from('orders')
+    .select('id,buyer_id,merchant_id,payment_provider,payment_method,payment_reference,grand_total')
+    .eq('id', orderId).eq('buyer_id', buyerId).maybeSingle()
+  if (orderError || !order) return { success: false as const, error: 'Order not found' }
+  if (String(order.payment_provider || order.payment_method || '').toLowerCase() !== 'orchid') {
+    return { success: false as const, error: 'Not an Orchid order' }
+  }
+  const { data: account, error: accountError } = await db.from('merchant_payment_accounts')
+    .select('institution_name,account_holder_name,account_number,currency_code,is_default')
+    .eq('merchant_id', order.merchant_id).eq('is_default', true).maybeSingle()
+  if (accountError) return { success: false as const, error: 'Merchant account details are temporarily unavailable' }
+  return {
+    success: true as const,
+    data: {
+      institutionName: account?.institution_name || null,
+      accountHolderName: account?.account_holder_name || null,
+      accountNumber: account?.account_number || null,
+      currency: account?.currency_code || null,
+      paymentReference: order.payment_reference || null,
+      amount: Number(order.grand_total || 0),
+      // Bank account registration does not prove Orchid custody/escrow eligibility.
+      destinationVerifiedForOrchid: false,
+    },
+  }
+}
