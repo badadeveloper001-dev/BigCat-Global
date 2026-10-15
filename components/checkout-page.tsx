@@ -562,10 +562,17 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
     })
     const tokenChargeResult = await tokenChargeResponse.json()
 
-    if (!tokenChargeResult.success && Array.isArray(tokenChargeResult.failed) && tokenChargeResult.failed.length > 0) {
-      const firstFailed = tokenChargeResult.failed[0]
+    if (!tokenChargeResponse.ok || !tokenChargeResult.success) {
+      if (Array.isArray(tokenChargeResult.failed) && tokenChargeResult.failed.length > 0) {
+        const firstFailed = tokenChargeResult.failed[0]
+        setIsSubmitting(false)
+        setError(`This merchant cannot receive orders right now (${firstFailed.merchantId}) because token balance is exhausted.`)
+        return
+      }
       setIsSubmitting(false)
-      setError(`This merchant cannot receive orders right now (${firstFailed.merchantId}) because token balance is exhausted.`)
+      setError(tokenChargeResult.code === 'DEMO_CHECKOUT_DISABLED'
+        ? 'Demo products are for testing only and cannot be purchased.'
+        : tokenChargeResult.error || 'Unable to validate checkout. Please try again.')
       return
     }
 
