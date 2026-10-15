@@ -446,6 +446,17 @@ export async function createOrder(
         return { success: false, code: 'DEMO_CHECKOUT_DISABLED', error: 'Demo products are for checkout testing only. No order or payment was created.' }
       }
 
+      // Reject synthetic merchants even if a client submits an ordinary product ID
+      // with a demo merchant ID. Never trust merchant IDs supplied by the cart.
+      const { data: demoMerchants, error: demoMerchantError } = await supabase
+        .from('bigcat_demo_merchants')
+        .select('merchant_id')
+        .in('merchant_id', Object.keys(groupedItems))
+      if (demoMerchantError) return { success: false, error: 'Checkout temporarily unavailable.' }
+      if ((demoMerchants || []).length > 0) {
+        return { success: false, code: 'DEMO_CHECKOUT_DISABLED', error: 'Demo merchants cannot accept orders.' }
+      }
+
       // Validate the entire cart before creating any merchant's order.
       for (const [merchantId, merchantItems] of Object.entries(groupedItems)) {
         const availability = await checkStockAvailability(supabase, merchantId, merchantItems)
