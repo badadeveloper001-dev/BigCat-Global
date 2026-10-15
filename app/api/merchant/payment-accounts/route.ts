@@ -5,6 +5,20 @@ import { createClient } from '@/lib/supabase/server'
 const table = 'merchant_payment_accounts'
 const fields = 'id,country_code,currency_code,institution_name,account_holder_name,account_number,branch_name,routing_code_type,routing_code,is_default,created_at,updated_at'
 
+function safeAccount(row: any) {
+ if (!row) return row
+ const { account_number, ...rest } = row
+ return { ...rest, account_number_last4: String(account_number || '').slice(-4) }
+}
+
+function requireSameOrigin(request: NextRequest) {
+ const origin = request.headers.get('origin')
+ if (!origin || origin !== request.nextUrl.origin) {
+  return NextResponse.json({success:false,error:'Invalid request origin'}, {status:403})
+ }
+ return null
+}
+
 async function merchant(request: NextRequest) {
  const auth = await requireAuthenticatedUser(undefined, request)
  if (auth.response) return { response: auth.response, id: null }
@@ -41,10 +55,12 @@ export async function GET(request: NextRequest) {
  if (auth.response) return auth.response
  const { data,error } = await createClient().from(table).select(fields).eq('merchant_id',auth.id).order('created_at',{ascending:false})
  if (error) return NextResponse.json({success:false,error:'Unable to load payment accounts'}, {status:500})
- return NextResponse.json({success:true,data})
+ return NextResponse.json({success:true,data:(data || []).map(safeAccount)})
 }
 
 export async function POST(request: NextRequest) {
+ const originError = requireSameOrigin(request)
+ if (originError) return originError
  const auth = await merchant(request)
  if (auth.response) return auth.response
  let details
@@ -54,10 +70,12 @@ export async function POST(request: NextRequest) {
  if (lookupError) return NextResponse.json({success:false,error:'Unable to check existing accounts'}, {status:500})
  const {data,error} = await db.from(table).insert({...details,merchant_id:auth.id,is_default:!existing?.length}).select(fields).single()
  if (error) return NextResponse.json({success:false,error:'Unable to save payment account'}, {status:500})
- return NextResponse.json({success:true,data}, {status:201})
+ return NextResponse.json({success:true,data:safeAccount(data)}, {status:201})
 }
 
 export async function PATCH(request: NextRequest) {
+ const originError = requireSameOrigin(request)
+ if (originError) return originError
  const auth = await merchant(request)
  if (auth.response) return auth.response
  let body: any
@@ -76,10 +94,12 @@ export async function PATCH(request: NextRequest) {
  try { details = parse(body) } catch(e) { return NextResponse.json({success:false,error:e instanceof Error ? e.message : 'Invalid request'}, {status:400}) }
  const {data,error} = await db.from(table).update({...details,updated_at:new Date().toISOString()}).eq('id',id).eq('merchant_id',auth.id).select(fields).single()
  if (error) return NextResponse.json({success:false,error:'Could not update account'}, {status:500})
- return NextResponse.json({success:true,data})
+ return NextResponse.json({success:true,data:safeAccount(data)})
 }
 
 export async function DELETE(request: NextRequest) {
+ const originError = requireSameOrigin(request)
+ if (originError) return originError
  const auth = await merchant(request)
  if (auth.response) return auth.response
  const id = request.nextUrl.searchParams.get('id') || ''
