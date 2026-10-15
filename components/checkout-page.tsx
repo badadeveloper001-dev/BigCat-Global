@@ -8,7 +8,7 @@ import { useState, useEffect } from "react"
 import { ArrowLeft, Truck, Zap, MapPin, Package, CreditCard, CheckCircle2, Wallet, Building2, Loader2, Plus, RefreshCw, ArrowDownLeft } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 import { useRole } from "@/lib/role-context"
-import { createOrder } from "@/lib/order-actions"
+import { createOrder, getBuyerOrchidPaymentDetails } from "@/lib/order-actions"
 import { calculateDeliveryFee } from "@/lib/delivery-utils"
 import { formatCurrency, convertCurrency } from "@/lib/currency-utils"
 import { PaymentMethodSelector, type PaymentMethod } from "@/components/payment-method-selector"
@@ -60,6 +60,26 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
   const [orchidPaymentReference, setOrchidPaymentReference] = useState<string | null>(null)
   const [successOrderId, setSuccessOrderId] = useState<string | null>(null)
   const [successMerchantName, setSuccessMerchantName] = useState<string | null>(null)
+  const [merchantAccount, setMerchantAccount] = useState<{institutionName:string|null;accountHolderName:string|null;accountNumber:string|null;currency:string|null;amount:number}|null>(null)
+  const [merchantAccountMessage, setMerchantAccountMessage] = useState("")
+  const [copiedField, setCopiedField] = useState("")
+  async function copyPaymentField(value:string, field:string) {
+    try { await navigator.clipboard.writeText(value); setCopiedField(field); setTimeout(()=>setCopiedField(""),2000) }
+    catch { setMerchantAccountMessage("Could not copy. Please select the value manually.") }
+  }
+  useEffect(() => {
+    if (!successOrderId || !orchidPaymentReference) return
+    let active=true
+    setMerchantAccount(null)
+    setMerchantAccountMessage("Loading merchant payment details...")
+    getBuyerOrchidPaymentDetails(successOrderId).then(result=>{
+      if(!active)return
+      if(result.success){setMerchantAccount(result.data);setMerchantAccountMessage("")}
+      else setMerchantAccountMessage(result.error)
+    }).catch(()=>{if(active)setMerchantAccountMessage("Unable to load merchant payment details.")})
+    return ()=>{active=false}
+  },[successOrderId,orchidPaymentReference])
+
 
   const [savedAddresses, setSavedAddresses] = useState<Array<{ id: string; label: string; address: string }>>([])
   const [serviceBooking, setServiceBooking] = useState<any>(null)
@@ -1134,14 +1154,30 @@ export function CheckoutPage({ onBack, onSuccess }: CheckoutPageProps) {
                   <p className="mb-2 text-sm text-foreground">Merchant: <span className="font-semibold"><UiValue value={successMerchantName} /></span></p>
                 )}
                 <p className="text-xs font-medium text-muted-foreground">Orchid payment reference</p>
-                <p className="mt-1 text-xl font-bold tracking-wider text-[#6C2BD9]">
-                  {orchidPaymentReference}
-                </p>
+                <div className="mt-1 flex items-center justify-between gap-2">
+                  <p className="break-all text-xl font-bold tracking-wider text-[#6C2BD9]">{orchidPaymentReference}</p>
+                  <button type="button" onClick={() => void copyPaymentField(orchidPaymentReference, "reference")} className="rounded-lg border px-2 py-1 text-xs font-semibold">{copiedField === "reference" ? "Copied!" : "Copy reference"}</button>
+                </div>
                 <p className="mt-2 text-xs leading-5 text-muted-foreground">
                   Quote this reference when making payment via Orchid.
                 </p>
               </div>
 
+              <div className="mt-3 rounded-xl border border-border p-3 text-sm space-y-2">
+                <p className="font-semibold">Merchant registered payment account</p>
+                {merchantAccountMessage && <p role="status" className="text-amber-800">{merchantAccountMessage}</p>}
+                {merchantAccount?.accountNumber ? <>
+                  <p>Bank: <strong>{merchantAccount.institutionName}</strong></p>
+                  <p>Account holder: <strong>{merchantAccount.accountHolderName}</strong></p>
+                  <p>Currency: <strong>{merchantAccount.currency}</strong></p>
+                  <p>Order total: <strong>{formatCurrency(merchantAccount.amount, "NGN")}</strong></p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="break-all">Account: <strong>{merchantAccount.accountNumber}</strong></p>
+                    <button type="button" onClick={() => void copyPaymentField(merchantAccount.accountNumber!, "account")} className="rounded-lg border px-2 py-1 text-xs font-semibold">{copiedField === "account" ? "Copied!" : "Copy number"}</button>
+                  </div>
+                  <p className="text-xs text-amber-800">This is a registered merchant account, not a verified Orchid escrow destination. Confirm the approved payment destination before transferring funds.</p>
+                </> : !merchantAccountMessage ? <p className="text-amber-800">No default account registered. Contact support before paying.</p> : null}
+              </div>
               <div className="mt-4 grid gap-2">
                 <a
                   href="https://app.orchid.ch/auth/realms/FrontOffice/protocol/openid-connect/registrations?client_id=userToOrchidFrontoffice&redirect_uri=https%3A%2F%2Fapp.orchid.ch%2F&response_type=code&scope=openid&skip_prescore=true&referral=BCGold&utm_medium=orchid.referral&utm_source=BCGold"
