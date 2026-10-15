@@ -13,4 +13,13 @@ CREATE TABLE IF NOT EXISTS public.bigcat_demo_products (
 );
 ALTER TABLE public.bigcat_demo_merchants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bigcat_demo_products ENABLE ROW LEVEL SECURITY;
+-- Block public and authenticated direct reads of synthetic fixture products.
+-- The service role used by approved server-side routes bypasses RLS.
+DROP POLICY IF EXISTS private_demo_products_select_guard ON public.products;
+CREATE POLICY private_demo_products_select_guard ON public.products
+  AS RESTRICTIVE FOR SELECT TO anon, authenticated
+  USING (NOT EXISTS (
+    SELECT 1 FROM public.bigcat_demo_products AS fixture
+    WHERE fixture.product_id = products.id
+  ));
 COMMIT;
