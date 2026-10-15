@@ -436,6 +436,16 @@ export async function createOrder(
         }
       }
 
+      // Demo fixtures are reserved for checkout rejection tests, not order creation.
+      const { data: demoRows, error: demoError } = await supabase
+        .from('bigcat_demo_products')
+        .select('product_id')
+        .in('product_id', payload.items.map(item => item.productId))
+      if (demoError) return { success: false, error: 'Checkout temporarily unavailable.' }
+      if ((demoRows || []).length > 0) {
+        return { success: false, code: 'DEMO_CHECKOUT_DISABLED', error: 'Demo products are for checkout testing only. No order or payment was created.' }
+      }
+
       // Validate the entire cart before creating any merchant's order.
       for (const [merchantId, merchantItems] of Object.entries(groupedItems)) {
         const availability = await checkStockAvailability(supabase, merchantId, merchantItems)
